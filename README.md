@@ -198,8 +198,13 @@ Die Rollennamen sind je Instanz frei wählbar.
 ## Betrieb
 
 - **Konfiguration als Code:** Datenmodell, Rollen und Berechtigungen legt `scripts/schema-anwenden.mjs` idempotent in Directus an. Das Skript liegt im Repo und lässt sich beliebig oft ausführen.
-- **Backup:** `scripts/backup.sh` sichert die SQLite-Datei per `sqlite3 .backup` und die Uploads. Die Datenbankdatei nie im laufenden Betrieb einfach kopieren.
-- **Wiederherstellung:** `scripts/restore.sh`. Einmal testen, bevor es ernst wird.
+- **Backup:** `scripts/backup.sh` sichert die SQLite-Datei per `sqlite3 .backup` (auch bei laufendem Betrieb konsistent) und die Uploads in ein Archiv unter `backups/`. Die neuesten 14 Archive bleiben erhalten (`BACKUP_KEEP`). Ohne `sqlite3` auf dem Host stoppt das Skript Directus kurz und kopiert die Datei. Die Datenbankdatei nie im laufenden Betrieb einfach kopieren. Das Archiv enthält personenbezogene Daten und ist nur für den Eigentümer lesbar. Die `.env` ist nicht enthalten und muss getrennt aufbewahrt werden.
+- **Wiederherstellung:** `scripts/restore.sh backups/<Archiv>` prüft das Archiv, fragt nach, stoppt Directus, verschiebt die bisherigen Daten nach `data/vorher-<Zeit>` (nichts wird gelöscht) und spielt die Sicherung ein. Mit `--yes` ohne Rückfrage. Als Benutzer ausführen, dem das Datenverzeichnis gehört. Einmal testen, bevor es ernst wird.
+- **Regelmäßig sichern:** zum Beispiel täglich per Cron, und das Archiv zusätzlich an einen anderen Ort kopieren:
+
+  ```bash
+  15 3 * * * cd /pfad/zu/beirat-dabei && scripts/backup.sh >> backups/backup.log 2>&1
+  ```
 - **Übergabe:** Neue Administrierende bekommen die Admin-Rolle. Eine Betriebsanleitung für Nicht-Entwickler liegt unter `docs/`.
 
 ## Datenschutz
