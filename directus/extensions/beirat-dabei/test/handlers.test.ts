@@ -110,6 +110,7 @@ describe("dashboard", () => {
     const body = r.body as { kommend: { id: string; teilnehmer: { name: string }[]; ichTeilnehmend: boolean }[]; notizfragen: unknown[] };
     expect(body.kommend[0]).toMatchObject({ id: "s1", ichTeilnehmend: false, teilnehmer: [{ name: "Bernd" }] });
     expect(body.notizfragen).toHaveLength(2);
+    expect(r.body).toMatchObject({ instanz: { name: "Beirat dabei", zeitzone: "Europe/Berlin" }, ich: "a" });
   });
 });
 

@@ -65,7 +65,7 @@ export async function dashboard(d: Abhaengigkeiten, nutzerId: string | null): Pr
   const mitglieder = await d.speicher.mitglieder();
   if (!mitglieder.some((m) => m.id === nutzerId && m.aktiv)) return fehler(403, "kein-mitglied");
 
-  const [{ einstellungen, notizfragen }, sitzungen, teilnahmen, notizen] = await Promise.all([
+  const [{ einstellungen, notizfragen, name }, sitzungen, teilnahmen, notizen] = await Promise.all([
     d.speicher.einstellungen(),
     d.speicher.sitzungen(),
     d.speicher.teilnahmen(),
@@ -84,7 +84,12 @@ export async function dashboard(d: Abhaengigkeiten, nutzerId: string | null): Pr
     new Map(mitglieder.map((m) => [m.id, m.name])),
     nutzerId,
   );
-  return antwort(200, { ...ansicht, notizfragen });
+  return antwort(200, {
+    ...ansicht,
+    notizfragen,
+    instanz: { name: name ?? "Beirat dabei", zeitzone: einstellungen.zeitzone },
+    ich: nutzerId,
+  });
 }
 
 // --- Teilnahme -----------------------------------------------------------
@@ -181,8 +186,9 @@ export async function linkInfo(d: Abhaengigkeiten, wert: string): Promise<Antwor
   const { token, mitglied, sitzung } = r as Exclude<typeof r, { fehler: Antwort }>;
   const teilnahmen = await d.speicher.teilnahmen(sitzung.id);
   const bereitsEingetragen = teilnahmen.some((t) => t.mitgliedId === mitglied.id && !t.ausgetragenAm);
-  const { notizfragen } = await d.speicher.einstellungen();
+  const { notizfragen, name } = await d.speicher.einstellungen();
   return antwort(200, {
+    instanz: name ?? "Beirat dabei",
     aktion: token.a,
     mitglied: mitglied.name,
     bereitsEingetragen,

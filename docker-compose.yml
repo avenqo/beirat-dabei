@@ -3,14 +3,14 @@ services:
   directus:
     image: directus/directus:12.5.0 # Version fest, Updates bewusst durchführen
     restart: unless-stopped
-    ports:
-      - "${PORT:-8055}:8055"
     volumes:
       - ./data/database:/directus/database
       - ./data/uploads:/directus/uploads
       - ./directus/extensions:/directus/extensions
     environment:
       PUBLIC_URL: ${PUBLIC_URL}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-true}
+      PASSWORD_RESET_URL_ALLOW_LIST: ${PUBLIC_URL}/admin/reset-password
       KEY: ${KEY}
       SECRET: ${SECRET}
       DB_CLIENT: sqlite3
@@ -42,3 +42,15 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
+
+  # Eine Adresse für Dashboard und Directus
+  web:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    depends_on:
+      - directus
+    ports:
+      - "${PORT:-8055}:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./dashboard:/srv/dashboard:ro

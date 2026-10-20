@@ -1,0 +1,18 @@
+# Eine Adresse für alles: Dashboard unter /dashboard/, der Rest geht an Directus
+# (Admin-Oberfläche unter /admin, API, Extension unter /beirat-dabei).
+# TLS übernimmt der vorgeschaltete Reverse Proxy des Servers.
+:80 {
+	encode gzip
+
+	redir /dashboard /dashboard/ permanent
+
+	handle_path /dashboard/* {
+		root * /srv/dashboard
+		header Cache-Control "no-cache"
+		file_server
+	}
+
+	handle {
+		reverse_proxy directus:8055
+	}
+}

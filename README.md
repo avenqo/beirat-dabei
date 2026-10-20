@@ -48,7 +48,7 @@ Die Regeln werden einmal täglich um 7 Uhr geprüft, außerdem kurz nach jeder �
 
 `REGELN_MODUS` steuert den Versand: `aus`, `trocken` (nur ins Log schreiben, Standard) oder `scharf`. Erst auf `scharf` stellen, wenn die Sitzungen im System stimmen, sonst gehen beim ersten Lauf Mails zu allem Bestehenden raus. Sitzungen, die mehr als 60 Tage zurückliegen, werden nicht mehr bewertet.
 
-Links in Mails gelten bis zum Sitzungsende plus 14 Tage (`MAGIC_LINK_NACHLAUF_TAGE`, `SITZUNGSDAUER_STUNDEN`). Der Rückgängig-Link nach einem Klick gilt 30 Minuten. Die Mails verweisen auf `DASHBOARD_URL/link.html?token=…`, die Seite entsteht mit dem Dashboard.
+Links in Mails gelten bis zum Sitzungsende plus 14 Tage (`MAGIC_LINK_NACHLAUF_TAGE`, `SITZUNGSDAUER_STUNDEN`). Der Rückgängig-Link nach einem Klick gilt 30 Minuten. Die Mails verweisen auf `DASHBOARD_URL/link.html?token=…`. Die Seite zeigt eine Bestätigung, erst der Knopf führt die Aktion aus, danach gibt es „Rückgängig machen“.
 
 ## RIS-Adapter
 
@@ -110,11 +110,13 @@ beirat-dabei/
 ├── directus/
 │   └── extensions/beirat-dabei/ # Bundle: Endpoints (Dashboard-API, Magic Link, iCal),
 │                                # Hooks (Regeln mit Mailversand, RIS-Abgleich)
-├── dashboard/                   # statisches Frontend (Vite)
+├── dashboard/                   # statisches Frontend (HTML, CSS, ES-Module)
+├── Caddyfile                    # Dashboard und Directus unter einer Adresse
 ├── examples/
 │   └── kremmen/                 # instanz.yaml, .env.example, Branding
 ├── scripts/
 │   ├── schema-anwenden.mjs      # Datenmodell, Rollen, Rechte → Directus
+│   ├── dev-proxy.mjs            # Dashboard + Directus lokal unter einer Adresse
 │   ├── instanz-anwenden.sh      # instanz.yaml → Directus
 │   ├── backup.sh
 │   └── restore.sh
@@ -158,6 +160,19 @@ pnpm -r build
 Danach das Datenmodell anlegen: `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `DIRECTUS_URL` und die Rollennamen aus der `.env` setzen und `node scripts/schema-anwenden.mjs` ausführen.
 
 **Keine echten Werte committen.** Die `.env` steht in `.gitignore`.
+
+## Dashboard
+
+Eine statische Seite ohne Framework unter `dashboard/` (`index.html` für Mitglieder, `link.html` für Magic Links). Der Stack enthält einen Caddy-Dienst (`Caddyfile`), der unter einer Adresse das Dashboard auf `/dashboard/` ausliefert und alles andere an Directus weiterreicht. Die Anmeldung nutzt den Directus-Login mit Sitzungs-Cookie. Die Seite kann also ohne Cross-Origin-Einstellungen mit der API sprechen.
+
+Zur Entwicklung gegen einen lokalen Directus:
+
+```bash
+DIRECTUS_URL=http://localhost:8055 PORT=8056 pnpm dev:dashboard
+# http://localhost:8056/dashboard/
+```
+
+Lokal über http muss `SESSION_COOKIE_SECURE=false` gesetzt sein.
 
 ## Schnittstelle der Extension
 
