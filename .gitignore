@@ -1,0 +1,51 @@
+# --- Geheimnisse und Instanz-Konfiguration ----------------------------
+# Echte Werte nur auf dem Server, nie im Repo.
+.env
+.env.*
+!.env.example
+!examples/**/.env.example
+
+# --- Laufzeitdaten der Instanz -----------------------------------------
+# Datenbank, Uploads und Backups enthalten personenbezogene Daten.
+data/
+uploads/
+backups/
+*.db
+*.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+*.db-journal
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
+
+# --- Node: Extensions, Adapter, Dashboard ------------------------------
+node_modules/
+dist/
+build/
+.npm/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Tests und Werkzeuge -----------------------------------------------
+coverage/
+.cache/
+tmp/
+*.log
+
+# --- Docker -------------------------------------------------------------
+docker-compose.override.yml
+
+# --- Editor und Betriebssystem -----------------------------------------
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
