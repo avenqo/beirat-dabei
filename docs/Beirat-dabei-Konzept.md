@@ -167,10 +167,19 @@ Der Aufbau mit Directus 11 wäre eine Alternative ohne diese Grenzen. Die Extens
 
 1. **OParl**, der offene Standard für Ratsinformationssysteme
 2. **iCal oder RSS**, falls das RIS nur Feeds liefert
-3. **Scraper** für verbreitete RIS-Produkte wie SessionNet oder ALLRIS
+3. **Scraper** für verbreitete RIS-Produkte wie SessionNet, ALLRIS oder KOMFA RIS
 4. **Manuell**, damit das System auch ohne Schnittstelle nutzbar ist
 
 Weitere Adapter können andere Instanzen beitragen.
+
+**Kremmen: KOMFA RIS.** Die Stadt nutzt das [KOMFA RIS](https://ris-kremmen.komfa.de/index.php?module=komfaris&action=cal). Ein OParl-Zugang und ein RSS-Feed sind nicht erkennbar. Es gibt aber pro Sitzung eine iCal-Datei und eine Tagesordnungsseite mit nummerierten TOPs, Ort, Uhrzeit, Einladung als PDF und Vorlagen. Der Kremmen-Adapter kombiniert deshalb iCal und Scraping:
+
+1. Monatskalender der nächsten ein bis drei Monate abrufen (`action=cal`) und die Sitzungen des „Bau-/Wirtschafts- und Umweltausschusses“ mit ihrer ID herausfiltern.
+2. Beginn, Ende und Ort aus der iCal-Datei der Sitzung lesen (`action=ic`).
+3. Tagesordnungsseite abrufen (`action=to`). Sind TOPs vorhanden oder steht die Einladung zum Download (`action=dlg`), gilt die TO als veröffentlicht und Regel 1 greift. „Die Tagesordnung ist nicht verfügbar“ heißt: noch nicht veröffentlicht.
+4. Absagen und Verschiebungen durch Vergleich mit dem letzten Abgleich erkennen. Dieselbe Sitzungs-ID mit anderem Beginn ist eine Verschiebung. Fehlt eine kommende Sitzung bei vollständigem Abruf, gilt sie als abgesagt.
+
+Der Adapter fragt nur wenige Male am Tag ab, pausiert zwischen den Abrufen, nutzt einen Cache und sendet einen erkennbaren User-Agent. Getestet wird er gegen gespeicherte Antworten des RIS unter `packages/ris-adapter/test/fixtures/komfa/`.
 
 **Regeln als Code statt Flows.** Die Benachrichtigungsregeln laufen als Hook-Extension, nicht als Directus-Flows. Flows liegen in der Datenbank, sind schwer zu testen und schlecht zu reviewen. Für kleine Automationen einzelner Instanzen bleiben Flows nutzbar.
 
@@ -220,13 +229,12 @@ Die KI übernimmt das Lesen und Formulieren, die festen Regeln aus Stufe 1 bleib
 
 **Offene Fragen**
 
-- Welches Ratsinformationssystem nutzt Kremmen, und bietet es OParl, iCal oder RSS?
 - Welches E-Mail-Konto nutzt das System als Absender?
 
 **Nächste Schritte**
 
 - [ ] Konzept und Entwürfe im Beirat vorstellen und abstimmen
-- [ ] RIS prüfen und passenden Adapter wählen
+- [x] RIS prüfen und passenden Adapter wählen (KOMFA RIS, Adapter umgesetzt)
 - [ ] Datenmodell und Rollen ub und ub-admin in Directus anlegen
 - [ ] Repo-Gerüst: Compose-Datei, `.env`-Vorlage, Sync-Setup, README
 - [ ] Magic-Link- und iCal-Extension bauen

@@ -30,6 +30,9 @@ services:
       DASHBOARD_URL: ${DASHBOARD_URL:-}
       REGELN_MODUS: ${REGELN_MODUS:-trocken}
       REGELN_CRON: ${REGELN_CRON:-0 7 * * *}
+      RIS_MODUS: ${RIS_MODUS:-trocken}
+      RIS_CRON: ${RIS_CRON:-15 6,12,18 * * *}
+      RIS_USER_AGENT: ${RIS_USER_AGENT:-}
       ROLLE_MITGLIED: ${ROLLE_MITGLIED:-mitglied}
       ROLLE_ADMIN: ${ROLLE_ADMIN:-admin}
       TZ: ${TZ:-Europe/Berlin}

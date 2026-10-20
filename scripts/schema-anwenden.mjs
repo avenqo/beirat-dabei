@@ -63,9 +63,9 @@ const sammlungen = [
       text("themenfokus", { note: "Für die optionale KI-Vorsortierung" }),
       text("ris_adapter", {
         interface: "select-dropdown",
-        options: { choices: ["manuell", "scraper", "oparl", "ical"].map((v) => ({ text: v, value: v })) },
+        options: { choices: ["manuell", "komfa", "oparl", "ical"].map((v) => ({ text: v, value: v })) },
       }, { default_value: "manuell" }),
-      text("ris_quelle", { note: "URL oder Kennung für den Adapter" }),
+      text("ris_quelle", { note: "Adresse des RIS, z. B. https://ris-kremmen.komfa.de" }),
     ],
   },
   {
@@ -155,6 +155,10 @@ async function sammlungenAnlegen() {
       console.log(`+ Feld ${s.collection}.${f.field}`);
     }
   }
+  // Auswahlmöglichkeiten bestehender Felder nachziehen
+  const risFeld = sammlungen.find((x) => x.collection === "einstellungen").felder.find((f) => f.field === "ris_adapter");
+  await api("PATCH", "/fields/einstellungen/ris_adapter", { meta: { options: risFeld.meta.options } });
+
   const vorhandene = await api("GET", "/relations");
   for (const [many, feld, one] of relationen) {
     if (vorhandene.some((r) => r.collection === many && r.field === feld)) continue;

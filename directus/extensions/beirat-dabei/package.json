@@ -33,7 +33,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@beirat-dabei/core": "workspace:*"
+    "@beirat-dabei/core": "workspace:*",
+    "@beirat-dabei/ris-adapter": "workspace:*"
   },
   "devDependencies": {
     "@directus/extensions-sdk": "^18.0.6",

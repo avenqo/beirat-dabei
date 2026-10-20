@@ -1,5 +1,7 @@
 import type { Notizfrage, SitzungInfo, Teilnahme, Versand } from "@beirat-dabei/core";
+import type { BekannteSitzung, NeueSitzung, SitzungsAenderung } from "@beirat-dabei/ris-adapter";
 import type { RegelSpeicher } from "./regellauf.js";
+import type { AbgleichSpeicher } from "./abgleichlauf.js";
 
 // Minimale Sicht auf den Endpoint-Kontext von Directus; die Typen des SDKs sind für
 // die Services bewusst offen gehalten.
@@ -24,7 +26,7 @@ const datum = (v: unknown): Date | null => (v ? new Date(v as string) : null);
 export function speicherAusDirectus(
   kontext: Kontext,
   rollen: { mitglied: string; admin: string },
-): RegelSpeicher {
+): RegelSpeicher & AbgleichSpeicher {
   const dienst = async (sammlung: string): Promise<Dienst> =>
     new kontext.services.ItemsService(sammlung, { schema: await kontext.getSchema(), accountability: null });
 
@@ -167,6 +169,64 @@ export function speicherAusDirectus(
       for (const e of eintraege) {
         await dienstV.createOne({ regel: e.regel, sitzung: e.sitzungId, empfaenger: e.empfaengerId, bezug: e.bezug });
       }
+    },
+
+    async risEinstellungen() {
+      const e = await (await dienst("einstellungen")).readSingleton({ fields: ["ris_adapter", "ris_quelle"] });
+      return { adapter: (e["ris_adapter"] as string) ?? "manuell", quelle: (e["ris_quelle"] as string) ?? "" };
+    },
+
+    async gremien() {
+      const zeilen = await (await dienst("gremien")).readByQuery({ fields: ["*"], limit: -1 });
+      return zeilen.map((z) => ({
+        id: z["id"] as string,
+        name: z["name"] as string,
+        risKennung: (z["ris_kennung"] as string) ?? "",
+        aktiv: Boolean(z["aktiv"]),
+      }));
+    },
+
+    async sitzungenBekannt(gremiumId): Promise<BekannteSitzung[]> {
+      const zeilen = await (await dienst("sitzungen")).readByQuery({
+        fields: ["*"],
+        filter: { gremium: { _eq: gremiumId } },
+        limit: -1,
+      });
+      return zeilen.map((z) => ({
+        id: z["id"],
+        risId: z["ris_id"] ?? null,
+        start: new Date(z["beginn"]),
+        ort: z["ort"] ?? null,
+        abgesagt: Boolean(z["abgesagt"]),
+        toVeroeffentlicht: Boolean(z["to_veroeffentlicht"]),
+        toLink: z["to_link"] ?? null,
+        risLink: z["ris_link"] ?? null,
+      }));
+    },
+
+    async sitzungAnlegen(gremiumId, d: NeueSitzung) {
+      await (await dienst("sitzungen")).createOne({
+        gremium: gremiumId,
+        ris_id: d.risId,
+        beginn: d.start.toISOString(),
+        ort: d.ort,
+        ris_link: d.risLink,
+        abgesagt: d.abgesagt,
+        to_veroeffentlicht: d.toVeroeffentlicht,
+        to_link: d.toLink,
+      });
+    },
+
+    async sitzungAendern(id, d: Partial<SitzungsAenderung>) {
+      const daten: Record<string, unknown> = {};
+      if (d.start) daten["beginn"] = d.start.toISOString();
+      if (d.verschobenVon) daten["verschoben_von"] = d.verschobenVon.toISOString();
+      if (d.ort !== undefined) daten["ort"] = d.ort;
+      if (d.risLink !== undefined) daten["ris_link"] = d.risLink;
+      if (d.abgesagt !== undefined) daten["abgesagt"] = d.abgesagt;
+      if (d.toVeroeffentlicht !== undefined) daten["to_veroeffentlicht"] = d.toVeroeffentlicht;
+      if (d.toLink !== undefined) daten["to_link"] = d.toLink;
+      await (await dienst("sitzungen")).updateOne(id, daten);
     },
 
     async notizSpeichern(sitzungId, wert) {

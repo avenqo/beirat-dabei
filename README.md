@@ -56,12 +56,17 @@ Der Kern spricht nur mit einer kleinen Schnittstelle: Sitzungen eines Gremiums a
 
 | Adapter | Wann | Status |
 | --- | --- | --- |
+| `komfa` | [KOMFA RIS](https://www.komfa.de): Monatskalender, iCal je Sitzung und Tagesordnungsseite | umgesetzt (Kremmen) |
 | OParl | das RIS bietet den offenen [OParl-Standard](https://oparl.org) | geplant |
 | iCal / RSS | das RIS liefert nur Feeds | geplant |
-| Scraper | für verbreitete RIS-Produkte ohne Schnittstelle | nach Bedarf |
-| Manuell | Termine werden von Hand gepflegt | geplant |
+| Scraper für andere Produkte | z. B. SessionNet oder ALLRIS | nach Bedarf |
+| `manuell` | Termine werden von Hand in Directus gepflegt, kein Abgleich | umgesetzt |
 
 Gebaut wird zuerst, was die erste Instanz braucht. Weitere Adapter sind als Beitrag willkommen.
+
+**Abgleich.** Dreimal täglich (`RIS_CRON`) werden die Sitzungen der aktiven Gremien mit dem RIS verglichen, von 7 Tagen zurück bis 90 Tage voraus. Erkannt werden neue Sitzungen, Verschiebungen, Orts- und Absageänderungen sowie das Erscheinen einer Tagesordnung. Eine kommende Sitzung, die bei vollständigem Abruf im RIS fehlt, gilt als abgesagt. Zurückgenommen wird nichts automatisch. Wie bei den Regeln steuert `RIS_MODUS` (`aus`, `trocken`, `scharf`) den Betrieb. Der Adapter nutzt einen erkennbaren User-Agent, pausiert zwischen den Abrufen und ruft die Tagesordnung nur ab, solange sie noch nicht als veröffentlicht gilt.
+
+**Einrichten für KOMFA:** In den Einstellungen `ris_adapter` auf `komfa` und `ris_quelle` auf die Adresse des RIS setzen (z. B. `https://ris-kremmen.komfa.de`). Bei jedem Gremium `ris_kennung` auf den Namen setzen, wie ihn das RIS anzeigt (z. B. `Bau-/Wirtschafts- und Umweltausschuss`).
 
 ## Architektur
 
@@ -101,7 +106,7 @@ beirat-dabei/
 ├── pnpm-workspace.yaml
 ├── packages/
 │   ├── core/                    # Regeln, Fristen, Magic-Link-Token, iCal
-│   └── ris-adapter/             # Schnittstelle + oparl/, ical/, manuell/
+│   └── ris-adapter/             # Schnittstelle, KOMFA-Adapter, Abgleich
 ├── directus/
 │   └── extensions/beirat-dabei/ # Bundle: Endpoints (Dashboard-API, Magic Link, iCal),
 │                                # Hooks (Regeln mit Mailversand, RIS-Abgleich)
