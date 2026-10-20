@@ -41,6 +41,15 @@ export interface Teilnahme {
 
 export interface Notiz {
   sitzungId: string;
+  relevant?: boolean;
+  antworten?: Record<string, string>;
+}
+
+export interface Notizfrage {
+  schluessel: string;
+  frage: string;
+  typ: "ja-nein" | "text";
+  pflicht: boolean;
 }
 
 export type RegelId = "R1" | "R2" | "R3" | "R4" | "R5" | "verschoben" | "abgesagt";

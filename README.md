@@ -140,7 +140,28 @@ Wichtige Werte in `.env`:
 | `MAGIC_LINK_SECRET` | Schlüssel zum Signieren der Magic Links |
 | `TZ=Europe/Berlin` | Zeitzone für die Fristen |
 
+Die Extension muss einmal gebaut werden, bevor der Stack startet:
+
+```bash
+pnpm install
+pnpm -r build
+```
+
+Danach das Datenmodell anlegen: `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `DIRECTUS_URL` und die Rollennamen aus der `.env` setzen und `node scripts/schema-anwenden.mjs` ausführen.
+
 **Keine echten Werte committen.** Die `.env` steht in `.gitignore`.
+
+## Schnittstelle der Extension
+
+Alle Pfade unter `/beirat-dabei`. Mitglieder greifen nie direkt auf Daten zu, die Extension prüft die Rechte im Code.
+
+| Pfad | Zugang | Zweck |
+| --- | --- | --- |
+| `GET /dashboard` | Directus-Anmeldung | kommende und vergangene Sitzungen, Teilnehmende (nur Namen), Notizfragen |
+| `POST /teilnahme` | Directus-Anmeldung | `{sitzung, aktion}` mit `eintragen`, `austragen`, `nicht-teilgenommen` |
+| `POST /notiz` | Directus-Anmeldung | `{sitzung, relevant, antworten}`, nur für Teilnehmende nach der Sitzung |
+| `GET /link/:token` | Magic Link | Angaben für die Bestätigungsseite, ändert nichts |
+| `POST /link/:token` | Magic Link | führt die Aktion aus, liefert einen Rückgängig-Link |
 
 ## Rollen
 

@@ -4,3 +4,6 @@ export * from "./status.js";
 export * from "./regeln.js";
 export * from "./token.js";
 export * from "./ical.js";
+export * from "./aktionen.js";
+export * from "./notiz.js";
+export * from "./dashboard.js";

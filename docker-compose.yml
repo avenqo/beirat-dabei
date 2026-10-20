@@ -25,6 +25,9 @@ services:
       EMAIL_SMTP_PASSWORD: ${EMAIL_SMTP_PASSWORD}
       EMAIL_SMTP_SECURE: ${EMAIL_SMTP_SECURE:-false}
       MAGIC_LINK_SECRET: ${MAGIC_LINK_SECRET}
+      MAGIC_LINK_TTL_SEKUNDEN: ${MAGIC_LINK_TTL_SEKUNDEN:-1800}
+      ROLLE_MITGLIED: ${ROLLE_MITGLIED:-mitglied}
+      ROLLE_ADMIN: ${ROLLE_ADMIN:-admin}
       TZ: ${TZ:-Europe/Berlin}
       TELEMETRY: "false"
     healthcheck:
