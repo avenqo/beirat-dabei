@@ -66,7 +66,7 @@ RIS der Kommune ──▶ RIS-Adapter ──▶ Directus + SQLite ──▶ Dash
                                          │
                           ┌──────────────┴──────────────┐
                           ▼                             ▼
-                  Extension                      Regeln (Flows)
+                  Extension                      Regeln (Hook)
             Magic Links, iCal-Feed                      │
                   ▲        │                            ▼
                   │        ▼                      E-Mail / Push
@@ -78,31 +78,43 @@ RIS der Kommune ──▶ RIS-Adapter ──▶ Directus + SQLite ──▶ Dash
 | --- | --- |
 | [Directus](https://directus.io) | Datenmodell, Rollen, Admin-Oberfläche, API |
 | SQLite | Datenbank als eine Datei im Volume |
-| Directus-Extension | Magic Links und iCal-Feed |
-| Directus Flows | die Benachrichtigungsregeln |
-| RIS-Adapter | holt Termine und Tagesordnungen |
+| Directus-Extension | Magic Links, iCal-Feed und Cron-Hooks für Regeln und RIS-Abgleich |
+| `packages/core` | Fristen, Regeln, Token, iCal als reine, getestete Funktionen |
+| `packages/ris-adapter` | holt Termine und Tagesordnungen |
 | Dashboard | schlanke statische Seite gegen die Directus-API |
 
 Jede Instanz läuft als eigener Docker-Compose-Stack und lässt sich durch Kopieren von Konfiguration und Datenbankdatei auf einen anderen Server umziehen. Eine gemeinsame Plattform für mehrere Beiräte ist bewusst nicht vorgesehen.
 
 ## Geplanter Aufbau
 
+TypeScript-Monorepo mit pnpm-Workspaces. Die Logik liegt in `packages/` und kennt Directus nicht, die Extensions sind nur die Anbindung.
+
 ```
 beirat-dabei/
 ├── docker-compose.yml
 ├── .env.example
+├── package.json                 # pnpm-Workspaces
+├── pnpm-workspace.yaml
+├── packages/
+│   ├── core/                    # Regeln, Fristen, Magic-Link-Token, iCal
+│   └── ris-adapter/             # Schnittstelle + oparl/, ical/, manuell/
 ├── directus/
-│   ├── extensions/     # Magic Links, iCal-Feed
-│   └── sync/           # Schema, Flows, Rollen als Code (directus-sync)
-├── adapters/           # RIS-Adapter: oparl, ical, manual, …
-├── dashboard/          # statisches Frontend
+│   ├── extensions/beirat-dabei/ # Bundle: Endpoints (Magic Link, iCal),
+│   │                            # Hooks (Regeln, RIS-Abgleich)
+│   ├── templates/               # E-Mail-Vorlagen (Liquid)
+│   └── sync/                    # Schema, Rollen, Rechte (directus-sync)
+├── dashboard/                   # statisches Frontend (Vite)
+├── examples/
+│   └── kremmen/                 # instanz.yaml, .env.example, Branding
 ├── scripts/
+│   ├── instanz-anwenden.sh      # instanz.yaml → Directus
 │   ├── backup.sh
 │   └── restore.sh
-├── examples/
-│   └── kremmen/        # Beispielkonfiguration, ohne Geheimnisse
-└── docs/               # Konzept und Betriebsanleitung
+├── docs/                        # Konzept, Betrieb, neue Instanz, Adapter schreiben
+└── .github/workflows/ci.yml     # Lint, Tests, Build
 ```
+
+Die Benachrichtigungsregeln sind bewusst Code und keine Directus-Flows: So sind sie versioniert, reviewbar und per Unit-Test abgedeckt.
 
 ## Eigene Instanz aufsetzen
 
@@ -115,7 +127,7 @@ cp .env.example .env    # Werte eintragen, siehe unten
 docker compose up -d
 ```
 
-Danach in der Admin-Oberfläche die Einstellungen setzen: Name, Gremien, Fristen, Notizfragen, RIS-Adapter. Als Vorlage dient `examples/kremmen/`.
+Danach die Instanz konfigurieren: `examples/kremmen/instanz.yaml` kopieren, anpassen (Name, Gremien, Fristen, Notizfragen, Rollennamen, RIS-Adapter) und mit `scripts/instanz-anwenden.sh` übertragen. Spätere Änderungen erfolgen in der Admin-Oberfläche.
 
 Wichtige Werte in `.env`:
 
@@ -135,13 +147,13 @@ Wichtige Werte in `.env`:
 | Rolle | Rechte |
 | --- | --- |
 | Mitglied | Dashboard sehen, sich ein- und austragen, Notizen schreiben |
-| Admin | zusätzlich Mitglieder, Gremien, Sitzungen, Einstellungen und Flows verwalten |
+| Admin | zusätzlich Mitglieder, Gremien, Sitzungen und Einstellungen verwalten |
 
 Die Rollennamen sind je Instanz frei wählbar.
 
 ## Betrieb
 
-- **Konfiguration als Code:** Schema, Flows, Rollen und Berechtigungen werden mit [directus-sync](https://github.com/tractr/directus-sync) im Repo gehalten.
+- **Konfiguration als Code:** Schema, Rollen und Berechtigungen werden mit [directus-sync](https://github.com/tractr/directus-sync) im Repo gehalten.
 - **Backup:** `scripts/backup.sh` sichert die SQLite-Datei per `sqlite3 .backup` und die Uploads. Die Datenbankdatei nie im laufenden Betrieb einfach kopieren.
 - **Wiederherstellung:** `scripts/restore.sh`. Einmal testen, bevor es ernst wird.
 - **Übergabe:** Neue Administrierende bekommen die Admin-Rolle. Eine Betriebsanleitung für Nicht-Entwickler liegt unter `docs/`.
