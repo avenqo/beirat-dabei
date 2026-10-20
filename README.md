@@ -174,4 +174,8 @@ Fragen, Ideen, neue RIS-Adapter und Fehlermeldungen gern als Issue oder Pull Req
 
 ## Lizenz
 
-Noch festzulegen, z. B. [EUPL-1.2](https://interoperable-europe.ec.europa.eu/collection/eupl) oder MIT.
+[EUPL-1.2](LICENSE), die European Union Public Licence. Sie ist in allen EU-Amtssprachen [offiziell verfügbar](https://interoperable-europe.ec.europa.eu/collection/eupl).
+
+Geänderte Versionen, auch solche, die als Webdienst betrieben werden, müssen unter der EUPL oder einer kompatiblen Lizenz offen bleiben. So kommen neue Adapter und Verbesserungen allen Instanzen zugute.
+
+Die Lizenz gilt für den Code in diesem Repository. [Directus](https://directus.io) selbst steht unter eigener Lizenz (Business Source License), deren Bedingungen für den Betrieb einer Instanz zu beachten sind.
