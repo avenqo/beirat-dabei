@@ -101,12 +101,12 @@ beirat-dabei/
 ├── directus/
 │   ├── extensions/beirat-dabei/ # Bundle: Endpoints (Magic Link, iCal),
 │   │                            # Hooks (Regeln, RIS-Abgleich)
-│   ├── templates/               # E-Mail-Vorlagen (Liquid)
-│   └── sync/                    # Schema, Rollen, Rechte (directus-sync)
+│   └── templates/               # E-Mail-Vorlagen (Liquid)
 ├── dashboard/                   # statisches Frontend (Vite)
 ├── examples/
 │   └── kremmen/                 # instanz.yaml, .env.example, Branding
 ├── scripts/
+│   ├── schema-anwenden.mjs      # Datenmodell, Rollen, Rechte → Directus
 │   ├── instanz-anwenden.sh      # instanz.yaml → Directus
 │   ├── backup.sh
 │   └── restore.sh
@@ -153,7 +153,7 @@ Die Rollennamen sind je Instanz frei wählbar.
 
 ## Betrieb
 
-- **Konfiguration als Code:** Schema, Rollen und Berechtigungen werden mit [directus-sync](https://github.com/tractr/directus-sync) im Repo gehalten.
+- **Konfiguration als Code:** Datenmodell, Rollen und Berechtigungen legt `scripts/schema-anwenden.mjs` idempotent in Directus an. Das Skript liegt im Repo und lässt sich beliebig oft ausführen.
 - **Backup:** `scripts/backup.sh` sichert die SQLite-Datei per `sqlite3 .backup` und die Uploads. Die Datenbankdatei nie im laufenden Betrieb einfach kopieren.
 - **Wiederherstellung:** `scripts/restore.sh`. Einmal testen, bevor es ernst wird.
 - **Übergabe:** Neue Administrierende bekommen die Admin-Rolle. Eine Betriebsanleitung für Nicht-Entwickler liegt unter `docs/`.

@@ -148,11 +148,19 @@ Der RIS-Adapter füllt Directus. Von dort lesen das Dashboard, die Regeln und di
 
 **Anmeldung und Mitglieder.** Mitglieder sind Directus-Benutzer (`directus_users`), die Anmeldung läuft über den Directus-Login. Eine eigene Collection `mitglieder` gibt es nicht, `teilnahmen` verweisen auf `directus_users`. Als Kanal ist in Stufe 1 nur E-Mail vorgesehen.
 
+**Grenzen der kostenlosen Directus-Lizenz (Version 12, Core).** Sie erlaubt höchstens 3 Sitze (Benutzer mit Zugang zur Admin-Oberfläche), 25 Collections und 5 Flows. Benutzerdefinierte Berechtigungsregeln gibt es nicht: keine Feldeinschränkungen, keine Filter wie „nur eigene Einträge“. Die Telemetrie lässt sich nicht abschalten. Folgen für den Entwurf:
+
+- Mitglieder bekommen keinen Zugang zur Admin-Oberfläche (belegt keinen Sitz) und nur Lesezugriff auf Sitzungsdaten.
+- Alles andere läuft über die Extension, die Rechte im Code prüft: ein- und austragen, Notizen, die Namen der Mitglieder. Mitglieder lesen `directus_users` nie direkt, E-Mail-Adressen bleiben damit verborgen.
+- Bis zu drei Personen können Administrierende sein.
+
+Der Aufbau mit Directus 11 wäre eine Alternative ohne diese Grenzen. Die Extension-Lösung funktioniert in beiden Versionen.
+
 **Rollen in Directus (Namen je Instanz, hier Kremmen)**
 
 | Rolle | Für wen | Rechte |
 | --- | --- | --- |
-| `ub` | einfache Mitglieder | Dashboard sehen, sich ein- und austragen, Notizen schreiben, eigenen Kanal wählen |
+| `ub` | einfache Mitglieder | Dashboard sehen, sich ein- und austragen, Notizen schreiben (Schreiben über die Extension) |
 | `ub-admin` | Administrierende | zusätzlich Mitglieder und Sitzungen verwalten, Einstellungen ändern |
 
 **RIS-Adapter.** Der Kern spricht nur mit einer kleinen Schnittstelle: Sitzungen eines Gremiums abrufen und die Tagesordnung einer Sitzung abrufen. Der Abgleich läuft alle paar Stunden und erkennt neue Sitzungen, Verschiebungen, Absagen und das Erscheinen einer Tagesordnung. Vorgesehene Adapter:
@@ -174,7 +182,7 @@ Weitere Adapter können andere Instanzen beitragen.
 
 Das System muss ohne seinen Erbauer weiterlaufen: In diesem Fall übernehmen andere Beiratsmitglieder den Betrieb.
 
-- **Konfiguration als Code.** Schema, Rollen und Berechtigungen liegen im Git-Repo, exportiert mit einem Sync-Werkzeug wie directus-sync. Der eingebaute Schema-Snapshot erfasst nur Collections, Felder und Relationen.
+- **Konfiguration als Code.** Schema, Rollen und Berechtigungen liegen im Git-Repo, angelegt durch `scripts/schema-anwenden.mjs`. Das Skript ist idempotent und lässt sich auf jeder frischen Instanz ausführen. Es ersetzt directus-sync, das mit Directus 12 nicht geprüft ist.
 - **Ein Stack, eine Datei.** `docker-compose.yml` plus `.env`. Der Umzug auf einen anderen Server ist Repo und Datenbankdatei kopieren, dann starten.
 - **Funktionsadressen statt persönlicher Konten.** Ein SMTP-Konto, das dem Beirat gehört (etwa umweltbeirat@…), und eine Domain umweltbeirat.[ort].de. Bei einem Domainwechsel ändern sich alle Links in alten E-Mails.
 - **Admins über eine Rolle.** Administrieren kann, wer die Rolle `ub-admin` hat. Die Übergabe ist damit eine Rollenzuweisung in Directus.
