@@ -66,7 +66,7 @@ Oben stehen die anstehenden Sitzungen, darunter die vergangenen mit ihren Notize
 2. Welche TOPs waren umweltrelevant?
 3. Was wurde beschlossen oder vertagt, und muss der Beirat etwas tun?
 
-**Magic Links:** Jeder Link gilt für eine Person und eine Sitzung. Der Link öffnet eine Bestätigungsseite, erst der Knopf dort (POST) trägt ein. So lösen Mail-Scanner und Link-Vorschauen nichts aus. Danach gibt es „Rückgängig machen“. Der Token ist signiert und 30 Minuten gültig. Eine Anmeldung ist nicht nötig.
+**Magic Links:** Jeder Link gilt für eine Person und eine Sitzung. Der Link öffnet eine Bestätigungsseite, erst der Knopf dort (POST) trägt ein. So lösen Mail-Scanner und Link-Vorschauen nichts aus. Danach gibt es „Rückgängig machen“. Der Token ist signiert. Links in Mails gelten bis zum Sitzungsende plus 14 Tage (einstellbar), der „Rückgängig“-Link nach dem Klick 30 Minuten. Eine Anmeldung ist nicht nötig.
 
 **Kalender (optional):** eine iCal-Abo-Adresse mit allen Sitzungsterminen, die Mitglieder in ihren eigenen Kalender übernehmen können.
 

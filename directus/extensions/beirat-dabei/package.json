@@ -5,12 +5,28 @@
   "type": "module",
   "license": "EUPL-1.2",
   "directus:extension": {
-    "type": "endpoint",
-    "path": "dist/index.js",
-    "source": "src/index.ts",
+    "type": "bundle",
+    "path": {
+      "app": "dist/app.js",
+      "api": "dist/api.js"
+    },
+    "entries": [
+      {
+        "type": "endpoint",
+        "name": "beirat-dabei",
+        "source": "src/endpoint.ts"
+      },
+      {
+        "type": "hook",
+        "name": "regeln",
+        "source": "src/hook.ts"
+      }
+    ],
     "host": "^12.0.0"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "directus-extension build",
     "lint": "tsc --noEmit",

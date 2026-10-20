@@ -1,5 +1,4 @@
 import { defineEndpoint } from "@directus/extensions-sdk";
-import { TOKEN_GUELTIGKEIT_SEKUNDEN } from "@beirat-dabei/core";
 import * as h from "./handlers.js";
 import { speicherAusDirectus, type Kontext } from "./speicher.js";
 
@@ -17,7 +16,6 @@ export default defineEndpoint({
       }),
       geheimnis,
       jetzt: () => new Date(),
-      linkGueltigkeit: Number(env["MAGIC_LINK_TTL_SEKUNDEN"] ?? TOKEN_GUELTIGKEIT_SEKUNDEN),
     };
 
     // Kleine Hülle: Handler aufrufen, Antwort schreiben, Ausnahmen als 500 melden.

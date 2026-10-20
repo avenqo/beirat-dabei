@@ -36,13 +36,29 @@ export function tokenErzeugen(
   jetzt: Date,
   gueltigkeitSekunden: number = TOKEN_GUELTIGKEIT_SEKUNDEN,
 ): string {
+  return tokenErzeugenBis(inhalt, geheimnis, new Date(jetzt.getTime() + gueltigkeitSekunden * 1000));
+}
+
+/** Token mit festem Ablaufzeitpunkt. */
+export function tokenErzeugenBis(inhalt: TokenInhalt, geheimnis: string, ablauf: Date): string {
   const token: Token = {
     ...inhalt,
-    exp: Math.floor(jetzt.getTime() / 1000) + gueltigkeitSekunden,
+    exp: Math.floor(ablauf.getTime() / 1000),
     n: randomBytes(8).toString("base64url"),
   };
   const nutzlast = b64(JSON.stringify(token));
   return `${nutzlast}.${b64(signatur(nutzlast, geheimnis))}`;
+}
+
+/**
+ * Ablauf für Links in Mails: Ende der Sitzung plus Nachlauf. Das Ende ist nicht
+ * bekannt, daher Beginn plus angenommene Dauer.
+ */
+export function mailLinkAblauf(
+  sitzungStart: Date,
+  { nachlaufTage = 14, dauerStunden = 3 }: { nachlaufTage?: number; dauerStunden?: number } = {},
+): Date {
+  return new Date(sitzungStart.getTime() + (dauerStunden + nachlaufTage * 24) * 3_600_000);
 }
 
 export function tokenPruefen(wert: string, geheimnis: string, jetzt: Date): TokenPruefung {

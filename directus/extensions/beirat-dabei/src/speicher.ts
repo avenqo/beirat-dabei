@@ -1,5 +1,5 @@
-import type { Notizfrage, SitzungInfo, Teilnahme } from "@beirat-dabei/core";
-import type { Speicher } from "./handlers.js";
+import type { Notizfrage, SitzungInfo, Teilnahme, Versand } from "@beirat-dabei/core";
+import type { RegelSpeicher } from "./regellauf.js";
 
 // Minimale Sicht auf den Endpoint-Kontext von Directus; die Typen des SDKs sind für
 // die Services bewusst offen gehalten.
@@ -24,7 +24,7 @@ const datum = (v: unknown): Date | null => (v ? new Date(v as string) : null);
 export function speicherAusDirectus(
   kontext: Kontext,
   rollen: { mitglied: string; admin: string },
-): Speicher {
+): RegelSpeicher {
   const dienst = async (sammlung: string): Promise<Dienst> =>
     new kontext.services.ItemsService(sammlung, { schema: await kontext.getSchema(), accountability: null });
 
@@ -62,6 +62,7 @@ export function speicherAusDirectus(
           zeitzone: e["zeitzone"] ?? "Europe/Berlin",
         },
         notizfragen: (Array.isArray(e["notizfragen"]) ? e["notizfragen"] : []) as Notizfrage[],
+        ...(e["name"] ? { name: e["name"] as string } : {}),
       };
     },
 
@@ -133,6 +134,39 @@ export function speicherAusDirectus(
         relevant: Boolean(z["relevant"]),
         antworten: (z["antworten"] ?? {}) as Record<string, string>,
       }));
+    },
+
+    async empfaenger() {
+      const rollenZeilen = await (await dienst("directus_roles")).readByQuery({
+        filter: { name: { _in: [rollen.mitglied, rollen.admin] } },
+        fields: ["id"],
+        limit: -1,
+      });
+      const ids = rollenZeilen.map((r) => r["id"]);
+      if (ids.length === 0) return [];
+      const nutzer = await (await dienst("directus_users")).readByQuery({
+        filter: { role: { _in: ids } },
+        fields: ["id", "first_name", "last_name", "email", "status"],
+        limit: -1,
+      });
+      return nutzer.map((n) => ({
+        id: n["id"],
+        aktiv: n["status"] === "active",
+        name: [n["first_name"], n["last_name"]].filter(Boolean).join(" ") || "Mitglied",
+        email: (n["email"] as string) ?? "",
+      }));
+    },
+
+    async versand(): Promise<Versand[]> {
+      const zeilen = await (await dienst("benachrichtigungen")).readByQuery({ fields: ["regel", "sitzung", "empfaenger", "bezug"], limit: -1 });
+      return zeilen.map((z) => ({ regel: z["regel"], sitzungId: z["sitzung"], empfaengerId: z["empfaenger"], bezug: z["bezug"] }));
+    },
+
+    async versandSchreiben(eintraege) {
+      const dienstV = await dienst("benachrichtigungen");
+      for (const e of eintraege) {
+        await dienstV.createOne({ regel: e.regel, sitzung: e.sitzungId, empfaenger: e.empfaengerId, bezug: e.bezug });
+      }
     },
 
     async notizSpeichern(sitzungId, wert) {

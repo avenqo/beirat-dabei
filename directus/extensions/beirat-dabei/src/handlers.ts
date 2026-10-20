@@ -18,7 +18,7 @@ import {
 
 /** Zugriff auf die Daten. Die Directus-Anbindung implementiert das; Tests nutzen eine Attrappe. */
 export interface Speicher {
-  einstellungen(): Promise<{ einstellungen: Einstellungen; notizfragen: Notizfrage[] }>;
+  einstellungen(): Promise<{ einstellungen: Einstellungen; notizfragen: Notizfrage[]; name?: string }>;
   /** Alle Personen mit Mitglieds- oder Admin-Rolle. Ohne E-Mail-Adressen. */
   mitglieder(): Promise<{ id: string; aktiv: boolean; name: string }[]>;
   sitzungen(): Promise<SitzungInfo[]>;
@@ -34,8 +34,6 @@ export interface Abhaengigkeiten {
   speicher: Speicher;
   geheimnis: string;
   jetzt: () => Date;
-  /** Gültigkeit der Magic Links in Sekunden */
-  linkGueltigkeit?: number;
 }
 
 export interface Antwort {

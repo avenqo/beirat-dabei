@@ -44,7 +44,11 @@ Eine vollständige Beispielkonfiguration liegt unter [`examples/kremmen/`](examp
 | 4 | Letzte Person trägt sich aus | innerhalb dieser Frist | alle Mitglieder |
 | 5 | *m* Tage nach der Sitzung (Standard: 3) | keine Notiz vorhanden | die Teilnehmenden |
 
-Die Regeln werden einmal täglich geprüft. Ein Versandprotokoll verhindert doppelte Nachrichten.
+Die Regeln werden einmal täglich um 7 Uhr geprüft, außerdem kurz nach jeder Änderung an einer Teilnahme. Ein Versandprotokoll verhindert doppelte Nachrichten. Schlägt ein Versand fehl, wird er beim nächsten Lauf wiederholt.
+
+`REGELN_MODUS` steuert den Versand: `aus`, `trocken` (nur ins Log schreiben, Standard) oder `scharf`. Erst auf `scharf` stellen, wenn die Sitzungen im System stimmen, sonst gehen beim ersten Lauf Mails zu allem Bestehenden raus. Sitzungen, die mehr als 60 Tage zurückliegen, werden nicht mehr bewertet.
+
+Links in Mails gelten bis zum Sitzungsende plus 14 Tage (`MAGIC_LINK_NACHLAUF_TAGE`, `SITZUNGSDAUER_STUNDEN`). Der Rückgängig-Link nach einem Klick gilt 30 Minuten. Die Mails verweisen auf `DASHBOARD_URL/link.html?token=…`, die Seite entsteht mit dem Dashboard.
 
 ## RIS-Adapter
 
@@ -99,9 +103,8 @@ beirat-dabei/
 │   ├── core/                    # Regeln, Fristen, Magic-Link-Token, iCal
 │   └── ris-adapter/             # Schnittstelle + oparl/, ical/, manuell/
 ├── directus/
-│   ├── extensions/beirat-dabei/ # Bundle: Endpoints (Magic Link, iCal),
-│   │                            # Hooks (Regeln, RIS-Abgleich)
-│   └── templates/               # E-Mail-Vorlagen (Liquid)
+│   └── extensions/beirat-dabei/ # Bundle: Endpoints (Dashboard-API, Magic Link, iCal),
+│                                # Hooks (Regeln mit Mailversand, RIS-Abgleich)
 ├── dashboard/                   # statisches Frontend (Vite)
 ├── examples/
 │   └── kremmen/                 # instanz.yaml, .env.example, Branding
