@@ -1,18 +1,19 @@
 import { defineEndpoint } from "@directus/extensions-sdk";
 import * as h from "./handlers.js";
+import { envText } from "./env.js";
 import { speicherAusDirectus, type Kontext } from "./speicher.js";
 
 export default defineEndpoint({
   id: "beirat-dabei",
   handler: (router, context) => {
     const env = context.env as Record<string, string | undefined>;
-    const geheimnis = env["MAGIC_LINK_SECRET"];
+    const geheimnis = envText(env["MAGIC_LINK_SECRET"]);
     if (!geheimnis) throw new Error("MAGIC_LINK_SECRET ist nicht gesetzt.");
 
     const d: h.Abhaengigkeiten = {
       speicher: speicherAusDirectus(context as unknown as Kontext, {
-        mitglied: env["ROLLE_MITGLIED"] ?? "mitglied",
-        admin: env["ROLLE_ADMIN"] ?? "admin",
+        mitglied: envText(env["ROLLE_MITGLIED"]) ?? "mitglied",
+        admin: envText(env["ROLLE_ADMIN"]) ?? "admin",
       }),
       geheimnis,
       jetzt: () => new Date(),
