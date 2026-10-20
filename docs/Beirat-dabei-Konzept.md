@@ -66,7 +66,7 @@ Oben stehen die anstehenden Sitzungen, darunter die vergangenen mit ihren Notize
 2. Welche TOPs waren umweltrelevant?
 3. Was wurde beschlossen oder vertagt, und muss der Beirat etwas tun?
 
-**Magic Links:** Jeder Link gilt für eine Person und eine Sitzung. Ein Klick trägt ein und zeigt eine Bestätigungsseite mit „Rückgängig machen“. Eine Anmeldung ist nicht nötig.
+**Magic Links:** Jeder Link gilt für eine Person und eine Sitzung. Der Link öffnet eine Bestätigungsseite, erst der Knopf dort (POST) trägt ein. So lösen Mail-Scanner und Link-Vorschauen nichts aus. Danach gibt es „Rückgängig machen“. Der Token ist signiert und 30 Minuten gültig. Eine Anmeldung ist nicht nötig.
 
 **Kalender (optional):** eine iCal-Abo-Adresse mit allen Sitzungsterminen, die Mitglieder in ihren eigenen Kalender übernehmen können.
 
@@ -77,7 +77,7 @@ Fünf feste Regeln, geprüft von einem täglichen Lauf am Morgen. Die Fristen si
 | # | Auslöser | Bedingung | Empfänger | Kanal und Inhalt |
 | --- | --- | --- | --- | --- |
 | 1 | Tagesordnung veröffentlicht | – | alle Mitglieder | E-Mail mit Link zur TO und Magic Link „Ich nehme teil“ |
-| 2 | Jemand trägt sich ein | – | alle anderen Mitglieder | Push oder E-Mail: „X nimmt am … teil“ |
+| 2 | Jemand trägt sich ein | – | alle anderen Mitglieder | E-Mail: „X nimmt am … teil“ |
 | 3 | 7 Tage vor der Sitzung | niemand eingetragen | alle Mitglieder | E-Mail mit Magic Link „Ich nehme teil“ |
 | 4 | Letzte Person trägt sich aus | innerhalb der 7 Tage | alle Mitglieder | wie Regel 3 |
 | 5 | 3 Tage nach der Sitzung | keine Notiz vorhanden | die Teilnehmenden | E-Mail mit Link zur Kurznotiz |
@@ -88,7 +88,7 @@ Fünf feste Regeln, geprüft von einem täglichen Lauf am Morgen. Die Fristen si
 - **Verschiebung:** Die Fristen werden neu berechnet. Eingetragene behalten ihren Eintrag und werden informiert.
 - **Absage:** Eine Info geht an die Eingetragenen, danach keine weiteren Nachrichten.
 - **Doch nicht teilgenommen:** Die Erinnerungsmail enthält einen Link, mit dem man das meldet. Danach kommt keine weitere Erinnerung.
-- **Kanalwahl:** Jedes Mitglied wählt selbst, ob es Regel 2 als Push oder E-Mail bekommt. Alle anderen Regeln laufen per E-Mail.
+- **Kanal:** Alle Regeln laufen in Stufe 1 per E-Mail. Push (etwa über Ortsfunk) ist ein möglicher späterer Zusatzkanal für Regel 2.
 
 ## Technische Umsetzung
 
@@ -141,11 +141,12 @@ Der RIS-Adapter füllt Directus. Von dort lesen das Dashboard, die Regeln und di
 | --- | --- |
 | einstellungen | Singleton: Name, Absender, Fristen, Notizfragen, Themenfokus, RIS-Adapter |
 | gremien | Name, Kennung im RIS, aktiv |
-| mitglieder | Name, E-Mail, bevorzugter Kanal (Push/E-Mail), aktiv |
 | sitzungen | Gremium, Datum, Ort, Link ins RIS, TO-Status, abgesagt |
-| teilnahmen | Sitzung, Mitglied, eingetragen am, nicht teilgenommen |
+| teilnahmen | Sitzung, Mitglied (`directus_users`), eingetragen am, ausgetragen am, nicht teilgenommen |
 | notizen | Sitzung, relevant ja/nein, Antworten auf die Notizfragen |
 | benachrichtigungen | Regel, Sitzung, Empfänger, Zeitpunkt (Versandprotokoll) |
+
+**Anmeldung und Mitglieder.** Mitglieder sind Directus-Benutzer (`directus_users`), die Anmeldung läuft über den Directus-Login. Eine eigene Collection `mitglieder` gibt es nicht, `teilnahmen` verweisen auf `directus_users`. Als Kanal ist in Stufe 1 nur E-Mail vorgesehen.
 
 **Rollen in Directus (Namen je Instanz, hier Kremmen)**
 
