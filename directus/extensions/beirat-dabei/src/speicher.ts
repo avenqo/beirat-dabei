@@ -11,6 +11,7 @@ interface Dienst {
   readSingleton(query: Record<string, unknown>): Promise<Record<string, any>>;
   createOne(daten: Record<string, unknown>): Promise<unknown>;
   updateOne(id: string, daten: Record<string, unknown>): Promise<unknown>;
+  deleteOne(id: string): Promise<unknown>;
 }
 
 interface AssetDienst {
@@ -279,6 +280,13 @@ export function speicherAusDirectus(
         name: (file["filename_download"] as string) || "datei",
         groesse: file["filesize"] ? Number(file["filesize"]) : null,
       };
+    },
+
+    async notizLoeschen(sitzungId) {
+      const notizen = await dienst("notizen");
+      const vorhanden = await notizen.readByQuery({ fields: ["id"], filter: { sitzung: { _eq: sitzungId } }, limit: -1 });
+      for (const n of vorhanden) await notizen.deleteOne(n["id"]);
+      return vorhanden.length > 0;
     },
 
     async notizSpeichern(sitzungId, wert) {

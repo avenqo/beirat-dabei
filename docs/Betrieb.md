@@ -143,6 +143,10 @@ Unterlagen pflegst du in der Verwaltung unter Inhalt → **Dokumente**:
 
 Prüfe vor dem Veröffentlichen, dass im Dokument nichts Internes steht (Namen, Mailadressen, Entwurfsvermerke). Wer die Adresse einer Datei kennt, kann sie abrufen, solange sie veröffentlicht ist. Entwürfe sind nicht abrufbar.
 
+### Notizen löschen
+
+Teilnehmende löschen eine Notiz im Dashboard über „Notiz löschen“ (mit Sicherheitsabfrage). Weil die Notiz allen Teilnehmenden einer Sitzung gehört, verschwindet sie für alle. Das Löschen ist endgültig. Die Erinnerungsmail „Notiz fehlt“ kommt danach nicht noch einmal. Administrierende können Notizen außerdem in der Verwaltung unter Inhalt → Notizen löschen, auch wenn sie bei der Sitzung nicht dabei waren.
+
 ## Einstellungen
 
 Inhalt → **Einstellungen** (es gibt genau einen Eintrag).

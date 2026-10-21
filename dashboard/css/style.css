@@ -128,3 +128,6 @@ details.abo input { margin-top: .5rem; }
 ul.dokumente { list-style: none; margin: 0; padding: 0; }
 ul.dokumente li a { font-weight: 600; }
 ul.dokumente li p { margin: .25rem 0 0; }
+
+button.gefahr { color: var(--alarm); border-color: var(--alarm); }
+button.gefahr.primaer { background: var(--alarm); color: var(--alarm-text); }

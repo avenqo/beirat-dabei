@@ -29,6 +29,7 @@ const speicher: RegelSpeicher = {
   teilnahmeAendern: async () => {},
   notizen: async () => notizen,
   notizSpeichern: async () => {},
+  notizLoeschen: async () => false,
   versand: async () => versand,
   versandSchreiben: async (e) => void versand.push(...e),
 };

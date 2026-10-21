@@ -271,6 +271,7 @@ function ergebnis(s) {
     teile.push(
       el("div", { class: "aktionen" },
         el("button", { type: "button", class: s.notiz ? "" : "primaer", onclick: () => notizDialog(s) }, s.notiz ? "Notiz ergänzen" : "Notiz schreiben"),
+        s.notiz ? el("button", { type: "button", class: "gefahr", onclick: () => loeschenDialog(s) }, "Notiz löschen") : null,
         el("button", {
           type: "button",
           onclick: (e) => aktion(e.currentTarget, () => api.teilnahme(s.id, "nicht-teilgenommen")),
@@ -279,6 +280,46 @@ function ergebnis(s) {
     );
   }
   return el("div", { class: "abschnitt" }, ...teile);
+}
+
+/** Sicherheitsabfrage vor dem Löschen. Die Notiz gehört allen Teilnehmenden und ist danach weg. */
+function loeschenDialog(s) {
+  const dialog = el("dialog", { "aria-labelledby": "loeschen-titel" });
+  const schliessen = () => {
+    dialog.close();
+    dialog.remove();
+  };
+  const meldung = el("p", { class: "fehler", role: "alert", hidden: true });
+  const ja = el("button", {
+    type: "button",
+    class: "gefahr primaer",
+    onclick: async () => {
+      ja.disabled = true;
+      const r = await api.notizLoeschen(s.id);
+      if (r.status !== 200) {
+        ja.disabled = false;
+        meldung.textContent = fehlerText(r.daten?.fehler);
+        meldung.hidden = false;
+        return;
+      }
+      schliessen();
+      meldung_zuruecksetzen();
+      await laden();
+    },
+  }, "Notiz endgültig löschen");
+  dialog.append(
+    el("h3", { id: "loeschen-titel" }, "Notiz löschen?"),
+    el("p", {}, `Die Notiz zur Sitzung am ${datumLang(s.beginn, daten.instanz.zeitzone)} wird für alle gelöscht. Das lässt sich nicht rückgängig machen.`),
+    meldung,
+    el("div", { class: "aktionen" }, ja, el("button", { type: "button", onclick: schliessen }, "Abbrechen")),
+  );
+  dialog.addEventListener("close", () => dialog.remove());
+  document.body.append(dialog);
+  dialog.showModal();
+}
+
+function meldung_zuruecksetzen() {
+  meldung = null;
 }
 
 function notizDialog(s) {

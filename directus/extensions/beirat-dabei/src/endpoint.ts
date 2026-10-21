@@ -58,6 +58,7 @@ export default defineEndpoint({
     // Mit Directus-Anmeldung
     router.get("/dashboard", route((req) => h.dashboard(d, nutzer(req))));
     router.post("/teilnahme", route((req) => h.teilnahme(d, nutzer(req), req.body ?? {})));
+    router.post("/notiz/loeschen", route((req) => h.notizLoeschen(d, nutzer(req), req.body ?? {})));
     router.get("/abo", route((req) => h.abo(d, nutzer(req))));
     router.post("/notiz", route((req) => h.notiz(d, nutzer(req), req.body ?? {})));
 

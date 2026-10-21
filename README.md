@@ -196,6 +196,7 @@ Alle Pfade unter `/beirat-dabei`. Mitglieder greifen nie direkt auf Daten zu, di
 | `GET /dashboard` | Directus-Anmeldung | kommende und vergangene Sitzungen, Teilnehmende (nur Namen), Notizfragen |
 | `POST /teilnahme` | Directus-Anmeldung | `{sitzung, aktion}` mit `eintragen`, `austragen`, `nicht-teilgenommen` |
 | `POST /notiz` | Directus-Anmeldung | `{sitzung, relevant, antworten}`, nur für Teilnehmende nach der Sitzung |
+| `POST /notiz/loeschen` | Directus-Anmeldung | `{sitzung}`, löscht die Notiz endgültig, nur für Teilnehmende |
 | `GET /abo` | Directus-Anmeldung | die persönliche Adresse des Kalender-Abos |
 | `GET /instanz` | öffentlich | Name und Logo für Kopfzeile und Anmeldeseite |
 | `GET /oeffentlich` | öffentlich | nächste Sitzungen und veröffentlichte Unterlagen |

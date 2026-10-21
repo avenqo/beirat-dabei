@@ -32,5 +32,7 @@ export const dashboard = () => anfrage("GET", `${EXT}/dashboard`);
 export const teilnahme = (sitzung, aktion) => anfrage("POST", `${EXT}/teilnahme`, { sitzung, aktion });
 export const notiz = (sitzung, relevant, antworten) => anfrage("POST", `${EXT}/notiz`, { sitzung, relevant, antworten });
 
+export const notizLoeschen = (sitzung) => anfrage("POST", `${EXT}/notiz/loeschen`, { sitzung });
+
 export const linkInfo = (token) => anfrage("GET", `${EXT}/link/${encodeURIComponent(token)}`);
 export const linkBestaetigen = (token, body = {}) => anfrage("POST", `${EXT}/link/${encodeURIComponent(token)}`, body);

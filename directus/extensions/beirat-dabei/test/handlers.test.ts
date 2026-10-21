@@ -9,6 +9,7 @@ import {
 } from "@beirat-dabei/core";
 import {
   abo,
+  notizLoeschen,
   dashboard,
   ical,
   linkBestaetigen,
@@ -58,6 +59,11 @@ const speicher: Speicher = {
     Object.assign(t, daten);
   },
   notizen: async () => notizen,
+  notizLoeschen: async (sitzungId) => {
+    const vorher = notizen.length;
+    notizen = notizen.filter((n) => n.sitzungId !== sitzungId);
+    return notizen.length < vorher;
+  },
   notizSpeichern: async (sitzungId, wert) => {
     notizen = notizen.filter((n) => n.sitzungId !== sitzungId);
     notizen.push({ sitzungId, ...wert });
@@ -155,6 +161,37 @@ describe("notiz", () => {
     jetzt = d("2026-11-19T08:00:00Z");
     const r = await notiz(deps(), "a", { sitzung: "s1", relevant: true, antworten: {} });
     expect(r).toEqual({ status: 400, body: { fehler: "ungueltige-eingabe", felder: ["beschluesse"] } });
+  });
+});
+
+describe("notiz löschen", () => {
+  beforeEach(() => {
+    jetzt = d("2026-11-19T08:00:00Z");
+    teilnahmen = [{ id: "t1", sitzungId: "s1", mitgliedId: "a", eingetragenAm: d("2026-11-01T00:00:00Z"), nichtTeilgenommen: false }];
+    notizen = [{ sitzungId: "s1", relevant: true, antworten: { beschluesse: "x" } }];
+  });
+
+  it("Teilnehmende löschen die Notiz endgültig", async () => {
+    const r = await notizLoeschen(deps(), "a", { sitzung: "s1" });
+    expect(r).toEqual({ status: 200, body: { ok: true, geloescht: true } });
+    expect(notizen).toEqual([]);
+  });
+  it("zweimal löschen ist harmlos", async () => {
+    await notizLoeschen(deps(), "a", { sitzung: "s1" });
+    expect((await notizLoeschen(deps(), "a", { sitzung: "s1" })).body).toEqual({ ok: true, geloescht: false });
+  });
+  it("andere Mitglieder, 'doch nicht dabei' und Abgemeldete nicht", async () => {
+    expect((await notizLoeschen(deps(), "b", { sitzung: "s1" })).status).toBe(403);
+    teilnahmen[0]!.nichtTeilgenommen = true;
+    expect((await notizLoeschen(deps(), "a", { sitzung: "s1" })).status).toBe(403);
+    expect(notizen).toHaveLength(1);
+  });
+  it("ohne Anmeldung, falsche Eingabe, unbekannte Sitzung", async () => {
+    expect((await notizLoeschen(deps(), null, { sitzung: "s1" })).status).toBe(401);
+    expect((await notizLoeschen(deps(), "x", { sitzung: "s1" })).status).toBe(403);
+    expect((await notizLoeschen(deps(), "a", {})).status).toBe(400);
+    expect((await notizLoeschen(deps(), "a", { sitzung: "nix" })).status).toBe(404);
+    expect(notizen).toHaveLength(1);
   });
 });
 

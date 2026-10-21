@@ -31,6 +31,8 @@ export interface Speicher {
   teilnahmeAendern(id: string, daten: Partial<Omit<Teilnahme, "id">>): Promise<void>;
   notizen(): Promise<Notiz[]>;
   notizSpeichern(sitzungId: string, wert: { relevant: boolean; antworten: Record<string, string> }): Promise<void>;
+  /** Liefert, ob eine Notiz gelöscht wurde. */
+  notizLoeschen(sitzungId: string): Promise<boolean>;
 }
 
 export interface Abhaengigkeiten {
@@ -185,6 +187,29 @@ export async function notiz(
   if (!nutzerId) return fehler(401, "nicht-angemeldet");
   if (!(await aktiveMitglieder(d)).has(nutzerId)) return fehler(403, "kein-mitglied");
   return notizAusfuehren(d, nutzerId, body?.sitzung, { relevant: body?.relevant, antworten: body?.antworten });
+}
+
+/**
+ * Löscht die gemeinsame Notiz einer Sitzung. Wer sie schreiben darf (Teilnehmende), darf sie
+ * auch löschen. Das Löschen ist endgültig. Die Erinnerungsmail (Regel 5) kommt danach nicht
+ * noch einmal, das Versandprotokoll verhindert es.
+ */
+export async function notizLoeschen(
+  d: Abhaengigkeiten,
+  nutzerId: string | null,
+  body: { sitzung?: unknown },
+): Promise<Antwort> {
+  if (!nutzerId) return fehler(401, "nicht-angemeldet");
+  if (!(await aktiveMitglieder(d)).has(nutzerId)) return fehler(403, "kein-mitglied");
+  if (typeof body?.sitzung !== "string") return fehler(400, "ungueltige-eingabe");
+  const sitzung = await d.speicher.sitzung(body.sitzung);
+  if (!sitzung) return fehler(404, "sitzung-unbekannt");
+
+  const teilnahmen = await d.speicher.teilnahmen(sitzung.id);
+  const dabei = teilnahmen.some((t) => t.mitgliedId === nutzerId && !t.ausgetragenAm && !t.nichtTeilgenommen);
+  if (!dabei) return fehler(403, "nicht-teilnehmend");
+
+  return antwort(200, { ok: true, geloescht: await d.speicher.notizLoeschen(sitzung.id) });
 }
 
 // --- Magic Links ---------------------------------------------------------
