@@ -27,6 +27,7 @@ export const logout = () => anfrage("POST", "/auth/logout", { mode: "session" })
 export const passwortVergessen = (email) =>
   anfrage("POST", "/auth/password/request", { email, reset_url: `${location.origin}/admin/reset-password` });
 
+export const abo = () => anfrage("GET", `${EXT}/abo`);
 export const dashboard = () => anfrage("GET", `${EXT}/dashboard`);
 export const teilnahme = (sitzung, aktion) => anfrage("POST", `${EXT}/teilnahme`, { sitzung, aktion });
 export const notiz = (sitzung, relevant, antworten) => anfrage("POST", `${EXT}/notiz`, { sitzung, relevant, antworten });

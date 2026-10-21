@@ -68,7 +68,7 @@ Oben stehen die anstehenden Sitzungen, darunter die vergangenen mit ihren Notize
 
 **Magic Links:** Jeder Link gilt für eine Person und eine Sitzung. Der Link öffnet eine Bestätigungsseite, erst der Knopf dort (POST) trägt ein. So lösen Mail-Scanner und Link-Vorschauen nichts aus. Danach gibt es „Rückgängig machen“. Der Token ist signiert. Links in Mails gelten bis zum Sitzungsende plus 14 Tage (einstellbar), der „Rückgängig“-Link nach dem Klick 30 Minuten. Eine Anmeldung ist nicht nötig.
 
-**Kalender (optional):** eine iCal-Abo-Adresse mit allen Sitzungsterminen, die Mitglieder in ihren eigenen Kalender übernehmen können.
+**Kalender (optional):** eine persönliche iCal-Abo-Adresse mit allen Sitzungsterminen, die Mitglieder im Dashboard abrufen und in ihren eigenen Kalender übernehmen können. Der Token ist pro Mitglied abgeleitet, gesperrte Mitglieder verlieren den Zugang sofort, und über `abo_version` in den Einstellungen lassen sich alle Adressen widerrufen.
 
 ## Benachrichtigungsregeln
 

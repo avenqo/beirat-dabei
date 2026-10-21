@@ -65,6 +65,7 @@ const sammlungen = [
         interface: "select-dropdown",
         options: { choices: ["manuell", "komfa", "oparl", "ical"].map((v) => ({ text: v, value: v })) },
       }, { default_value: "manuell" }),
+      zahl("abo_version", 1, { note: "Erhöhen, um alle Kalender-Abo-Adressen ungültig zu machen" }),
       text("ris_quelle", { note: "Adresse des RIS, z. B. https://ris-kremmen.komfa.de" }),
     ],
   },

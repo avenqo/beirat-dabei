@@ -65,6 +65,7 @@ export function speicherAusDirectus(
         },
         notizfragen: (Array.isArray(e["notizfragen"]) ? e["notizfragen"] : []) as Notizfrage[],
         ...(e["name"] ? { name: e["name"] as string } : {}),
+        aboVersion: Number(e["abo_version"]) || 1,
       };
     },
 

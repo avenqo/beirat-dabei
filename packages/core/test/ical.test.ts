@@ -41,7 +41,7 @@ describe("kalenderErzeugen", () => {
       [{ id: "s1", start: new Date("2026-11-18T17:00:00Z"), titel: "a;b\\c", beschreibung: "x\ny" }],
       opt,
     );
-    expect(ics).toContain("SUMMARY:a\;b\\\\c");
+    expect(ics).toContain("SUMMARY:a\\;b\\\\c");
     expect(ics).toContain("DESCRIPTION:x\\ny");
   });
 });

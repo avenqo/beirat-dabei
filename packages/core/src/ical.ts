@@ -28,7 +28,7 @@ function zeit(d: Date): string {
 function maskieren(text: string): string {
   return text
     .replace(/\\/g, "\\\\")
-    .replace(/;/g, "\;")
+    .replace(/;/g, "\\;")
     .replace(/,/g, "\\,")
     .replace(/\r?\n/g, "\\n");
 }
@@ -62,6 +62,9 @@ export function kalenderErzeugen(sitzungen: KalenderSitzung[], opt: KalenderOpti
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     `X-WR-CALNAME:${maskieren(opt.name)}`,
+    // Hinweis an Kalender-Apps, wie oft sie nachladen sollen
+    "REFRESH-INTERVAL;VALUE=DURATION:PT6H",
+    "X-PUBLISHED-TTL:PT6H",
   ];
   for (const s of sitzungen) {
     const ende = new Date(s.start.getTime() + (s.dauerMinuten ?? 120) * 60_000);

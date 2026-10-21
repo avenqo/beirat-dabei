@@ -1,6 +1,6 @@
 import { defineEndpoint } from "@directus/extensions-sdk";
 import * as h from "./handlers.js";
-import { envText } from "./env.js";
+import { envText, envZahl } from "./env.js";
 import { speicherAusDirectus, type Kontext } from "./speicher.js";
 
 export default defineEndpoint({
@@ -17,6 +17,8 @@ export default defineEndpoint({
       }),
       geheimnis,
       jetzt: () => new Date(),
+      publicUrl: envText(env["PUBLIC_URL"]) ?? "",
+      sitzungsdauerStunden: envZahl(env["SITZUNGSDAUER_STUNDEN"], 3),
     };
 
     // Kleine Hülle: Handler aufrufen, Antwort schreiben, Ausnahmen als 500 melden.
@@ -25,7 +27,9 @@ export default defineEndpoint({
       async (req: any, res: any) => {
         try {
           const a = await fn(req);
-          res.status(a.status).json(a.body);
+          for (const [k, v] of Object.entries(a.kopf ?? {})) res.setHeader(k, v);
+          if (a.typ) res.status(a.status).type(a.typ).send(a.body);
+          else res.status(a.status).json(a.body);
         } catch (e) {
           context.logger.error(e, "beirat-dabei");
           res.status(500).json({ fehler: "serverfehler" });
@@ -36,9 +40,11 @@ export default defineEndpoint({
     // Mit Directus-Anmeldung
     router.get("/dashboard", route((req) => h.dashboard(d, nutzer(req))));
     router.post("/teilnahme", route((req) => h.teilnahme(d, nutzer(req), req.body ?? {})));
+    router.get("/abo", route((req) => h.abo(d, nutzer(req))));
     router.post("/notiz", route((req) => h.notiz(d, nutzer(req), req.body ?? {})));
 
     // Öffentlich, durch signierten Token geschützt
+    router.get("/ical/:token", route((req) => h.ical(d, req.params.token)));
     router.get("/link/:token", route((req) => h.linkInfo(d, req.params.token)));
     router.post("/link/:token", route((req) => h.linkBestaetigen(d, req.params.token, req.body ?? {})));
   },

@@ -120,6 +120,48 @@ function zeichnen() {
   inhalt.append(el("h2", {}, "Vergangene Sitzungen"));
   if (vergangen.length === 0) inhalt.append(el("p", { class: "leer" }, "Noch keine vergangenen Sitzungen."));
   for (const s of vergangen) inhalt.append(karte(s));
+
+  inhalt.append(kalenderAbo());
+}
+
+/** Persönliche Abo-Adresse für den eigenen Kalender, wird erst beim Aufklappen geladen. */
+function kalenderAbo() {
+  const platz = el("div", { class: "abschnitt" }, el("p", { class: "meta" }, "Lade …"));
+  const bereich = el(
+    "details",
+    {
+      class: "karte abo",
+      ontoggle: async (e) => {
+        if (!e.target.open || platz.dataset.geladen) return;
+        platz.dataset.geladen = "1";
+        const r = await api.abo();
+        if (r.status !== 200) {
+          delete platz.dataset.geladen;
+          return void platz.replaceChildren(el("p", { class: "fehler" }, fehlerText(r.daten?.fehler)));
+        }
+        const feld = el("input", { type: "text", readonly: true, value: r.daten.url, "aria-label": "Abo-Adresse", onfocus: (ev) => ev.target.select() });
+        const kopieren = el("button", {
+          type: "button",
+          onclick: async (ev) => {
+            try {
+              await navigator.clipboard.writeText(r.daten.url);
+              ev.target.textContent = "Kopiert";
+            } catch {
+              feld.select();
+            }
+          },
+        }, "Kopieren");
+        platz.replaceChildren(
+          el("p", { class: "meta" }, "Alle Sitzungstermine in deinem Kalender, aktualisiert sich von selbst. Die Adresse gehört nur dir, bitte nicht weitergeben."),
+          feld,
+          el("div", { class: "aktionen" }, kopieren, el("a", { class: "knopf", href: r.daten.webcal }, "In Kalender-App öffnen")),
+        );
+      },
+    },
+    el("summary", {}, "Kalender abonnieren"),
+    platz,
+  );
+  return bereich;
 }
 
 function karte(s) {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mailLinkAblauf, tokenErzeugen, tokenErzeugenBis, tokenPruefen, TOKEN_GUELTIGKEIT_SEKUNDEN } from "../src/index.js";
+import { aboTokenErzeugen, aboTokenPruefen, mailLinkAblauf, tokenErzeugen, tokenErzeugenBis, tokenPruefen, TOKEN_GUELTIGKEIT_SEKUNDEN } from "../src/index.js";
 
 const jetzt = new Date("2026-11-01T08:00:00Z");
 const inhalt = { a: "eintragen", m: "mitglied-1", s: "sitzung-1" } as const;
@@ -56,5 +56,35 @@ describe("Magic-Link-Token", () => {
   it("Nachlauf und Dauer sind einstellbar", () => {
     const start = new Date("2026-11-18T17:00:00Z");
     expect(mailLinkAblauf(start, { nachlaufTage: 1, dauerStunden: 1 }).toISOString()).toBe("2026-11-19T18:00:00.000Z");
+  });
+});
+
+describe("Abo-Token", () => {
+  it("ist pro Mitglied stabil und lässt sich prüfen", () => {
+    const t = aboTokenErzeugen("mitglied-1", geheimnis, 1);
+    expect(aboTokenErzeugen("mitglied-1", geheimnis, 1)).toBe(t);
+    expect(aboTokenPruefen(t, geheimnis, 1)).toBe("mitglied-1");
+    expect(aboTokenErzeugen("mitglied-2", geheimnis, 1)).not.toBe(t);
+  });
+
+  it("falsches Geheimnis oder neue Version machen ihn ungültig", () => {
+    const t = aboTokenErzeugen("mitglied-1", geheimnis, 1);
+    expect(aboTokenPruefen(t, "anderes", 1)).toBeNull();
+    expect(aboTokenPruefen(t, geheimnis, 2)).toBeNull();
+  });
+
+  it("lässt sich nicht auf ein anderes Mitglied umbiegen", () => {
+    const t = aboTokenErzeugen("mitglied-1", geheimnis, 1);
+    const sig = t.split(".")[1];
+    const fremd = `${Buffer.from("mitglied-2").toString("base64url")}.${sig}`;
+    expect(aboTokenPruefen(fremd, geheimnis, 1)).toBeNull();
+  });
+
+  it("Müll", () => {
+    for (const x of ["", "a", "a.b.c", ".x", "x.", "!!.!!"]) expect(aboTokenPruefen(x, geheimnis, 1)).toBeNull();
+  });
+
+  it("ist kein Magic-Link-Token", () => {
+    expect(tokenPruefen(aboTokenErzeugen("m", geheimnis, 1), geheimnis, jetzt).ok).toBe(false);
   });
 });

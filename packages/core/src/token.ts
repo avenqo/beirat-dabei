@@ -89,3 +89,28 @@ export function tokenPruefen(wert: string, geheimnis: string, jetzt: Date): Toke
   if (Math.floor(jetzt.getTime() / 1000) >= token.exp) return { ok: false, grund: "abgelaufen" };
   return { ok: true, token };
 }
+
+// --- Abo-Token für den Kalender-Feed ----------------------------------------
+// Dauerhaft gültig, pro Mitglied, ohne Speicherung abgeleitet. Alle Abo-Adressen
+// einer Instanz lassen sich durch Erhöhen der Version widerrufen. Inaktive
+// Mitglieder prüft der Aufrufer.
+
+function aboSignatur(mitgliedId: string, geheimnis: string, version: number): Buffer {
+  return createHmac("sha256", geheimnis).update(`abo:${version}:${mitgliedId}`).digest();
+}
+
+export function aboTokenErzeugen(mitgliedId: string, geheimnis: string, version: number): string {
+  return `${b64(mitgliedId)}.${b64(aboSignatur(mitgliedId, geheimnis, version))}`;
+}
+
+/** Liefert die Mitglieds-ID, wenn der Token zur Version und zum Geheimnis passt, sonst null. */
+export function aboTokenPruefen(token: string, geheimnis: string, version: number): string | null {
+  const teile = token.split(".");
+  if (teile.length !== 2 || !teile[0] || !teile[1]) return null;
+  const mitgliedId = Buffer.from(teile[0], "base64url").toString("utf8");
+  if (!mitgliedId || b64(mitgliedId) !== teile[0]) return null;
+  const erwartet = aboSignatur(mitgliedId, geheimnis, version);
+  const erhalten = Buffer.from(teile[1], "base64url");
+  if (erhalten.length !== erwartet.length || !timingSafeEqual(erhalten, erwartet)) return null;
+  return mitgliedId;
+}

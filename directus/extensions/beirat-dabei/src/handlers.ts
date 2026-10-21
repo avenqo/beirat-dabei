@@ -1,5 +1,8 @@
 import {
   TOKEN_GUELTIGKEIT_SEKUNDEN,
+  aboTokenErzeugen,
+  aboTokenPruefen,
+  kalenderErzeugen,
   dashboardBauen,
   notizPruefen,
   teilnahmeAnwenden,
@@ -18,7 +21,7 @@ import {
 
 /** Zugriff auf die Daten. Die Directus-Anbindung implementiert das; Tests nutzen eine Attrappe. */
 export interface Speicher {
-  einstellungen(): Promise<{ einstellungen: Einstellungen; notizfragen: Notizfrage[]; name?: string }>;
+  einstellungen(): Promise<{ einstellungen: Einstellungen; notizfragen: Notizfrage[]; name?: string; aboVersion?: number }>;
   /** Alle Personen mit Mitglieds- oder Admin-Rolle. Ohne E-Mail-Adressen. */
   mitglieder(): Promise<{ id: string; aktiv: boolean; name: string }[]>;
   sitzungen(): Promise<SitzungInfo[]>;
@@ -34,11 +37,18 @@ export interface Abhaengigkeiten {
   speicher: Speicher;
   geheimnis: string;
   jetzt: () => Date;
+  /** Öffentliche Adresse der Instanz, für Abo-Adressen und Kalendereinträge */
+  publicUrl?: string;
+  /** Angenommene Dauer einer Sitzung im Kalender */
+  sitzungsdauerStunden?: number;
 }
 
 export interface Antwort {
   status: number;
   body: unknown;
+  /** Content-Type für Antworten, die kein JSON sind */
+  typ?: string;
+  kopf?: Record<string, string>;
 }
 
 const antwort = (status: number, body: unknown): Antwort => ({ status, body });
@@ -229,4 +239,81 @@ export async function linkBestaetigen(
     ? tokenErzeugen({ a: gegen, m: mitglied.id, s: sitzung.id }, d.geheimnis, d.jetzt(), TOKEN_GUELTIGKEIT_SEKUNDEN)
     : null;
   return antwort(200, { ok: true, aktion: token.a, rueckgaengig });
+}
+
+// --- Kalender-Abo ----------------------------------------------------------
+
+const ABO_VERGANGENHEIT_TAGE = 60;
+
+function basisUrl(d: Abhaengigkeiten): string {
+  return (d.publicUrl ?? "").replace(/\/$/, "");
+}
+
+/** Mit Directus-Anmeldung: die persönliche Abo-Adresse. */
+export async function abo(d: Abhaengigkeiten, nutzerId: string | null): Promise<Antwort> {
+  if (!nutzerId) return fehler(401, "nicht-angemeldet");
+  if (!(await aktiveMitglieder(d)).has(nutzerId)) return fehler(403, "kein-mitglied");
+  const { aboVersion } = await d.speicher.einstellungen();
+  const pfad = `/beirat-dabei/ical/${aboTokenErzeugen(nutzerId, d.geheimnis, aboVersion ?? 1)}.ics`;
+  const url = `${basisUrl(d)}${pfad}`;
+  return antwort(200, { url, webcal: url.replace(/^https?:/, "webcal:") });
+}
+
+/**
+ * Öffentlich, durch den Abo-Token geschützt: alle Sitzungstermine als iCal-Feed.
+ * Jede Abweichung (falscher Token, inaktives Mitglied) ergibt gleichermaßen 404.
+ */
+export async function ical(d: Abhaengigkeiten, tokenMitEndung: string): Promise<Antwort> {
+  const nichtDa = fehler(404, "nicht-gefunden");
+  const { einstellungen, name, aboVersion } = await d.speicher.einstellungen();
+  const mitgliedId = aboTokenPruefen(tokenMitEndung.replace(/\.ics$/i, ""), d.geheimnis, aboVersion ?? 1);
+  if (!mitgliedId) return nichtDa;
+  const mitglieder = await d.speicher.mitglieder();
+  if (!mitglieder.some((m) => m.id === mitgliedId && m.aktiv)) return nichtDa;
+
+  const jetzt = d.jetzt();
+  const grenze = jetzt.getTime() - ABO_VERGANGENHEIT_TAGE * 86_400_000;
+  const [sitzungen, teilnahmen] = await Promise.all([d.speicher.sitzungen(), d.speicher.teilnahmen()]);
+  const namen = new Map(mitglieder.filter((m) => m.aktiv).map((m) => [m.id, m.name]));
+  const basis = basisUrl(d);
+  let domain = "beirat-dabei";
+  try {
+    domain = new URL(basis).host || domain;
+  } catch {
+    /* ohne gültige Adresse bleibt der Standard */
+  }
+
+  const termine = sitzungen
+    .filter((s) => s.start.getTime() >= grenze)
+    .map((s) => {
+      const dabei = teilnahmen.filter((t) => t.sitzungId === s.id && !t.ausgetragenAm && namen.has(t.mitgliedId));
+      const zeilen = [
+        s.abgesagt
+          ? "Die Sitzung ist abgesagt."
+          : dabei.length > 0
+            ? `Dabei: ${dabei.map((t) => namen.get(t.mitgliedId)).join(", ")}${dabei.some((t) => t.mitgliedId === mitgliedId) ? " (du bist eingetragen)" : ""}`
+            : "Noch niemand eingetragen.",
+        s.toVeroeffentlicht && s.toLink ? `Tagesordnung: ${s.toLink}` : "Tagesordnung: noch nicht veröffentlicht",
+        basis ? `Dashboard: ${basis}/dashboard/` : "",
+      ].filter(Boolean);
+      const link = s.toVeroeffentlicht && s.toLink ? s.toLink : s.risLink;
+      return {
+        id: s.id,
+        start: s.start,
+        dauerMinuten: Math.round((d.sitzungsdauerStunden ?? 3) * 60),
+        titel: `${s.abgesagt ? "ABGESAGT: " : ""}${s.gremiumName}`,
+        beschreibung: zeilen.join("\n"),
+        abgesagt: s.abgesagt,
+        ...(s.ort ? { ort: s.ort } : {}),
+        ...(link && /^https?:\/\//.test(link) ? { url: link } : {}),
+      };
+    });
+
+  const text = kalenderErzeugen(termine, { name: name ?? "Beirat dabei", domain, jetzt });
+  return {
+    status: 200,
+    body: text,
+    typ: "text/calendar; charset=utf-8",
+    kopf: { "cache-control": "private, max-age=900" },
+  };
 }

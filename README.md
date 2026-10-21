@@ -174,6 +174,12 @@ DIRECTUS_URL=http://localhost:8055 PORT=8056 pnpm dev:dashboard
 
 Lokal über http muss `SESSION_COOKIE_SECURE=false` gesetzt sein.
 
+## Kalender-Abo
+
+Jedes Mitglied findet im Dashboard unter „Kalender abonnieren“ eine persönliche Adresse für den eigenen Kalender (Google, Apple, Outlook, Thunderbird). Der Feed enthält alle Sitzungen der letzten 60 Tage und der Zukunft mit Ort, Teilnehmenden, Link zur Tagesordnung und Absagen (`STATUS:CANCELLED`). Kalender-Apps laden ihn alle paar Stunden neu, Verschiebungen kommen so von selbst an. Als Dauer gilt `SITZUNGSDAUER_STUNDEN`.
+
+Der Token ist pro Mitglied aus dem `MAGIC_LINK_SECRET` abgeleitet und nirgends gespeichert. Gesperrte Mitglieder bekommen sofort 404. Alle Abo-Adressen auf einmal ungültig machen: in den Einstellungen `abo_version` erhöhen, danach holen sich die Mitglieder im Dashboard die neue Adresse. Wer die Adresse weitergibt, gibt die Termine weiter, nicht mehr.
+
 ## Schnittstelle der Extension
 
 Alle Pfade unter `/beirat-dabei`. Mitglieder greifen nie direkt auf Daten zu, die Extension prüft die Rechte im Code.
@@ -183,8 +189,10 @@ Alle Pfade unter `/beirat-dabei`. Mitglieder greifen nie direkt auf Daten zu, di
 | `GET /dashboard` | Directus-Anmeldung | kommende und vergangene Sitzungen, Teilnehmende (nur Namen), Notizfragen |
 | `POST /teilnahme` | Directus-Anmeldung | `{sitzung, aktion}` mit `eintragen`, `austragen`, `nicht-teilgenommen` |
 | `POST /notiz` | Directus-Anmeldung | `{sitzung, relevant, antworten}`, nur für Teilnehmende nach der Sitzung |
+| `GET /abo` | Directus-Anmeldung | die persönliche Adresse des Kalender-Abos |
 | `GET /link/:token` | Magic Link | Angaben für die Bestätigungsseite, ändert nichts |
 | `POST /link/:token` | Magic Link | führt die Aktion aus, liefert einen Rückgängig-Link |
+| `GET /ical/:token.ics` | Abo-Token | iCal-Feed mit allen Sitzungsterminen |
 
 ## Rollen
 
