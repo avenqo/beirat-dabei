@@ -54,7 +54,7 @@ const sammlungen = [
     meta: { singleton: true, icon: "settings", note: "Einstellungen dieser Instanz" },
     felder: [
       id,
-      text("name", { note: "Anzeigename, z. B. Umweltbeirat Kremmen" }),
+      text("name", { note: "Anzeigename der Instanz, erscheint im Kopf und in Mails" }),
       zahl("frist_vor_tage", 7, { note: "Tage vor der Sitzung (Regeln 3 und 4)" }),
       zahl("frist_nach_tage", 3, { note: "Tage nach der Sitzung (Regel 5)" }),
       text("zeitzone", {}, { default_value: "Europe/Berlin" }),
@@ -65,7 +65,7 @@ const sammlungen = [
         options: { choices: ["manuell", "komfa", "oparl", "ical"].map((v) => ({ text: v, value: v })) },
       }, { default_value: "manuell" }),
       zahl("abo_version", 1, { note: "Erhöhen, um alle Kalender-Abo-Adressen ungültig zu machen" }),
-      text("ris_quelle", { note: "Adresse des RIS, z. B. https://ris-kremmen.komfa.de" }),
+      text("ris_quelle", { note: "Adresse des Ratsinformationssystems, z. B. https://ris-musterstadt.komfa.de" }),
     ],
   },
   {
@@ -274,7 +274,7 @@ async function einstellungenVorbelegen() {
     ris_adapter: "manuell",
     notizfragen: [
       { schluessel: "relevant", frage: "War etwas Relevantes für den Beirat dabei?", typ: "ja-nein", pflicht: true },
-      { schluessel: "tops", frage: "Welche TOPs waren umweltrelevant?", typ: "text", pflicht: false },
+      { schluessel: "tops", frage: "Welche TOPs waren für den Beirat relevant?", typ: "text", pflicht: false },
       { schluessel: "beschluesse", frage: "Was wurde beschlossen oder vertagt, und muss der Beirat etwas tun?", typ: "text", pflicht: false },
     ],
   });

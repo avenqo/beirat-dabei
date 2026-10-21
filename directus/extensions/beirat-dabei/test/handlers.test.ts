@@ -199,7 +199,7 @@ describe("Magic Links", () => {
   it("Info ändert nichts", async () => {
     const r = await linkInfo(deps(), link("eintragen"));
     expect(r.status).toBe(200);
-    expect(r.body).toMatchObject({ aktion: "eintragen", mitglied: "Anna", bereitsEingetragen: false, sitzung: { gremium: "BUA" } });
+    expect(r.body).toMatchObject({ aktion: "eintragen", mitglied: "Anna", bereitsEingetragen: false, zeitzone: "Europe/Berlin", sitzung: { gremium: "BUA" } });
     expect(teilnahmen).toHaveLength(0);
   });
   it("Bestätigen trägt ein und liefert Rückgängig-Link, der austrägt", async () => {

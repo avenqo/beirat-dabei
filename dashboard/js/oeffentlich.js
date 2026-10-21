@@ -46,7 +46,7 @@ async function laden() {
             el("h3", {}, s.gremium),
             s.abgesagt ? el("span", { class: "chip abgesagt" }, "Abgesagt") : null,
           ),
-          el("p", { class: "meta" }, datumLang(s.beginn)),
+          el("p", { class: "meta" }, datumLang(s.beginn, daten.instanz.zeitzone)),
           s.ort ? el("p", { class: "meta" }, s.ort) : null,
           !s.abgesagt ? el("p", { class: "abschnitt" }, to ? el("a", { href: to, target: "_blank", rel: "noopener noreferrer" }, "Tagesordnung ansehen") : "Tagesordnung: noch nicht veröffentlicht") : null,
         );

@@ -18,7 +18,7 @@ export interface GremiumZeile {
 }
 
 export interface AbgleichSpeicher {
-  risEinstellungen(): Promise<{ adapter: string; quelle: string }>;
+  risEinstellungen(): Promise<{ adapter: string; quelle: string; zeitzone?: string }>;
   gremien(): Promise<GremiumZeile[]>;
   sitzungenBekannt(gremiumId: string): Promise<BekannteSitzung[]>;
   sitzungAnlegen(gremiumId: string, daten: NeueSitzung): Promise<void>;
@@ -50,8 +50,8 @@ export async function abgleichAusfuehren(o: AbgleichOptionen): Promise<AbgleichE
   if (o.modus === "aus" || laeuft) return ergebnis;
   laeuft = true;
   try {
-    const { adapter: name, quelle } = await o.speicher.risEinstellungen();
-    const adapter = adapterErzeugen(name, quelle, o.http);
+    const { adapter: name, quelle, zeitzone } = await o.speicher.risEinstellungen();
+    const adapter = adapterErzeugen(name, quelle, o.http, zeitzone);
     if (!adapter) {
       o.log.info(`RIS-Abgleich übersprungen (Adapter "${name}" ohne Abgleich)`);
       return ergebnis;

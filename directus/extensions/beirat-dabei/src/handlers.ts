@@ -231,9 +231,10 @@ export async function linkInfo(d: Abhaengigkeiten, wert: string): Promise<Antwor
   const { token, mitglied, sitzung } = r as Exclude<typeof r, { fehler: Antwort }>;
   const teilnahmen = await d.speicher.teilnahmen(sitzung.id);
   const bereitsEingetragen = teilnahmen.some((t) => t.mitgliedId === mitglied.id && !t.ausgetragenAm);
-  const { notizfragen, name } = await d.speicher.einstellungen();
+  const { notizfragen, name, einstellungen } = await d.speicher.einstellungen();
   return antwort(200, {
     instanz: name ?? "Beirat dabei",
+    zeitzone: einstellungen.zeitzone,
     aktion: token.a,
     mitglied: mitglied.name,
     bereitsEingetragen,

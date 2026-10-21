@@ -48,7 +48,7 @@ export async function instanz(d: OeffentlichAbhaengigkeiten): Promise<Antwort> {
 /** Öffentlich: nächste Sitzungstermine und veröffentlichte Unterlagen. Keine Namen, keine Notizen. */
 export async function oeffentlich(d: OeffentlichAbhaengigkeiten): Promise<Antwort> {
   const jetzt = d.jetzt().getTime();
-  const [{ name }, logoId, sitzungen, dokumente] = await Promise.all([
+  const [{ name, einstellungen }, logoId, sitzungen, dokumente] = await Promise.all([
     d.speicher.einstellungen(),
     d.speicher.logoId(),
     d.speicher.sitzungen(),
@@ -90,7 +90,7 @@ export async function oeffentlich(d: OeffentlichAbhaengigkeiten): Promise<Antwor
   return {
     status: 200,
     body: {
-      instanz: { name: name ?? "Beirat dabei", logo: logoId ? `/assets/${logoId}?width=320&fit=inside` : null },
+      instanz: { name: name ?? "Beirat dabei", logo: logoId ? `/assets/${logoId}?width=320&fit=inside` : null, zeitzone: einstellungen.zeitzone },
       sitzungen: kommend,
       kategorien,
     },

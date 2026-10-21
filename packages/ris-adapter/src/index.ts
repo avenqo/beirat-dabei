@@ -11,7 +11,7 @@ export * from "./abgleich.js";
 export const ADAPTER_NAMEN = ["manuell", "komfa"] as const;
 
 /** Erzeugt den Adapter zum Namen aus den Einstellungen. `manuell` hat keinen Abgleich. */
-export function adapterErzeugen(name: string, quelle: string, http: Http): RisAdapter | null {
-  if (name === "komfa" && quelle) return new KomfaAdapter({ basisUrl: quelle, http });
+export function adapterErzeugen(name: string, quelle: string, http: Http, zeitzone?: string): RisAdapter | null {
+  if (name === "komfa" && quelle) return new KomfaAdapter({ basisUrl: quelle, http, ...(zeitzone ? { zeitzone } : {}) });
   return null;
 }

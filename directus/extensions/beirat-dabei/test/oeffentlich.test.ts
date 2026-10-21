@@ -61,6 +61,11 @@ describe("instanz", () => {
 });
 
 describe("oeffentlich", () => {
+  it("liefert die Zeitzone der Instanz mit", async () => {
+    const b = (await oeffentlich(deps())).body as { instanz: { name: string; zeitzone: string } };
+    expect(b.instanz).toMatchObject({ name: "Umweltbeirat Kremmen", zeitzone: "Europe/Berlin" });
+  });
+
   it("nennt nur kommende Sitzungen, sortiert, ohne gefährliche Links", async () => {
     const b = (await oeffentlich(deps())).body as { sitzungen: { beginn: string; tagesordnung: string | null; abgesagt: boolean }[] };
     expect(b.sitzungen.map((s) => s.beginn)).toEqual(["2026-11-12T18:00:00.000Z", "2026-12-03T18:00:00.000Z", "2026-12-20T18:00:00.000Z"]);

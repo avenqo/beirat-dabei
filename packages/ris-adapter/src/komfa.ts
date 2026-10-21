@@ -9,7 +9,7 @@ const norm = (t: string) => t.replace(/ /g, " ").replace(/\s+/g, " ").trim();
 
 export interface KalenderEintrag {
   risId: string;
-  /** Voller Titel, z. B. "Stadt Kremmen, Bau-/Wirtschafts- und Umweltausschuss" */
+  /** Voller Titel, z. B. "Stadt Musterstadt, Bauausschuss" */
   titel: string;
 }
 
@@ -64,12 +64,14 @@ export function tagesordnungLesen(html: string, link: string): RisTagesordnung {
 }
 
 export interface KomfaOptionen {
-  /** z. B. https://ris-kremmen.komfa.de */
+  /** z. B. https://ris-musterstadt.komfa.de */
   basisUrl: string;
   http: Http;
   jetzt?: () => Date;
   /** Obergrenze für abgerufene Monate pro Aufruf */
   maxMonate?: number;
+  /** Zeitzone der Instanz, für Zeiten ohne Zone in der iCal-Datei */
+  zeitzone?: string;
 }
 
 /**
@@ -119,7 +121,7 @@ export class KomfaAdapter implements RisAdapter {
       try {
         const r = await this.o.http.holen(this.url("ic", `&id=${e.risId}`));
         if (r.status !== 200) throw new Error(`HTTP ${r.status}`);
-        const t = icsLesen(r.text)[0];
+        const t = icsLesen(r.text, this.o.zeitzone)[0];
         if (!t) throw new Error("keine Termine in iCal");
         if (t.start < zeitraum.von || t.start > zeitraum.bis) continue;
         sitzungen.push({

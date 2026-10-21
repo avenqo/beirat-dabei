@@ -24,7 +24,7 @@ function fehlerAnzeige(daten) {
 function sitzungKopf(info) {
   return [
     el("h2", {}, info.sitzung.gremium),
-    el("p", {}, datumLang(info.sitzung.beginn)),
+    el("p", {}, datumLang(info.sitzung.beginn, info.zeitzone)),
     info.sitzung.ort ? el("p", { class: "meta" }, info.sitzung.ort) : null,
   ];
 }

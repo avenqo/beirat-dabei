@@ -138,6 +138,17 @@ describe("KomfaAdapter", () => {
     expect(r.sitzungen.map((s) => s.risId)).toEqual([ID_NOV]);
   });
 
+  it("Zeiten ohne Zone gelten in der Zeitzone der Instanz", async () => {
+    const ics = ["BEGIN:VCALENDAR", "BEGIN:VEVENT", "UID:x", "SUMMARY:Test", "DTSTART:20261112T190000", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    const kalender = `<div class="cal_event"><div class="cal_eventtime">19:00 <a href="index.php?module=komfaris&amp;action=ic&amp;id=AB12">x</a></div><div class="cal_eventtitle">Stadt X, Bauausschuss</div></div>`;
+    const { http } = attrappe({ "FilterValue=2026-11-01": kalender, "action=ic&id=AB12": ics });
+    const zeitraum2 = { von: new Date("2026-11-01T00:00:00Z"), bis: new Date("2026-11-30T00:00:00Z") };
+    const berlin = await new KomfaAdapter({ basisUrl: "https://x", http, zeitzone: "Europe/Berlin" }).sitzungen("Bauausschuss", zeitraum2);
+    const newYork = await new KomfaAdapter({ basisUrl: "https://x", http, zeitzone: "America/New_York" }).sitzungen("Bauausschuss", zeitraum2);
+    expect(berlin.sitzungen[0]!.start.toISOString()).toBe("2026-11-12T18:00:00.000Z");
+    expect(newYork.sitzungen[0]!.start.toISOString()).toBe("2026-11-13T00:00:00.000Z");
+  });
+
   it("Tagesordnung abrufen", async () => {
     const { http } = attrappe({ [`action=to&id=${ID_SEP}`]: fx("to-sep.html") });
     const to = await new KomfaAdapter({ basisUrl: "https://x", http }).tagesordnung(ID_SEP);

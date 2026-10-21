@@ -182,8 +182,12 @@ export function speicherAusDirectus(
     },
 
     async risEinstellungen() {
-      const e = await (await dienst("einstellungen")).readSingleton({ fields: ["ris_adapter", "ris_quelle"] });
-      return { adapter: (e["ris_adapter"] as string) ?? "manuell", quelle: (e["ris_quelle"] as string) ?? "" };
+      const e = await (await dienst("einstellungen")).readSingleton({ fields: ["ris_adapter", "ris_quelle", "zeitzone"] });
+      return {
+        adapter: (e["ris_adapter"] as string) ?? "manuell",
+        quelle: (e["ris_quelle"] as string) ?? "",
+        ...(e["zeitzone"] ? { zeitzone: e["zeitzone"] as string } : {}),
+      };
     },
 
     async gremien() {

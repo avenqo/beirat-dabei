@@ -13,7 +13,7 @@ export interface KalenderSitzung {
 export interface KalenderOptionen {
   /** Anzeigename des Kalenders */
   name: string;
-  /** Domain für die UIDs, z. B. "umweltbeirat.kremmen.de" */
+  /** Domain für die UIDs, z. B. "beirat.example.de" */
   domain: string;
   /** Zeitstempel der Erzeugung (DTSTAMP) */
   jetzt: Date;

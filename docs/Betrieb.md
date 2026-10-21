@@ -53,7 +53,7 @@ beirat-dabei: Regellauf (scharf): 3 fällig, 3 gesendet, 0 fehlgeschlagen
 
 ## Erste Einrichtung
 
-1. **`.env` anlegen.** `cp .env.example .env`, dann die Werte eintragen. Die beiden Schlüssel (`KEY`, `SECRET`) und das `MAGIC_LINK_SECRET` erzeugst du mit `openssl rand -hex 32`, jeweils einzeln. Wichtig sind außerdem `PUBLIC_URL` (die Adresse, unter der die Instanz erreichbar ist), `ADMIN_EMAIL`/`ADMIN_PASSWORD` (erstes Administratorkonto) und die Mail-Zugangsdaten (`EMAIL_*`). `EMAIL_FROM` bestimmt den Absender, am besten mit Namen: `'Umweltbeirat Kremmen <umweltbeirat@example.de>'`.
+1. **`.env` anlegen.** `cp .env.example .env`, dann die Werte eintragen. Die beiden Schlüssel (`KEY`, `SECRET`) und das `MAGIC_LINK_SECRET` erzeugst du mit `openssl rand -hex 32`, jeweils einzeln. Wichtig sind außerdem `PUBLIC_URL` (die Adresse, unter der die Instanz erreichbar ist), `ADMIN_EMAIL`/`ADMIN_PASSWORD` (erstes Administratorkonto) und die Mail-Zugangsdaten (`EMAIL_*`). `EMAIL_FROM` bestimmt den Absender, am besten mit Namen: `'Mein Beirat <beirat@example.de>'`.
 2. **Erweiterung bauen** (einmal, und nach jedem Update): `pnpm install` und `pnpm -r build`.
 3. **Starten:** `docker compose up -d`. Nach etwa einer halben Minute antwortet `PUBLIC_URL/admin`.
 4. **Datenmodell anlegen:**
@@ -94,14 +94,14 @@ Mitglieder brauchen **keinen** Zugang zur Verwaltung. Sie arbeiten nur im Dashbo
 
 ### Gremium
 
-Ein **Gremium** ist der Ausschuss oder das Organ, dessen Sitzungen der Beirat verfolgt, zum Beispiel der Bau-/Wirtschafts- und Umweltausschuss. Es ist **nicht der Beirat selbst**: Jeder Beirat hat seine eigene Instanz, und in der Instanz steht, welche Gremien er begleitet. Der Umweltbeirat Kremmen begleitet nur eines. Ein Beirat kann aber mehrere begleiten, zum Beispiel zusätzlich den Hauptausschuss. Dann kommen die Sitzungen aller Gremien ins Dashboard, und es erscheint eine Auswahl zum Filtern. Auch der RIS-Abgleich ordnet die Sitzungen über das Gremium zu.
+Ein **Gremium** ist der Ausschuss oder das Organ, dessen Sitzungen der Beirat verfolgt, zum Beispiel der Bauausschuss. Es ist **nicht der Beirat selbst**: Jeder Beirat hat seine eigene Instanz, und in der Instanz steht, welche Gremien er begleitet. Viele Beiräte begleiten nur eines. Ein Beirat kann aber mehrere begleiten, zum Beispiel zusätzlich den Hauptausschuss. Dann kommen die Sitzungen aller Gremien ins Dashboard, und es erscheint eine Auswahl zum Filtern. Auch der RIS-Abgleich ordnet die Sitzungen über das Gremium zu.
 
 Verwaltung → Inhalt → **Gremien**.
 
 | Feld | Bedeutung |
 | --- | --- |
 | Name | Anzeigename, erscheint im Dashboard und in den Mails |
-| ris_kennung | der Name des Gremiums **genau so, wie ihn das RIS anzeigt**, zum Beispiel `Bau-/Wirtschafts- und Umweltausschuss`. Nur damit findet der Abgleich die Sitzungen. Bei Handpflege leer lassen. |
+| ris_kennung | der Name des Gremiums **genau so, wie ihn das RIS anzeigt**, zum Beispiel `Bauausschuss`. Nur damit findet der Abgleich die Sitzungen. Bei Handpflege leer lassen. |
 | aktiv | nur aktive Gremien werden mit dem RIS abgeglichen |
 
 ### Sitzung von Hand
@@ -155,18 +155,18 @@ Inhalt → **Einstellungen** (es gibt genau einen Eintrag).
 
 | Feld | Bedeutung |
 | --- | --- |
-| name | Anzeigename der Instanz, zum Beispiel `Umweltbeirat Kremmen` |
+| name | Anzeigename der Instanz, zum Beispiel `Seniorenbeirat Musterstadt` |
 | frist_vor_tage | Tage vor der Sitzung für die Erinnerung (Standard 7) |
 | frist_nach_tage | Tage nach der Sitzung für die Bitte um die Notiz (Standard 3) |
 | zeitzone | `Europe/Berlin` |
 | notizfragen | die Fragen im Notizformular als Liste. Jede Frage hat `schluessel`, `frage`, `typ` (`ja-nein` oder `text`) und `pflicht`. Die Frage mit dem Schlüssel `relevant` muss bleiben. |
-| ris_adapter | `komfa` für das KOMFA RIS (Kremmen), `manuell` ohne Abgleich |
-| ris_quelle | Adresse des RIS, bei Kremmen `https://ris-kremmen.komfa.de` |
+| ris_adapter | `komfa` für ein KOMFA RIS, `manuell` ohne Abgleich |
+| ris_quelle | Adresse des RIS, zum Beispiel `https://ris-musterstadt.komfa.de` |
 | abo_version | Zahl erhöhen, um **alle** Kalender-Abo-Adressen ungültig zu machen (zum Beispiel wenn eine Adresse unbefugt weitergegeben wurde). Die Mitglieder holen sich danach im Dashboard die neue Adresse. |
 
 Das Feld `themenfokus` hat derzeit keine Wirkung (es ist für die spätere KI-Vorsortierung gedacht). Den Absender der Mails legt `EMAIL_FROM` in der `.env` fest. In älteren Instanzen gibt es noch ein Feld `absender_email`, es wird nicht mehr benutzt und kann ignoriert werden.
 
-**Alles auf einmal einrichten:** Die Einstellungen und Gremien einer neuen Instanz stehen in einer Datei (`examples/kremmen/instanz.yaml` als Vorlage). Mit `node scripts/instanz-anwenden.mjs <Datei>` überträgst du sie nach Directus (siehe [Neue Instanz](#neue-instanz-einrichten)).
+**Alles auf einmal einrichten:** Die Einstellungen und Gremien einer neuen Instanz stehen in einer Datei (`examples/kremmen/instanz.yaml` ist die ausgefüllte Beispielinstanz und dient als Vorlage). Mit `node scripts/instanz-anwenden.mjs <Datei>` überträgst du sie nach Directus (siehe [Neue Instanz](#neue-instanz-einrichten)).
 
 ## RIS-Abgleich und Benachrichtigungen umstellen
 
