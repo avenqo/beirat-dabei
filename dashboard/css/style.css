@@ -214,3 +214,16 @@ details.jahr > summary::-webkit-details-marker { display: none; }
 details.jahr > summary::before { content: "▸"; display: inline-block; width: 1em; transition: transform .15s; color: var(--leise); }
 details.jahr[open] > summary::before { transform: rotate(90deg); }
 details.jahr > .monat:first-of-type { margin-top: .25rem; }
+
+/* Fußzeile und Rechtstexte */
+.fuss { max-width: 46rem; margin: 0 auto; padding: 1.5rem 16px 2.5rem; display: flex; gap: 1.25rem; flex-wrap: wrap; border-top: 1px solid var(--linie); }
+.fuss a { color: var(--leise); font-size: .95rem; }
+.recht { background: var(--karte); border: 1px solid var(--linie); border-radius: var(--radius); padding: 1.25rem 1.25rem 1.5rem; }
+.recht-titel { text-transform: none; letter-spacing: 0; color: var(--text); font-size: 1.6rem; margin: .25rem 0 1rem; }
+.recht-abschnitt { font-size: 1.15rem; margin: 1.75rem 0 .5rem; }
+.recht-text, .recht-liste { margin: 0 0 .85rem; }
+.recht-liste { padding-left: 1.4rem; }
+.recht-liste li { margin: .25rem 0; }
+.recht code { background: color-mix(in srgb, var(--leise) 14%, transparent); padding: .05em .35em; border-radius: 4px; font-size: .92em; }
+.platzhalter { background: color-mix(in srgb, var(--gelb) 45%, transparent); color: var(--text); padding: 0 .2em; border-radius: 3px; }
+@media (max-width: 600px) { .recht { padding: 1rem .9rem 1.25rem; } }

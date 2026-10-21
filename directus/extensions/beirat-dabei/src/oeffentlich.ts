@@ -21,6 +21,8 @@ export interface OeffentlichSpeicher {
   /** Alle Dokumente (auch Entwürfe); der Handler zeigt nur veröffentlichte */
   dokumente(): Promise<DokumentZeile[]>;
   dateiVonDokument(dokumentId: string): Promise<DateiStrom | null>;
+  /** Impressum und Datenschutzerklärung als Markdown, wie sie in den Einstellungen stehen */
+  rechtstexte(): Promise<{ impressum: string; datenschutz: string }>;
 }
 
 export type OeffentlichAbhaengigkeiten = Omit<Abhaengigkeiten, "speicher"> & { speicher: Speicher & OeffentlichSpeicher };
@@ -106,4 +108,14 @@ export async function datei(d: OeffentlichAbhaengigkeiten, dokumentId: string): 
   const datei = await d.speicher.dateiVonDokument(dokumentId);
   if (!datei) return fehler(404, "nicht-gefunden");
   return { status: 200, body: null, datei };
+}
+
+/** Öffentlich: Impressum und Datenschutzerklärung. Der Text kommt aus den Einstellungen der Instanz. */
+export async function rechtliches(d: OeffentlichAbhaengigkeiten): Promise<Antwort> {
+  const [{ name }, texte] = await Promise.all([d.speicher.einstellungen(), d.speicher.rechtstexte()]);
+  return {
+    status: 200,
+    body: { instanz: name ?? "Beirat dabei", impressum: texte.impressum, datenschutz: texte.datenschutz },
+    kopf: { "cache-control": "public, max-age=300" },
+  };
 }

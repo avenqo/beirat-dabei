@@ -248,6 +248,11 @@ export function speicherAusDirectus(
       return (e["project_logo"] as string | null) ?? null;
     },
 
+    async rechtstexte() {
+      const e = await (await dienst("einstellungen")).readSingleton({ fields: ["impressum", "datenschutz"] });
+      return { impressum: (e["impressum"] as string) ?? "", datenschutz: (e["datenschutz"] as string) ?? "" };
+    },
+
     async dokumente(): Promise<DokumentZeile[]> {
       const zeilen = await (await dienst("dokumente")).readByQuery({
         fields: ["id", "titel", "kategorie", "datum", "beschreibung", "veroeffentlicht", "datei.id", "datei.filename_download", "datei.type", "datei.filesize"],

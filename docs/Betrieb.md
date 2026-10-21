@@ -145,6 +145,16 @@ Unterlagen pflegst du in der Verwaltung unter Inhalt → **Dokumente**:
 
 Prüfe vor dem Veröffentlichen, dass im Dokument nichts Internes steht (Namen, Mailadressen, Entwurfsvermerke). Wer die Adresse einer Datei kennt, kann sie abrufen, solange sie veröffentlicht ist. Entwürfe sind nicht abrufbar.
 
+### Impressum und Datenschutzerklärung
+
+Beide Seiten sind von jeder Seite der Website über die Fußzeile erreichbar (`impressum.html`, `datenschutz.html`) und stehen auch in den Mails. Die Texte pflegst du in der Verwaltung unter Inhalt → **Einstellungen** in den Feldern `impressum` und `datenschutz`. Es ist Markdown: `#` und `##` für Überschriften, `-` für Listen, `**fett**` und `[Text](https://…)` für Links.
+
+Beim Einrichten trägt das Datenmodell-Skript **Vorlagen** ein (`docs/vorlagen/`). In den Vorlagen stehen Angaben in `[eckigen Klammern]`, die du ausfüllen musst. Auf der Website erscheinen sie gelb markiert, damit man sie nicht übersieht. **Eine Vorlage ist keine Rechtsberatung.** Lass die Texte vor der Veröffentlichung von der Datenschutzbeauftragten Person oder einer Rechtsberatung prüfen und passe sie an deinen Hoster, deinen Mailanbieter und deine Löschfristen an.
+
+**Cookie-Hinweis:** Die Website setzt im öffentlichen Bereich keine Cookies. Nach der Anmeldung entsteht ein einziges, technisch notwendiges Sitzungs-Cookie (24 Stunden, nicht für Skripte lesbar). Dafür ist keine Einwilligung nötig, also kein Cookie-Banner. Das ändert sich, sobald jemand Statistik, eingebettete Videos, Karten oder Schriftarten von fremden Servern einbaut. Dann braucht die Seite eine Einwilligungsabfrage.
+
+**Aufbewahrung:** Das Aktivitätsprotokoll von Directus (Anmeldungen, Änderungen) und der Versionsverlauf werden nach 90 Tagen gelöscht (`ACTIVITY_RETENTION`, `REVISIONS_RETENTION` in der `.env`). Das Anwendungsprotokoll des Servers ist auf etwa 30 MB begrenzt. Es enthält aufgerufene Adressen, auch persönliche Links. Wer Zugriff auf den Server hat, kann sie lesen.
+
 ### Notizen löschen
 
 Teilnehmende löschen eine Notiz im Dashboard über „Notiz löschen“ (mit Sicherheitsabfrage). Weil die Notiz allen Teilnehmenden einer Sitzung gehört, verschwindet sie für alle. Das Löschen ist endgültig. Die Erinnerungsmail „Notiz fehlt“ kommt danach nicht noch einmal. Administrierende können Notizen außerdem in der Verwaltung unter Inhalt → Notizen löschen, auch wenn sie bei der Sitzung nicht dabei waren.

@@ -185,6 +185,10 @@ Name und Logo der Instanz stehen in der Kopfzeile aller Seiten, auch auf der Anm
 
 Vergangene Sitzungen erscheinen im Dashboard nach Jahr gegliedert: das neueste Jahr ist aufgeklappt, ältere sind eingeklappt, bei jedem Jahr steht die Anzahl. Ab sieben vergangenen Sitzungen gibt es ein Suchfeld. Es durchsucht Gremium, Ort, Datum und die Antworten in den Notizen (mehrere Wörter müssen alle vorkommen) und klappt bei einer Suche die Jahre mit Treffern auf. Gespeichert bleibt alles unbegrenzt, eine automatische Löschfrist gibt es noch nicht. Mit fünf Jahren Testdaten (180 Sitzungen mit Notizen) antwortet das Dashboard in etwa 70 ms.
 
+## Impressum und Datenschutz
+
+Impressum und Datenschutzerklärung (nach Art. 13 DSGVO) sind in der Fußzeile jeder Seite verlinkt und werden in den Einstellungen der Instanz gepflegt. Die Vorlagen unter `docs/vorlagen/` werden beim Einrichten eingetragen. Offene Platzhalter erscheinen gelb markiert. Die Vorlagen sind eine Arbeitsgrundlage und müssen vor der Veröffentlichung geprüft werden.
+
 ## Kalender-Abo
 
 Jedes Mitglied findet im Dashboard unter „Kalender abonnieren“ eine persönliche Adresse für den eigenen Kalender (Google, Apple, Outlook, Thunderbird). Der Feed enthält alle Sitzungen der letzten 60 Tage und der Zukunft mit Ort, Teilnehmenden, Link zur Tagesordnung und Absagen (`STATUS:CANCELLED`). Kalender-Apps laden ihn alle paar Stunden neu, Verschiebungen kommen so von selbst an. Als Dauer gilt `SITZUNGSDAUER_STUNDEN`.

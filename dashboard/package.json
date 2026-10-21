@@ -1,0 +1,10 @@
+{
+  "name": "beirat-dabei-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "EUPL-1.2",
+  "scripts": {
+    "test": "node --test"
+  }
+}

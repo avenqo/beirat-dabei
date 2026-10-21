@@ -34,10 +34,19 @@ services:
       RIS_CRON: ${RIS_CRON:-15 6,12,18 * * *}
       RIS_USER_AGENT: ${RIS_USER_AGENT:-}
       RIS_RUECKBLICK_TAGE: ${RIS_RUECKBLICK_TAGE:-45}
+      # Aktivitätsprotokoll (Anmeldungen, Änderungen) und Versionsverlauf nach dieser Zeit löschen
+      ACTIVITY_RETENTION: ${ACTIVITY_RETENTION:-90d}
+      REVISIONS_RETENTION: ${REVISIONS_RETENTION:-90d}
       ROLLE_MITGLIED: ${ROLLE_MITGLIED:-mitglied}
       ROLLE_ADMIN: ${ROLLE_ADMIN:-admin}
       TZ: ${TZ:-Europe/Berlin}
       TELEMETRY: "false"
+    # Anwendungsprotokoll begrenzen: enthält aufgerufene Adressen, auch persönliche Links
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     healthcheck:
       # 127.0.0.1 statt localhost: im Container löst localhost zuerst zu IPv6 auf. /server/health verlangt eine Anmeldung.
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8055/server/ping"]

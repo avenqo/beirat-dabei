@@ -1,7 +1,7 @@
 import { Readable } from "node:stream";
 import { beforeEach, describe, expect, it } from "vitest";
 import { STANDARD_EINSTELLUNGEN, type SitzungInfo } from "@beirat-dabei/core";
-import { datei, instanz, oeffentlich, type DokumentZeile, type OeffentlichAbhaengigkeiten, type OeffentlichSpeicher } from "../src/oeffentlich.js";
+import { datei, instanz, oeffentlich, rechtliches, type DokumentZeile, type OeffentlichAbhaengigkeiten, type OeffentlichSpeicher } from "../src/oeffentlich.js";
 import type { Speicher } from "../src/handlers.js";
 
 const d = (iso: string) => new Date(iso);
@@ -13,6 +13,7 @@ const ID4 = "44444444-4444-4444-8444-444444444444";
 let logo: string | null;
 let dokumente: DokumentZeile[];
 let geliefert: string[];
+let rechtstexte: { impressum: string; datenschutz: string };
 
 const sitzungen: SitzungInfo[] = [
   { id: "alt", gremiumId: "g", gremiumName: "BUA", start: d("2026-09-17T17:00:00Z"), abgesagt: false, toVeroeffentlicht: true, toLink: "https://ris.example/alt" },
@@ -32,6 +33,7 @@ const speicher = {
   sitzungen: async () => sitzungen,
   logoId: async () => logo,
   dokumente: async () => dokumente,
+  rechtstexte: async () => rechtstexte,
   dateiVonDokument: async (id: string) => {
     geliefert.push(id);
     return { stream: Readable.from(["x"]), typ: "application/pdf", name: "go.pdf", groesse: 1 };
@@ -46,6 +48,7 @@ beforeEach(() => {
   logo = null;
   geliefert = [];
   dokumente = [];
+  rechtstexte = { impressum: "# Impressum\n\nMuster", datenschutz: "# Datenschutz\n\nText" };
 });
 
 describe("instanz", () => {
@@ -110,5 +113,17 @@ describe("datei", () => {
     dokumente = [dok({ id: ID1, veroeffentlicht: false }), dok({ id: ID2, hatDatei: false })];
     for (const id of [ID1, ID2, ID3, "../../etc/passwd", "x"]) expect((await datei(deps(), id)).status).toBe(404);
     expect(geliefert).toEqual([]);
+  });
+});
+
+describe("rechtliches", () => {
+  it("liefert Impressum und Datenschutzerklärung aus den Einstellungen, ohne Anmeldung", async () => {
+    const r = await rechtliches(deps());
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ instanz: "Umweltbeirat Kremmen", impressum: "# Impressum\n\nMuster", datenschutz: "# Datenschutz\n\nText" });
+  });
+  it("leere Texte bleiben leer (die Seite zeigt dann einen Hinweis)", async () => {
+    rechtstexte = { impressum: "", datenschutz: "" };
+    expect((await rechtliches(deps())).body).toMatchObject({ impressum: "", datenschutz: "" });
   });
 });

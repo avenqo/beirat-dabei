@@ -65,6 +65,7 @@ export default defineEndpoint({
     // Öffentlich, ohne Anmeldung: Name, Termine, veröffentlichte Unterlagen
     router.get("/instanz", route(() => o.instanz(od)));
     router.get("/oeffentlich", route(() => o.oeffentlich(od)));
+    router.get("/rechtliches", route(() => o.rechtliches(od)));
     router.get("/datei/:id", route((req) => o.datei(od, req.params.id)));
 
     // Öffentlich, durch signierten Token geschützt

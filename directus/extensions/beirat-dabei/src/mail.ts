@@ -124,7 +124,7 @@ export function mailRendern(daten: MailDaten, k: MailKontext): Mail {
   const betreff = `${k.instanzName}: ${titel}, ${betreffZusatz[haupt]}`;
 
   const gruss = `Hallo ${daten.empfaengerName},`;
-  const fuss = `Alle Sitzungen im Überblick: ${k.dashboardUrl}/`;
+  const fuss = `Alle Sitzungen im Überblick: ${k.dashboardUrl}/\nImpressum: ${k.dashboardUrl}/impressum.html · Datenschutz: ${k.dashboardUrl}/datenschutz.html`;
   const text = [
     gruss,
     "",
@@ -145,7 +145,7 @@ ${knoepfe
       `<p><a href="${esc(b.url)}" style="display:inline-block;padding:.6em 1.2em;background:#2e7d32;color:#fff;border-radius:6px;text-decoration:none">${esc(b.beschriftung)}</a></p>`,
   )
   .join("\n")}
-<p style="color:#555"><a href="${esc(k.dashboardUrl)}/">Alle Sitzungen im Überblick</a><br>${esc(k.instanzName)}</p>
+<p style="color:#555"><a href="${esc(k.dashboardUrl)}/">Alle Sitzungen im Überblick</a><br>${esc(k.instanzName)}<br><a href="${esc(k.dashboardUrl)}/impressum.html">Impressum</a> · <a href="${esc(k.dashboardUrl)}/datenschutz.html">Datenschutz</a></p>
 </body></html>`;
 
   return { betreff, text, html };

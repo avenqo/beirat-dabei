@@ -5,6 +5,8 @@
 //   DIRECTUS_URL=http://localhost:8055 ADMIN_EMAIL=… ADMIN_PASSWORD=… \
 //   ROLLE_MITGLIED=ub ROLLE_ADMIN=ub-admin node scripts/schema-anwenden.mjs
 
+import { readFile } from "node:fs/promises";
+
 const url = (process.env.DIRECTUS_URL ?? "http://localhost:8055").replace(/\/$/, "");
 const rolleMitglied = process.env.ROLLE_MITGLIED ?? "mitglied";
 const rolleAdmin = process.env.ROLLE_ADMIN ?? "admin";
@@ -64,6 +66,8 @@ const sammlungen = [
         interface: "select-dropdown",
         options: { choices: ["manuell", "komfa", "oparl", "ical"].map((v) => ({ text: v, value: v })) },
       }, { default_value: "manuell" }),
+      { field: "impressum", type: "text", meta: { interface: "input-rich-text-md", note: "Impressum der Website (Markdown). Platzhalter in [eckigen Klammern] ausfüllen." }, schema: {} },
+      { field: "datenschutz", type: "text", meta: { interface: "input-rich-text-md", note: "Datenschutzerklärung nach Art. 13 DSGVO (Markdown). Platzhalter in [eckigen Klammern] ausfüllen und prüfen." }, schema: {} },
       zahl("abo_version", 1, { note: "Erhöhen, um alle Kalender-Abo-Adressen ungültig zu machen" }),
       text("ris_quelle", { note: "Adresse des Ratsinformationssystems, z. B. https://ris-musterstadt.komfa.de" }),
     ],
@@ -281,9 +285,23 @@ async function einstellungenVorbelegen() {
   console.log("+ Einstellungen vorbelegt");
 }
 
+/** Impressum und Datenschutzerklärung aus den Vorlagen anlegen, solange die Felder leer sind. */
+async function rechtstexteVorbelegen() {
+  const aktuell = await api("GET", "/items/einstellungen?fields=impressum,datenschutz");
+  const neu = {};
+  for (const feld of ["impressum", "datenschutz"]) {
+    if (aktuell?.[feld]) continue;
+    neu[feld] = await readFile(new URL(`../docs/vorlagen/${feld}.md`, import.meta.url), "utf8");
+  }
+  if (Object.keys(neu).length === 0) return;
+  await api("PATCH", "/items/einstellungen", neu);
+  console.log(`+ Vorlagen für ${Object.keys(neu).join(" und ")} eingetragen (Platzhalter noch ausfüllen)`);
+}
+
 const login = await api("POST", "/auth/login", { email: ADMIN_EMAIL, password: ADMIN_PASSWORD });
 token = login.access_token;
 await sammlungenAnlegen();
 await rollenUndRechte();
 await einstellungenVorbelegen();
+await rechtstexteVorbelegen();
 console.log("Fertig.");
