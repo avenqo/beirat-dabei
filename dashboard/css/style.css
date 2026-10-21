@@ -30,6 +30,8 @@
   }
 }
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 [hidden] { display: none !important; }
 body {
   margin: 0;
@@ -105,7 +107,7 @@ fieldset label { display: inline-flex; grid-auto-flow: column; align-items: cent
 dialog { border: 1px solid var(--linie); border-radius: var(--radius); background: var(--karte); color: var(--text); width: min(34rem, calc(100vw - 32px)); padding: 1rem; }
 dialog::backdrop { background: rgb(0 0 0 / .5); }
 
-details.abo { margin-top: 2rem; }
+details.abo { margin: 0; }
 details.abo summary { cursor: pointer; font-weight: 600; }
 details.abo input { margin-top: .5rem; }
 
@@ -119,7 +121,7 @@ details.abo input { margin-top: .5rem; }
   background: var(--alarm); color: var(--alarm-text);
   border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0 0;
 }
-.alarm h2 { margin: 0 0 .5rem; color: inherit; text-transform: none; letter-spacing: 0; font-size: 1.15rem; }
+.alarm h3 { margin: 0 0 .5rem; color: inherit; text-transform: none; letter-spacing: 0; font-size: 1.15rem; }
 .alarm p { margin: 0; }
 .alarm-zeile { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; padding: .4rem 0; }
 .alarm button.primaer { background: var(--alarm-text); color: var(--alarm); border-color: var(--alarm-text); }
@@ -131,3 +133,51 @@ ul.dokumente li p { margin: .25rem 0 0; }
 
 button.gefahr { color: var(--alarm); border-color: var(--alarm); }
 button.gefahr.primaer { background: var(--alarm); color: var(--alarm-text); }
+
+/* Abschnitte der Startseite: klar voneinander getrennt */
+.sprung {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; gap: .5rem; overflow-x: auto;
+  margin: 0 -16px; padding: .6rem 16px;
+  background: var(--bg); border-bottom: 1px solid var(--linie);
+}
+.sprung a {
+  display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap;
+  padding: .35rem .85rem; border: 1px solid var(--linie); border-radius: 999px;
+  background: var(--karte); color: var(--text); text-decoration: none; font-weight: 600; font-size: .95rem;
+}
+.sprung a[aria-current] { background: var(--akzent); border-color: var(--akzent); color: var(--akzent-text); }
+.zahl {
+  display: inline-block; min-width: 1.5em; padding: 0 .45em; border-radius: 999px; text-align: center;
+  font-size: .8rem; font-weight: 700; line-height: 1.5; background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.bereich {
+  margin-top: 2.5rem; padding: 1.1rem 1rem 1rem;
+  border: 1px solid var(--linie); border-top: 6px solid var(--akzent); border-radius: var(--radius);
+  background: color-mix(in srgb, var(--karte) 45%, var(--bg));
+  scroll-margin-top: 4rem;
+}
+.bereich[data-art="grau"] { border-top-color: var(--leise); }
+.bereich[data-art="blau"] { border-top-color: var(--blau); }
+.bereich[data-art="hinweis"] { border-top-color: var(--gelb); }
+.bereich > h2 {
+  display: flex; align-items: center; gap: .6rem;
+  margin: 0 0 1rem; font-size: 1.4rem; text-transform: none; letter-spacing: 0; color: var(--text);
+}
+.bereich .karte:last-child { margin-bottom: 0; }
+.monat {
+  margin: 1.5rem 0 .6rem; padding-bottom: .3rem; border-bottom: 1px solid var(--linie);
+  font-size: .9rem; font-weight: 700; color: var(--leise); text-transform: uppercase; letter-spacing: .06em;
+}
+.monat:first-of-type { margin-top: 0; }
+
+.hinweisbox {
+  background: color-mix(in srgb, var(--gelb) 20%, var(--karte));
+  border: 1px solid var(--gelb); border-left-width: 8px; border-radius: var(--radius);
+  padding: .9rem 1.1rem; margin: 0 0 .75rem;
+}
+.hinweisbox h3 { margin: 0 0 .4rem; font-size: 1.05rem; }
+.hinweisbox p { margin: 0; }
+.bereich[data-art="hinweis"] > :last-child { margin-bottom: 0; }
+.alarm { margin: 0 0 .75rem; }

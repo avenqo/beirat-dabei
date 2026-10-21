@@ -97,9 +97,29 @@ async function aktion(knopf, aufruf) {
 
 function zeichnen() {
   leeren(inhalt);
-  if (meldung) inhalt.append(el("p", { class: `meldung${meldung.fehler ? " fehler" : ""}`, role: "alert" }, meldung.text));
 
   const gremien = [...new Map([...daten.kommend, ...daten.vergangen].map((s) => [s.gremiumId, s.gremium])).entries()];
+  const passt = (s) => !filter || s.gremiumId === filter;
+  const kommend = daten.kommend.filter(passt);
+  const vergangen = daten.vergangen.filter(passt);
+
+  // Hinweise: dringende Sitzungen und fehlende Notizen der letzten Wochen
+  const dringend = kommend.filter((s) => s.status === "dringend");
+  const ohneNotiz = vergangen.filter((s) => s.status === "notiz-fehlt" && s.tageBis >= -60);
+  const hinweise = [];
+  if (dringend.length > 0) hinweise.push(alarm(dringend));
+  if (ohneNotiz.length > 0) hinweise.push(notizHinweis(ohneNotiz));
+
+  const bereiche = [];
+  if (hinweise.length > 0) bereiche.push(bereich("hinweise", "Hinweise", dringend.length + ohneNotiz.length, "hinweis", hinweise));
+  bereiche.push(bereich("anstehend", "Anstehende Sitzungen", kommend.length, "gruen",
+    kommend.length === 0 ? [el("p", { class: "leer" }, "Keine anstehenden Sitzungen.")] : nachMonat(kommend)));
+  bereiche.push(bereich("vergangen", "Vergangene Sitzungen", vergangen.length, "grau",
+    vergangen.length === 0 ? [el("p", { class: "leer" }, "Noch keine vergangenen Sitzungen.")] : nachMonat(vergangen)));
+  bereiche.push(bereich("kalender", "Kalender", null, "blau", [kalenderAbo()]));
+
+  inhalt.append(sprungleiste(bereiche));
+  if (meldung) inhalt.append(el("p", { class: `meldung${meldung.fehler ? " fehler" : ""}`, role: "alert" }, meldung.text));
   if (gremien.length > 1) {
     const auswahl = el(
       "select",
@@ -109,23 +129,97 @@ function zeichnen() {
     );
     inhalt.append(el("label", { class: "filter", for: "gremium" }, "Gremium", auswahl));
   }
+  for (const b of bereiche) inhalt.append(b.knoten);
+  sprungMarkieren(bereiche);
+}
 
-  const passt = (s) => !filter || s.gremiumId === filter;
-  const kommend = daten.kommend.filter(passt);
-  const vergangen = daten.vergangen.filter(passt);
+/** Ein Abschnitt der Seite mit Überschrift, Anzahl und farbiger Kante. */
+function bereich(id, titel, anzahl, art, knoten) {
+  return {
+    id,
+    titel,
+    anzahl,
+    knoten: el(
+      "section",
+      { class: "bereich", id, "data-art": art, "aria-labelledby": `${id}-titel` },
+      el("h2", { id: `${id}-titel` }, titel, anzahl !== null ? el("span", { class: "zahl" }, anzahl) : null),
+      ...knoten,
+    ),
+  };
+}
 
-  const dringend = kommend.filter((s) => s.status === "dringend");
-  if (dringend.length > 0) inhalt.append(alarm(dringend));
+/** Leiste zum schnellen Springen zwischen den Abschnitten. Bleibt beim Scrollen oben stehen. */
+function sprungleiste(bereiche) {
+  return el(
+    "nav",
+    { class: "sprung", "aria-label": "Springen zu" },
+    ...bereiche.map((b) =>
+      el("a", {
+        href: `#${b.id}`,
+        "data-ziel": b.id,
+        onclick: (e) => {
+          e.preventDefault();
+          document.getElementById(b.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        },
+      }, b.titel.replace("Anstehende Sitzungen", "Anstehend").replace("Vergangene Sitzungen", "Vergangen"), b.anzahl !== null ? el("span", { class: "zahl" }, b.anzahl) : null),
+    ),
+  );
+}
 
-  inhalt.append(el("h2", {}, "Anstehende Sitzungen"));
-  if (kommend.length === 0) inhalt.append(el("p", { class: "leer" }, "Keine anstehenden Sitzungen."));
-  for (const s of kommend) inhalt.append(karte(s));
+/** Hebt in der Sprungleiste den Abschnitt hervor, der gerade im Blick ist. */
+let beobachter = null;
+function sprungMarkieren(bereiche) {
+  beobachter?.disconnect();
+  if (!("IntersectionObserver" in window)) return;
+  const links = new Map(bereiche.map((b) => [b.id, document.querySelector(`.sprung a[data-ziel="${b.id}"]`)]));
+  const sichtbar = new Set();
+  beobachter = new IntersectionObserver(
+    (eintraege) => {
+      for (const e of eintraege) (e.isIntersecting ? sichtbar.add(e.target.id) : sichtbar.delete(e.target.id));
+      const erster = bereiche.find((b) => sichtbar.has(b.id));
+      for (const [id, a] of links) a?.toggleAttribute("aria-current", id === erster?.id);
+    },
+    { rootMargin: "-20% 0px -60% 0px" },
+  );
+  for (const b of bereiche) beobachter.observe(b.knoten);
+}
 
-  inhalt.append(el("h2", {}, "Vergangene Sitzungen"));
-  if (vergangen.length === 0) inhalt.append(el("p", { class: "leer" }, "Noch keine vergangenen Sitzungen."));
-  for (const s of vergangen) inhalt.append(karte(s));
+/** Karten unter Monatsüberschriften gruppieren, damit lange Listen überschaubar bleiben. */
+function nachMonat(sitzungen) {
+  const zone = daten.instanz.zeitzone;
+  const monat = (iso) => new Intl.DateTimeFormat("de-DE", { timeZone: zone, month: "long", year: "numeric" }).format(new Date(iso));
+  const ausgabe = [];
+  let aktuell = null;
+  for (const s of sitzungen) {
+    const m = monat(s.beginn);
+    if (m !== aktuell) {
+      aktuell = m;
+      ausgabe.push(el("h3", { class: "monat" }, m));
+    }
+    ausgabe.push(karte(s));
+  }
+  return ausgabe;
+}
 
-  inhalt.append(kalenderAbo());
+/** Dezenter Hinweis (gelb): Sitzungen, zu denen noch keine Notiz geschrieben wurde. */
+function notizHinweis(sitzungen) {
+  const zone = daten.instanz.zeitzone;
+  return el(
+    "div",
+    { class: "hinweisbox", role: "status" },
+    el("h3", {}, sitzungen.length === 1 ? "Hinweis: Die Notiz für eine Sitzung fehlt noch" : `Hinweis: Die Notizen für ${sitzungen.length} Sitzungen fehlen noch`),
+    ...sitzungen.map((s) =>
+      el("div", { class: "alarm-zeile" },
+        el("p", {}, el("strong", {}, `${s.gremium}, ${tagKurz(s.beginn, zone)}`), ` (${countdown(s.tageBis)})`),
+        s.ichTeilnehmend
+          ? el("button", { type: "button", class: "primaer", onclick: () => notizDialog(s) }, "Notiz schreiben")
+          : el("button", {
+              type: "button",
+              onclick: (e) => aktion(e.currentTarget, () => api.teilnahme(s.id, "dabei-gewesen")),
+            }, "Ich war dabei"),
+      ),
+    ),
+  );
 }
 
 /** Persönliche Abo-Adresse für den eigenen Kalender, wird erst beim Aufklappen geladen. */
@@ -178,7 +272,7 @@ function alarm(sitzungen) {
   return el(
     "section",
     { class: "alarm", role: "alert", "aria-label": "Dringend" },
-    el("h2", {}, sitzungen.length === 1 ? "Dringend: Für eine Sitzung fehlt noch jemand" : `Dringend: Für ${sitzungen.length} Sitzungen fehlt noch jemand`),
+    el("h3", {}, sitzungen.length === 1 ? "Dringend: Für eine Sitzung fehlt noch jemand" : `Dringend: Für ${sitzungen.length} Sitzungen fehlt noch jemand`),
     ...sitzungen.map((s) =>
       el("div", { class: "alarm-zeile" },
         el("p", {}, el("strong", {}, `${s.gremium}, ${tagKurz(s.beginn, daten.instanz.zeitzone)}`), ` (${countdown(s.tageBis)}): noch niemand eingetragen.`),
@@ -348,4 +442,5 @@ function notizDialog(s) {
   dialog.showModal();
 }
 
+markeLaden(); // Name und Logo, auch wenn man schon angemeldet ist
 laden();
