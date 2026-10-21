@@ -196,7 +196,7 @@ Das System muss ohne seinen Erbauer weiterlaufen: In diesem Fall übernehmen and
 - **Funktionsadressen statt persönlicher Konten.** Ein SMTP-Konto, das dem Beirat gehört (etwa umweltbeirat@…), und eine Domain umweltbeirat.[ort].de. Bei einem Domainwechsel ändern sich alle Links in alten E-Mails.
 - **Admins über eine Rolle.** Administrieren kann, wer die Rolle `ub-admin` hat. Die Übergabe ist damit eine Rollenzuweisung in Directus.
 - **Backup und Restore als Skript.** Gesichert werden die SQLite-Datei und die Uploads. Die Datei wird mit `sqlite3 .backup` gesichert oder bei kurz gestopptem Container kopiert, nie einfach im laufenden Betrieb. Die Wiederherstellung verschiebt die bisherigen Daten beiseite statt sie zu löschen und wird einmal getestet.
-- **Betriebsanleitung im README** für Nicht-Entwickler: starten, aktualisieren, Mitglied anlegen, Backup einspielen.
+- **Betriebsanleitung** für Nicht-Entwickler unter [`Betrieb.md`](Betrieb.md): starten, aktualisieren, Mitglied anlegen, Sitzungen pflegen, RIS-Modus umstellen, Backup einspielen, häufige Probleme.
 
 **Repo-Aufteilung.** Der allgemeine Kern liegt öffentlich in `beirat-dabei`, mit einer vollständigen Beispielkonfiguration unter `examples/kremmen/` ohne Geheimnisse. Die `.env` der Kremmener Instanz mit SMTP-Zugang und Schlüsseln liegt nur auf dem Server.
 

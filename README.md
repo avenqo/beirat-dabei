@@ -213,7 +213,7 @@ Die Rollennamen sind je Instanz frei wählbar.
   ```bash
   15 3 * * * cd /pfad/zu/beirat-dabei && scripts/backup.sh >> backups/backup.log 2>&1
   ```
-- **Übergabe:** Neue Administrierende bekommen die Admin-Rolle. Eine Betriebsanleitung für Nicht-Entwickler liegt unter `docs/`.
+- **Übergabe:** Neue Administrierende bekommen die Admin-Rolle. Die [Betriebsanleitung für Nicht-Entwickler](docs/Betrieb.md) erklärt Starten, Aktualisieren, Mitglieder, Sitzungen, Backup und häufige Probleme.
 
 ## Datenschutz
 
