@@ -177,7 +177,7 @@ Lokal über http muss `SESSION_COOKIE_SECURE=false` gesetzt sein.
 
 ## Öffentlicher Bereich
 
-`dashboard/oeffentlich.html` zeigt ohne Anmeldung die nächsten Sitzungstermine mit Tagesordnung und die veröffentlichten Unterlagen des Beirats (Geschäftsordnung, Stellungnahmen, Tätigkeitsberichte, weitere Dokumente). Gepflegt wird das in der Verwaltung unter „Dokumente“. Nur Dokumente mit Haken bei `veroeffentlicht` sind sichtbar, und die Dateien laufen über die Extension, nicht über die offene Dateiablage von Directus. Mitglieder und Notizen erscheinen dort nie.
+`dashboard/oeffentlich.html` zeigt ohne Anmeldung die nächsten Sitzungstermine mit Tagesordnung und die veröffentlichten Unterlagen des Beirats (Geschäftsordnung, Stellungnahmen, Tätigkeitsberichte, weitere Dokumente). Gepflegt wird das in der Verwaltung unter „Dokumente“. Nur Dokumente mit Haken bei `veroeffentlicht` sind sichtbar, und die Dateien laufen über die Extension, nicht über die offene Dateiablage von Directus. Mitglieder und Notizen erscheinen dort nie. Die Seite ist wie das Dashboard in Abschnitte gegliedert (Termine, je eine Kategorie von Unterlagen) mit einer Sprungleiste und für Handys ausgelegt.
 
 Name und Logo der Instanz stehen in der Kopfzeile aller Seiten, auch auf der Anmeldeseite. Das Logo kommt aus den Projekteinstellungen von Directus, bis dahin gibt es einen Platzhalter.
 

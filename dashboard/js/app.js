@@ -2,6 +2,7 @@ import * as api from "./api.js";
 import { el, leeren, sichereUrl } from "./dom.js";
 import { countdown, datumLang, fehlerText, STATUS, tagKurz } from "./format.js";
 import { markeLaden } from "./marke.js";
+import { bereich, sprungleiste, sprungMarkieren } from "./bereiche.js";
 import { notizFormular } from "./notizformular.js";
 
 const inhalt = document.getElementById("inhalt");
@@ -111,12 +112,16 @@ function zeichnen() {
   if (ohneNotiz.length > 0) hinweise.push(notizHinweis(ohneNotiz));
 
   const bereiche = [];
-  if (hinweise.length > 0) bereiche.push(bereich("hinweise", "Hinweise", dringend.length + ohneNotiz.length, "hinweis", hinweise));
-  bereiche.push(bereich("anstehend", "Anstehende Sitzungen", kommend.length, "gruen",
-    kommend.length === 0 ? [el("p", { class: "leer" }, "Keine anstehenden Sitzungen.")] : nachMonat(kommend)));
-  bereiche.push(bereich("vergangen", "Vergangene Sitzungen", vergangen.length, "grau",
-    vergangen.length === 0 ? [el("p", { class: "leer" }, "Noch keine vergangenen Sitzungen.")] : nachMonat(vergangen)));
-  bereiche.push(bereich("kalender", "Kalender", null, "blau", [kalenderAbo()]));
+  if (hinweise.length > 0) bereiche.push(bereich({ id: "hinweise", titel: "Hinweise", anzahl: dringend.length + ohneNotiz.length, art: "hinweis", knoten: hinweise }));
+  bereiche.push(bereich({
+    id: "anstehend", titel: "Anstehende Sitzungen", kurz: "Anstehend", anzahl: kommend.length, art: "gruen",
+    knoten: kommend.length === 0 ? [el("p", { class: "leer" }, "Keine anstehenden Sitzungen.")] : nachMonat(kommend),
+  }));
+  bereiche.push(bereich({
+    id: "vergangen", titel: "Vergangene Sitzungen", kurz: "Vergangen", anzahl: vergangen.length, art: "grau",
+    knoten: vergangen.length === 0 ? [el("p", { class: "leer" }, "Noch keine vergangenen Sitzungen.")] : nachMonat(vergangen),
+  }));
+  bereiche.push(bereich({ id: "kalender", titel: "Kalender", art: "blau", knoten: [kalenderAbo()] }));
 
   inhalt.append(sprungleiste(bereiche));
   if (meldung) inhalt.append(el("p", { class: `meldung${meldung.fehler ? " fehler" : ""}`, role: "alert" }, meldung.text));
@@ -131,57 +136,6 @@ function zeichnen() {
   }
   for (const b of bereiche) inhalt.append(b.knoten);
   sprungMarkieren(bereiche);
-}
-
-/** Ein Abschnitt der Seite mit Überschrift, Anzahl und farbiger Kante. */
-function bereich(id, titel, anzahl, art, knoten) {
-  return {
-    id,
-    titel,
-    anzahl,
-    knoten: el(
-      "section",
-      { class: "bereich", id, "data-art": art, "aria-labelledby": `${id}-titel` },
-      el("h2", { id: `${id}-titel` }, titel, anzahl !== null ? el("span", { class: "zahl" }, anzahl) : null),
-      ...knoten,
-    ),
-  };
-}
-
-/** Leiste zum schnellen Springen zwischen den Abschnitten. Bleibt beim Scrollen oben stehen. */
-function sprungleiste(bereiche) {
-  return el(
-    "nav",
-    { class: "sprung", "aria-label": "Springen zu" },
-    ...bereiche.map((b) =>
-      el("a", {
-        href: `#${b.id}`,
-        "data-ziel": b.id,
-        onclick: (e) => {
-          e.preventDefault();
-          document.getElementById(b.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-        },
-      }, b.titel.replace("Anstehende Sitzungen", "Anstehend").replace("Vergangene Sitzungen", "Vergangen"), b.anzahl !== null ? el("span", { class: "zahl" }, b.anzahl) : null),
-    ),
-  );
-}
-
-/** Hebt in der Sprungleiste den Abschnitt hervor, der gerade im Blick ist. */
-let beobachter = null;
-function sprungMarkieren(bereiche) {
-  beobachter?.disconnect();
-  if (!("IntersectionObserver" in window)) return;
-  const links = new Map(bereiche.map((b) => [b.id, document.querySelector(`.sprung a[data-ziel="${b.id}"]`)]));
-  const sichtbar = new Set();
-  beobachter = new IntersectionObserver(
-    (eintraege) => {
-      for (const e of eintraege) (e.isIntersecting ? sichtbar.add(e.target.id) : sichtbar.delete(e.target.id));
-      const erster = bereiche.find((b) => sichtbar.has(b.id));
-      for (const [id, a] of links) a?.toggleAttribute("aria-current", id === erster?.id);
-    },
-    { rootMargin: "-20% 0px -60% 0px" },
-  );
-  for (const b of bereiche) beobachter.observe(b.knoten);
 }
 
 /** Karten unter Monatsüberschriften gruppieren, damit lange Listen überschaubar bleiben. */

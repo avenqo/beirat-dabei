@@ -181,3 +181,22 @@ button.gefahr.primaer { background: var(--alarm); color: var(--alarm-text); }
 .hinweisbox p { margin: 0; }
 .bereich[data-art="hinweis"] > :last-child { margin-bottom: 0; }
 .alarm { margin: 0 0 .75rem; }
+
+/* Sprungleiste: auf schmalen Bildschirmen seitlich wischbar, mit Hinweis am rechten Rand */
+.sprung { scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.sprung::-webkit-scrollbar { display: none; }
+.sprung a { min-height: 2.5rem; }
+.hinweis + .bereich, .sprung + .hinweis { margin-top: 1rem; }
+
+@media (max-width: 600px) {
+  main { padding-top: .5rem; }
+  .sprung { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.5rem), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 1.5rem), transparent); padding-right: 2rem; }
+  .bereich { margin-top: 1.75rem; padding: .9rem .6rem .75rem; }
+  .bereich > h2 { font-size: 1.25rem; }
+  .karte { padding: .85rem; }
+  .kopf { padding-top: .75rem; }
+  button, .knopf { min-height: 2.75rem; }
+  .alarm, .hinweisbox { padding: .8rem .85rem; }
+  .alarm-zeile button { width: 100%; }
+  .aktionen button, .aktionen .knopf { flex: 1 1 auto; text-align: center; }
+}
