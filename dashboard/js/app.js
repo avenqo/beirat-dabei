@@ -119,7 +119,7 @@ function zeichnen() {
   }));
   bereiche.push(bereich({
     id: "vergangen", titel: "Vergangene Sitzungen", kurz: "Vergangen", anzahl: vergangen.length, art: "grau",
-    knoten: vergangen.length === 0 ? [el("p", { class: "leer" }, "Noch keine vergangenen Sitzungen.")] : nachMonat(vergangen),
+    knoten: vergangen.length === 0 ? [el("p", { class: "leer" }, "Noch keine vergangenen Sitzungen.")] : vergangenNachJahr(vergangen),
   }));
   bereiche.push(bereich({ id: "kalender", titel: "Kalender", art: "blau", knoten: [kalenderAbo()] }));
 
@@ -136,6 +136,67 @@ function zeichnen() {
   }
   for (const b of bereiche) inhalt.append(b.knoten);
   sprungMarkieren(bereiche);
+}
+
+/** Text einer Sitzung für die Suche: Gremium, Ort, Datum und alle Antworten der Notiz. */
+function suchtext(s) {
+  const n = s.notiz;
+  return [s.gremium, s.ort, datumLang(s.beginn, daten.instanz.zeitzone), n ? (n.relevant ? "relevant" : "nicht relevant") : "", ...Object.values(n?.antworten ?? {})]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+/**
+ * Vergangene Sitzungen nach Jahr gegliedert: das neueste Jahr ist offen, ältere sind eingeklappt.
+ * Ein Suchfeld filtert nach Gremium, Ort, Datum und Inhalt der Notizen.
+ */
+function vergangenNachJahr(sitzungen) {
+  const zone = daten.instanz.zeitzone;
+  const jahr = (iso) => new Intl.DateTimeFormat("de-DE", { timeZone: zone, year: "numeric" }).format(new Date(iso));
+  const status = el("p", { class: "meta", role: "status", "aria-live": "polite" });
+  const liste = el("div", { class: "jahre" });
+
+  const suche = el("input", {
+    type: "search",
+    id: "suche",
+    placeholder: "Suchen, z. B. Solarpark oder 2024",
+    autocomplete: "off",
+    "aria-label": "Vergangene Sitzungen durchsuchen (Gremium, Ort, Datum, Notizen)",
+    oninput: () => aufbauen(suche.value),
+  });
+
+  function aufbauen(text = "") {
+    const begriffe = text.toLowerCase().split(/\s+/).filter(Boolean);
+    const treffer = sitzungen.filter((s) => begriffe.every((b) => suchtext(s).includes(b)));
+    const nachJahr = new Map();
+    for (const s of treffer) {
+      const j = jahr(s.beginn);
+      nachJahr.set(j, [...(nachJahr.get(j) ?? []), s]);
+    }
+    const jahre = [...nachJahr.entries()];
+    leeren(liste);
+    jahre.forEach(([j, eintraege], i) => {
+      // Offen: das neueste Jahr und bei einer Suche alle Jahre mit Treffern
+      liste.append(
+        el(
+          "details",
+          { class: "jahr", open: i === 0 || begriffe.length > 0 },
+          el("summary", {}, j, el("span", { class: "zahl" }, eintraege.length)),
+          ...nachMonat(eintraege),
+        ),
+      );
+    });
+    if (treffer.length === 0) liste.append(el("p", { class: "leer" }, "Keine Sitzung gefunden."));
+    status.textContent = begriffe.length > 0 ? `${treffer.length} von ${sitzungen.length} Sitzungen` : "";
+  }
+
+  aufbauen();
+  // Die Suche nur anbieten, wenn es sich lohnt
+  const kopf = sitzungen.length > 6
+    ? [el("div", { class: "suchleiste" }, suche, status)]
+    : [];
+  return [...kopf, liste];
 }
 
 /** Karten unter Monatsüberschriften gruppieren, damit lange Listen überschaubar bleiben. */
