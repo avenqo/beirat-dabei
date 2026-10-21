@@ -94,6 +94,8 @@ Mitglieder brauchen **keinen** Zugang zur Verwaltung. Sie arbeiten nur im Dashbo
 
 ### Gremium
 
+Ein **Gremium** ist der Ausschuss oder das Organ, dessen Sitzungen der Beirat verfolgt, zum Beispiel der Bau-/Wirtschafts- und Umweltausschuss. Es ist **nicht der Beirat selbst**: Jeder Beirat hat seine eigene Instanz, und in der Instanz steht, welche Gremien er begleitet. Der Umweltbeirat Kremmen begleitet nur eines. Ein Beirat kann aber mehrere begleiten, zum Beispiel zusätzlich den Hauptausschuss. Dann kommen die Sitzungen aller Gremien ins Dashboard, und es erscheint eine Auswahl zum Filtern. Auch der RIS-Abgleich ordnet die Sitzungen über das Gremium zu.
+
 Verwaltung → Inhalt → **Gremien**.
 
 | Feld | Bedeutung |
