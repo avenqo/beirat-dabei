@@ -64,7 +64,7 @@ beirat-dabei: Regellauf (scharf): 3 fällig, 3 gesendet, 0 fehlgeschlagen
    ```
 
    Das Skript ist harmlos, du kannst es beliebig oft ausführen. (Werte in der `.env`, die Leerzeichen enthalten, müssen in Anführungszeichen stehen, zum Beispiel `REGELN_CRON='0 7 * * *'`.) Es legt Sammlungen, Rollen und Rechte an und füllt die Einstellungen vor.
-5. **Anmelden** unter `PUBLIC_URL/admin` mit `ADMIN_EMAIL` und `ADMIN_PASSWORD`. Stelle die Oberfläche unter dem Profil (oben rechts) auf Deutsch.
+5. **Anmelden** unter `PUBLIC_URL/admin` mit `ADMIN_EMAIL` und `ADMIN_PASSWORD`. Stelle die Oberfläche unter dem Profil (oben rechts) auf Deutsch. Beim ersten Anmelden fragt Directus nach einem „Project Owner“ (E-Mail-Adresse der verantwortlichen Kontaktperson, laut Directus zur Einhaltung der Lizenz MSCL-1.0-GPL). Mit „Remind Later“ kannst du das verschieben. Wenn ihr eine Adresse eintragt, nehmt die Funktionsadresse des Beirats und ersetzt keine persönliche; sie wird an Directus übermittelt. Mit `PROJECT_OWNER_ENABLED=false` in der `.env` unterbleibt die Übermittlung.
 6. **Gremium, Mitglieder, Einstellungen** anlegen, wie in den folgenden Abschnitten beschrieben.
 7. **Benachrichtigungen bleiben zunächst im Trockenmodus** (siehe [unten](#ris-abgleich-und-benachrichtigungen-umstellen)). Erst wenn die Sitzungen stimmen, schaltest du sie scharf.
 
