@@ -18,10 +18,11 @@ Für alle, die eine Instanz betreuen, ohne selbst zu programmieren. Die Anleitun
 5. [Gremium und Sitzung pflegen](#gremium-und-sitzung-pflegen)
 6. [Einstellungen](#einstellungen)
 7. [RIS-Abgleich und Benachrichtigungen umstellen](#ris-abgleich-und-benachrichtigungen-umstellen)
-8. [Aktualisieren](#aktualisieren)
-9. [Backup und Wiederherstellung](#backup-und-wiederherstellung)
-10. [Übergabe an neue Administrierende](#übergabe-an-neue-administrierende)
-11. [Häufige Probleme](#häufige-probleme)
+8. [Neue Instanz einrichten](#neue-instanz-einrichten)
+9. [Aktualisieren](#aktualisieren)
+10. [Backup und Wiederherstellung](#backup-und-wiederherstellung)
+11. [Übergabe an neue Administrierende](#übergabe-an-neue-administrierende)
+12. [Häufige Probleme](#häufige-probleme)
 
 ## Was läuft da eigentlich?
 
@@ -134,7 +135,9 @@ Inhalt → **Einstellungen** (es gibt genau einen Eintrag).
 | ris_quelle | Adresse des RIS, bei Kremmen `https://ris-kremmen.komfa.de` |
 | abo_version | Zahl erhöhen, um **alle** Kalender-Abo-Adressen ungültig zu machen (zum Beispiel wenn eine Adresse unbefugt weitergegeben wurde). Die Mitglieder holen sich danach im Dashboard die neue Adresse. |
 
-Die Felder `absender_email` und `themenfokus` haben derzeit keine Wirkung. Der Absender kommt aus `EMAIL_FROM` in der `.env`.
+Das Feld `themenfokus` hat derzeit keine Wirkung (es ist für die spätere KI-Vorsortierung gedacht). Den Absender der Mails legt `EMAIL_FROM` in der `.env` fest. In älteren Instanzen gibt es noch ein Feld `absender_email`, es wird nicht mehr benutzt und kann ignoriert werden.
+
+**Alles auf einmal einrichten:** Die Einstellungen und Gremien einer neuen Instanz stehen in einer Datei (`examples/kremmen/instanz.yaml` als Vorlage). Mit `node scripts/instanz-anwenden.mjs <Datei>` überträgst du sie nach Directus (siehe [Neue Instanz](#neue-instanz-einrichten)).
 
 ## RIS-Abgleich und Benachrichtigungen umstellen
 
@@ -161,6 +164,26 @@ Zwei Schalter in der `.env`, jeweils mit drei Stufen:
 > **Vorsicht beim Scharfschalten der Regeln:** Gleich danach gehen alle gerade fälligen Mails raus, zum Beispiel „Tagesordnung veröffentlicht“ zu allem, was schon im System steht. Mails verschickt das System nur einmal pro Anlass (Versandprotokoll), du kannst sie aber nicht zurückholen. Informiere die Mitglieder vorher.
 
 Zum Testen des Mailversands ohne Wirkung auf alle: lege vorher nur dich selbst als Mitglied an.
+
+## Neue Instanz einrichten
+
+Für einen weiteren Beirat: Repository klonen, `examples/kremmen/` kopieren (zum Beispiel nach `examples/mein-beirat/`) und anpassen.
+
+- `instanz.yaml`: Name, Fristen, Notizfragen, RIS-Adapter, Rollennamen, Gremien. Fehler in der Datei meldet das Skript verständlich.
+- `.env.example`: Vorlage für die geheime `.env` (Adressen, Schlüssel, Mailzugang).
+
+Dann, nach „Erste Einrichtung“ Schritt 1 bis 4:
+
+```bash
+set -a; . ./.env; set +a
+export DIRECTUS_URL=http://localhost:${PORT:-8055}
+node scripts/instanz-anwenden.mjs --trocken examples/mein-beirat/instanz.yaml
+node scripts/instanz-anwenden.mjs examples/mein-beirat/instanz.yaml
+```
+
+Der erste Aufruf zeigt nur, was sich ändern würde. Der zweite fragt nach und überträgt es. Die Rollen müssen in Directus schon vorhanden sein (sie entstehen im Datenmodell-Schritt mit `ROLLE_MITGLIED` und `ROLLE_ADMIN` aus der `.env`).
+
+**Danach ist Directus maßgeblich.** Fristen, Texte und Gremien änderst du in der Verwaltung. Führst du das Skript später erneut aus, zeigt es an, was es dort zurücksetzen würde, und fragt vorher nach. Es löscht nie Gremien.
 
 ## Aktualisieren
 

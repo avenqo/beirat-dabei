@@ -55,7 +55,6 @@ const sammlungen = [
     felder: [
       id,
       text("name", { note: "Anzeigename, z. B. Umweltbeirat Kremmen" }),
-      text("absender_email", { note: "Absenderadresse der Benachrichtigungen" }),
       zahl("frist_vor_tage", 7, { note: "Tage vor der Sitzung (Regeln 3 und 4)" }),
       zahl("frist_nach_tage", 3, { note: "Tage nach der Sitzung (Regel 5)" }),
       text("zeitzone", {}, { default_value: "Europe/Berlin" }),

@@ -200,7 +200,7 @@ Das System muss ohne seinen Erbauer weiterlaufen: In diesem Fall übernehmen and
 
 **Repo-Aufteilung.** Der allgemeine Kern liegt öffentlich in `beirat-dabei`, mit einer vollständigen Beispielkonfiguration unter `examples/kremmen/` ohne Geheimnisse. Die `.env` der Kremmener Instanz mit SMTP-Zugang und Schlüsseln liegt nur auf dem Server.
 
-**Neue Instanz.** Die Startkonfiguration steht in einer `instanz.yaml` (Name, Gremien, Fristen, Notizfragen, Rollennamen, Adapter, Themenfokus). `scripts/instanz-anwenden.sh` überträgt sie nach Directus. Danach ist Directus maßgeblich, damit Admins Fristen und Texte in der Oberfläche ändern können. Die vollständige Verzeichnisstruktur steht in der README.
+**Neue Instanz.** Die Startkonfiguration steht in einer `instanz.yaml` (Name, Gremien, Fristen, Notizfragen, Rollennamen, Adapter, Themenfokus). `scripts/instanz-anwenden.mjs` prüft sie, zeigt die Änderungen an und überträgt sie nach Directus. Danach ist Directus maßgeblich, damit Admins Fristen und Texte in der Oberfläche ändern können. Die vollständige Verzeichnisstruktur steht in der README.
 
 **Datenschutz.** Gespeichert werden Name, E-Mail-Adresse, bevorzugter Kanal, Teilnahmen und Notizen. Zugriff haben nur Beiratsmitglieder mit der Rolle `ub` oder `ub-admin`.
 

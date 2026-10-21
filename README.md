@@ -24,7 +24,7 @@ Für jedes Gremium, das öffentliche Ausschusssitzungen begleiten will, zum Beis
 
 | Allgemein (Kern) | Pro Instanz einstellbar |
 | --- | --- |
-| Dashboard, Teilnahme, Magic Links, iCal | Name, Logo, Farben, Absender, Domain |
+| Dashboard, Teilnahme, Magic Links, iCal | Name, Logo, Farben, Absender (`EMAIL_FROM`), Domain |
 | Regel-Engine für Benachrichtigungen | Fristen vor und nach der Sitzung |
 | Kurznotiz | Fragen im Notizformular |
 | Datenmodell mit Gremien | begleitete Gremien |
@@ -106,6 +106,7 @@ beirat-dabei/
 ├── pnpm-workspace.yaml
 ├── packages/
 │   ├── core/                    # Regeln, Fristen, Magic-Link-Token, iCal
+│   ├── instanz/                 # instanz.yaml lesen, prüfen, mit Directus vergleichen
 │   └── ris-adapter/             # Schnittstelle, KOMFA-Adapter, Abgleich
 ├── directus/
 │   └── extensions/beirat-dabei/ # Bundle: Endpoints (Dashboard-API, Magic Link, iCal),
@@ -113,11 +114,11 @@ beirat-dabei/
 ├── dashboard/                   # statisches Frontend (HTML, CSS, ES-Module)
 ├── Caddyfile                    # Dashboard und Directus unter einer Adresse
 ├── examples/
-│   └── kremmen/                 # instanz.yaml, .env.example, Branding
+│   └── kremmen/                 # instanz.yaml, .env.example
 ├── scripts/
 │   ├── schema-anwenden.mjs      # Datenmodell, Rollen, Rechte → Directus
 │   ├── dev-proxy.mjs            # Dashboard + Directus lokal unter einer Adresse
-│   ├── instanz-anwenden.sh      # instanz.yaml → Directus
+│   ├── instanz-anwenden.mjs     # instanz.yaml → Directus
 │   ├── backup.sh
 │   └── restore.sh
 ├── docs/                        # Konzept, Betrieb, neue Instanz, Adapter schreiben
@@ -137,7 +138,7 @@ cp .env.example .env    # Werte eintragen, siehe unten
 docker compose up -d
 ```
 
-Danach die Instanz konfigurieren: `examples/kremmen/instanz.yaml` kopieren, anpassen (Name, Gremien, Fristen, Notizfragen, Rollennamen, RIS-Adapter) und mit `scripts/instanz-anwenden.sh` übertragen. Spätere Änderungen erfolgen in der Admin-Oberfläche.
+Danach die Instanz konfigurieren: `examples/kremmen/instanz.yaml` kopieren, anpassen (Name, Gremien, Fristen, Notizfragen, Rollennamen, RIS-Adapter) und mit `node scripts/instanz-anwenden.mjs examples/kremmen/instanz.yaml` übertragen (zuerst `scripts/schema-anwenden.mjs`, siehe [Betriebsanleitung](docs/Betrieb.md#neue-instanz-einrichten)). Das Skript zeigt vorher an, was sich ändert. Spätere Änderungen erfolgen in der Admin-Oberfläche.
 
 Wichtige Werte in `.env`:
 
