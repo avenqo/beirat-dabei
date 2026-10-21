@@ -45,7 +45,8 @@ export function dashboardBauen(
 ): DashboardAnsicht {
   const aktiveMitglieder = new Set(z.mitglieder.filter((m) => m.aktiv).map((m) => m.id));
   const ansichten = z.sitzungen.map((s): SitzungAnsicht => {
-    const aktive = aktiveTeilnahmen(z.teilnahmen, s.id).filter((t) => aktiveMitglieder.has(t.mitgliedId));
+    // Wer nachträglich "doch nicht dabei" gemeldet hat, zählt nicht als teilnehmend
+    const aktive = aktiveTeilnahmen(z.teilnahmen, s.id).filter((t) => aktiveMitglieder.has(t.mitgliedId) && !t.nichtTeilgenommen);
     const vorbei = s.start.getTime() <= z.jetzt.getTime();
     return {
       id: s.id,

@@ -116,9 +116,32 @@ Das RIS-Abgleich legt Sitzungen automatisch an. Von Hand brauchst du es, wenn da
 | abgesagt | Haken setzen, wenn die Sitzung ausfällt. Eingetragene werden informiert. |
 | ris_id, ris_link | leer lassen, das füllt der Abgleich |
 
+**Wichtig bei RIS-Anbindung:** Sitzungen, die aus dem RIS stammen (`ris_id` ist gefüllt), gleicht der Abgleich mit dem RIS ab und **überschreibt dort geänderten Beginn und Ort** wieder. Willst du etwas ausprobieren, lege dafür eine eigene Sitzung ohne `ris_id` an. Die lässt der Abgleich in Ruhe.
+
 **Verschieben:** einfach `beginn` ändern. Bei Handpflege werden die Eingetragenen dabei nicht automatisch informiert, schreibe ihnen kurz selbst. Beim RIS-Abgleich erledigt das System das.
 
 **Was die Fristen auslösen,** steht in der README unter „Benachrichtigungsregeln“. Kurz: sieben Tage vor der Sitzung geht eine Erinnerung raus, wenn niemand eingetragen ist, und drei Tage danach eine Bitte um die Notiz an die Teilnehmenden.
+
+### Logo und Name
+
+Name und Logo erscheinen in der Kopfzeile und auf der Anmeldeseite, auch ohne Anmeldung. Der Name steht in den Einstellungen (`name`). Das Logo lädst du in der Verwaltung unter Einstellungen → Projekteinstellungen → Logo hoch. Solange keins eingestellt ist, erscheint ein neutrales Platzhalter-Symbol.
+
+### Öffentliche Unterlagen
+
+Unter `PUBLIC_URL/dashboard/oeffentlich.html` sieht **jeder ohne Anmeldung** die nächsten Sitzungstermine mit Link zur Tagesordnung und die veröffentlichten Unterlagen: Geschäftsordnung, Stellungnahmen, Tätigkeitsberichte und weitere Dokumente. Die Seite zeigt keine Mitglieder und keine Notizen.
+
+Unterlagen pflegst du in der Verwaltung unter Inhalt → **Dokumente**:
+
+| Feld | Bedeutung |
+| --- | --- |
+| titel | so erscheint das Dokument öffentlich |
+| kategorie | Geschäftsordnung, Stellungnahme, Tätigkeitsbericht oder Weitere Unterlagen |
+| datum | Datum des Dokuments, die neuesten stehen oben |
+| beschreibung | optional, ein bis zwei Sätze |
+| datei | die Datei hochladen oder aus der Dateibibliothek wählen (PDF empfohlen) |
+| veroeffentlicht | **nur mit Haken** ist das Dokument öffentlich. Ohne Haken bleibt es ein Entwurf, den niemand ohne Zugang sieht. |
+
+Prüfe vor dem Veröffentlichen, dass im Dokument nichts Internes steht (Namen, Mailadressen, Entwurfsvermerke). Wer die Adresse einer Datei kennt, kann sie abrufen, solange sie veröffentlicht ist. Entwürfe sind nicht abrufbar.
 
 ## Einstellungen
 
@@ -158,7 +181,7 @@ Zwei Schalter in der `.env`, jeweils mit drei Stufen:
 
 1. Beide Schalter auf `trocken` lassen. In `docker compose logs --tail 200 directus` stehen Zeilen mit `[trocken]`: welche Sitzungen angelegt würden und welche Mails fällig wären.
 2. Prüfen, ob das stimmt. Mit `ris_adapter` und `ris_quelle` in den Einstellungen und der `ris_kennung` am Gremium.
-3. `RIS_MODUS=scharf` setzen und `docker compose up -d`. Nach dem nächsten Lauf (um 6:15, 12:15 oder 18:15 Uhr) stehen die Sitzungen im Dashboard.
+3. `RIS_MODUS=scharf` setzen und `docker compose up -d`. Nach dem nächsten Lauf (um 6:15, 12:15 oder 18:15 Uhr) stehen die Sitzungen im Dashboard. Der Abgleich holt auch die vergangenen 45 Tage (`RIS_RUECKBLICK_TAGE`), damit die letzte Sitzung dasteht und Notizen nachträglich möglich sind. Zum Ausprobieren kannst du für den ersten Lauf `RIS_CRON='* * * * *'` setzen (jede Minute) und die Zeile danach wieder entfernen.
 4. Das Dashboard kontrollieren. Dann erst `REGELN_MODUS=scharf` setzen und wieder `docker compose up -d`.
 
 > **Vorsicht beim Scharfschalten der Regeln:** Gleich danach gehen alle gerade fälligen Mails raus, zum Beispiel „Tagesordnung veröffentlicht“ zu allem, was schon im System steht. Mails verschickt das System nur einmal pro Anlass (Versandprotokoll), du kannst sie aber nicht zurückholen. Informiere die Mitglieder vorher.
@@ -241,6 +264,8 @@ Führe die Wiederherstellung einmal zur Probe aus, bevor du sie brauchst, am bes
 
 | Problem | Ursache und Abhilfe |
 | --- | --- |
+| **`docker compose ps` zeigt „unhealthy“** | Ältere Versionen der `docker-compose.yml` prüften die Gesundheit unter einer Adresse, die nicht erreichbar war. Aktuelle Version holen (`git pull`) und `docker compose up -d`. |
+| **Kalender-Abo schlägt fehl (zum Beispiel „Beim Abonnieren ist ein Fehler aufgetreten“)** | Kalender-Apps verlangen für Abos meist eine **https**-Adresse und lehnen `http://localhost` ab. Im Betrieb hinter HTTPS funktioniert es. Zum Ausprobieren hilft „Einmalig herunterladen (.ics)“ im Dashboard. Der Download aktualisiert sich aber nicht von selbst. |
 | **Dashboard zeigt „Lade …“ oder bleibt leer** | `docker compose ps` prüfen, beide Container müssen laufen. Meldungen mit `docker compose logs --tail 100 directus` und `docker compose logs --tail 100 web` ansehen. |
 | **Die Anmeldung geht, aber danach landet man wieder im Login** | `SESSION_COOKIE_SECURE=true` in der `.env`, die Seite wird aber ohne HTTPS aufgerufen. Im Betrieb immer über HTTPS gehen. Nur für lokale Tests `false` setzen. |
 | **„E-Mail-Adresse oder Passwort stimmen nicht“** | Tippfehler, oder das Mitglied ist gesperrt oder hat keine Rolle `ub`/`ub-admin`. Im Benutzerverzeichnis Status und Rolle prüfen. |

@@ -32,6 +32,8 @@ export interface AbgleichOptionen {
   modus: Modus;
   /** Wie weit der Abgleich in die Zukunft schaut, in Tagen */
   vorschauTage?: number;
+  /** Wie weit er zurückschaut, in Tagen. So erscheint auch die letzte Sitzung für nachträgliche Notizen. */
+  rueckblickTage?: number;
   log: { info(msg: string): void; error(err: unknown, msg: string): void };
 }
 
@@ -56,7 +58,7 @@ export async function abgleichAusfuehren(o: AbgleichOptionen): Promise<AbgleichE
     }
     const jetzt = o.jetzt();
     const zeitraum = {
-      von: new Date(jetzt.getTime() - 7 * 86_400_000),
+      von: new Date(jetzt.getTime() - (o.rueckblickTage ?? 45) * 86_400_000),
       bis: new Date(jetzt.getTime() + (o.vorschauTage ?? 90) * 86_400_000),
     };
 

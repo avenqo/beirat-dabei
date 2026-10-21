@@ -9,6 +9,8 @@
   --gelb: #f2c14e;
   --rot: #b3261e;
   --blau: #2457a6;
+  --alarm: #c62828;
+  --alarm-text: #ffffff;
   --radius: 10px;
 }
 @media (prefers-color-scheme: dark) {
@@ -23,6 +25,8 @@
     --gelb: #e0b23d;
     --rot: #f2928b;
     --blau: #8ab4f8;
+    --alarm: #ff6b61;
+    --alarm-text: #2a0705;
   }
 }
 * { box-sizing: border-box; }
@@ -34,15 +38,19 @@ body {
   font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 .kopf {
-  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem 1rem;
   max-width: 46rem; margin: 0 auto; padding: 1rem 16px 0;
 }
 .kopf h1 { font-size: 1.25rem; margin: 0; }
+.marke { display: flex; align-items: center; gap: .75rem; color: var(--text); text-decoration: none; min-width: 0; }
+.marke img { width: 44px; height: 44px; object-fit: contain; flex: none; }
+.navi { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 main { max-width: 46rem; margin: 0 auto; padding: 1rem 16px 3rem; }
 h2 { font-size: 1.05rem; margin: 2rem 0 .75rem; color: var(--leise); text-transform: uppercase; letter-spacing: .04em; }
 h3 { font-size: 1.1rem; margin: 0; }
 a { color: var(--blau); }
 .hinweis { color: var(--leise); }
+.hinweis.abstand { margin-top: 1.5rem; }
 .leer { color: var(--leise); padding: 1rem 0; }
 
 .karte {
@@ -61,7 +69,8 @@ a { color: var(--blau); }
   border: 1px solid var(--linie); white-space: nowrap;
 }
 .chip.besetzt, .chip.dokumentiert { background: color-mix(in srgb, var(--akzent) 18%, transparent); border-color: var(--akzent); }
-.chip.dringend, .chip.notiz-fehlt { background: color-mix(in srgb, var(--gelb) 30%, transparent); border-color: var(--gelb); }
+.chip.notiz-fehlt { background: color-mix(in srgb, var(--gelb) 30%, transparent); border-color: var(--gelb); }
+.chip.dringend { background: var(--alarm); border-color: var(--alarm); color: var(--alarm-text); font-size: .9rem; }
 .chip.abgesagt { background: color-mix(in srgb, var(--rot) 15%, transparent); border-color: var(--rot); }
 .chip.verschoben { border-color: var(--blau); color: var(--blau); }
 
@@ -99,3 +108,23 @@ dialog::backdrop { background: rgb(0 0 0 / .5); }
 details.abo { margin-top: 2rem; }
 details.abo summary { cursor: pointer; font-weight: 600; }
 details.abo input { margin-top: .5rem; }
+
+/* Dringend: Karte und Hinweis oben deutlich hervorheben */
+.karte.dringend {
+  border: 2px solid var(--alarm);
+  border-left-width: 10px;
+  background: color-mix(in srgb, var(--alarm) 9%, var(--karte));
+}
+.alarm {
+  background: var(--alarm); color: var(--alarm-text);
+  border-radius: var(--radius); padding: 1rem 1.25rem; margin: 1rem 0 0;
+}
+.alarm h2 { margin: 0 0 .5rem; color: inherit; text-transform: none; letter-spacing: 0; font-size: 1.15rem; }
+.alarm p { margin: 0; }
+.alarm-zeile { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; padding: .4rem 0; }
+.alarm button.primaer { background: var(--alarm-text); color: var(--alarm); border-color: var(--alarm-text); }
+
+.kategorie { margin: 1.5rem 0 .5rem; }
+ul.dokumente { list-style: none; margin: 0; padding: 0; }
+ul.dokumente li a { font-weight: 600; }
+ul.dokumente li p { margin: .25rem 0 0; }

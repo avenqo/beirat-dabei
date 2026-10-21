@@ -1,10 +1,10 @@
 import * as api from "./api.js";
 import { el, leeren, sichereUrl } from "./dom.js";
-import { countdown, datumLang, fehlerText, STATUS } from "./format.js";
+import { countdown, datumLang, fehlerText, STATUS, tagKurz } from "./format.js";
+import { markeLaden } from "./marke.js";
 import { notizFormular } from "./notizformular.js";
 
 const inhalt = document.getElementById("inhalt");
-const titel = document.getElementById("titel");
 const abmelden = document.getElementById("abmelden");
 
 let daten = null; // letzte Antwort des Dashboards
@@ -19,8 +19,9 @@ abmelden.addEventListener("click", async () => {
 
 // --- Anmeldung ---------------------------------------------------------
 
-function zeigeLogin(hinweis) {
+async function zeigeLogin(hinweis) {
   abmelden.hidden = true;
+  const name = await markeLaden();
   leeren(inhalt);
   const fehler = el("p", { class: "fehler", role: "alert", hidden: !hinweis }, hinweis ?? "");
   const email = el("input", { id: "email", type: "email", autocomplete: "username", required: true });
@@ -43,6 +44,7 @@ function zeigeLogin(hinweis) {
 
   inhalt.append(
     el("h2", {}, "Anmelden"),
+    el("p", { class: "hinweis" }, `Mitgliederbereich von ${name}. Hier tragen sich die Mitglieder zu den Sitzungen ein und halten Notizen fest.`),
     el(
       "form",
       {
@@ -62,6 +64,7 @@ function zeigeLogin(hinweis) {
       fehler,
       el("div", { class: "aktionen" }, knopf, vergessen),
     ),
+    el("p", { class: "hinweis abstand" }, "Kein Mitglied? ", el("a", { href: "oeffentlich.html" }, "Öffentliche Termine und Unterlagen ansehen")),
   );
   email.focus();
 }
@@ -80,8 +83,6 @@ async function laden() {
     return;
   }
   daten = r.daten;
-  titel.textContent = daten.instanz.name;
-  document.title = daten.instanz.name;
   abmelden.hidden = false;
   zeichnen();
 }
@@ -112,6 +113,9 @@ function zeichnen() {
   const passt = (s) => !filter || s.gremiumId === filter;
   const kommend = daten.kommend.filter(passt);
   const vergangen = daten.vergangen.filter(passt);
+
+  const dringend = kommend.filter((s) => s.status === "dringend");
+  if (dringend.length > 0) inhalt.append(alarm(dringend));
 
   inhalt.append(el("h2", {}, "Anstehende Sitzungen"));
   if (kommend.length === 0) inhalt.append(el("p", { class: "leer" }, "Keine anstehenden Sitzungen."));
@@ -154,7 +158,12 @@ function kalenderAbo() {
         platz.replaceChildren(
           el("p", { class: "meta" }, "Alle Sitzungstermine in deinem Kalender, aktualisiert sich von selbst. Die Adresse gehört nur dir, bitte nicht weitergeben."),
           feld,
-          el("div", { class: "aktionen" }, kopieren, el("a", { class: "knopf", href: r.daten.webcal }, "In Kalender-App öffnen")),
+          el("div", { class: "aktionen" },
+            kopieren,
+            el("a", { class: "knopf", href: r.daten.webcal }, "In Kalender-App öffnen"),
+            el("a", { class: "knopf", href: r.daten.url, download: "sitzungen.ics" }, "Einmalig herunterladen (.ics)"),
+          ),
+          el("p", { class: "meta" }, "Die Abo-Funktion der Kalender-Apps verlangt meist eine https-Adresse. Wenn sie die Adresse ablehnt, hilft der einmalige Download. Er aktualisiert sich aber nicht von selbst."),
         );
       },
     },
@@ -162,6 +171,25 @@ function kalenderAbo() {
     platz,
   );
   return bereich;
+}
+
+/** Auffälliger Hinweis oben: Sitzungen in der Frist, zu denen sich noch niemand eingetragen hat. */
+function alarm(sitzungen) {
+  return el(
+    "section",
+    { class: "alarm", role: "alert", "aria-label": "Dringend" },
+    el("h2", {}, sitzungen.length === 1 ? "Dringend: Für eine Sitzung fehlt noch jemand" : `Dringend: Für ${sitzungen.length} Sitzungen fehlt noch jemand`),
+    ...sitzungen.map((s) =>
+      el("div", { class: "alarm-zeile" },
+        el("p", {}, el("strong", {}, `${s.gremium}, ${tagKurz(s.beginn, daten.instanz.zeitzone)}`), ` (${countdown(s.tageBis)}): noch niemand eingetragen.`),
+        el("button", {
+          type: "button",
+          class: "primaer",
+          onclick: (e) => aktion(e.currentTarget, () => api.teilnahme(s.id, "eintragen")),
+        }, "Ich nehme teil"),
+      ),
+    ),
+  );
 }
 
 function karte(s) {
@@ -175,7 +203,7 @@ function karte(s) {
     el("span", {},
       s.verschoben && !vorbei ? el("span", { class: "chip verschoben" }, "Verschoben") : null,
       " ",
-      el("span", { class: `chip ${s.status}` }, STATUS[s.status] ?? s.status),
+      el("span", { class: `chip ${s.status}` }, s.status === "dringend" ? "⚠ " : null, STATUS[s.status] ?? s.status),
     ),
   );
   const wann = el("p", { class: "meta" }, `${datumLang(s.beginn, zone)} · ${countdown(s.tageBis)}`);
@@ -186,7 +214,7 @@ function karte(s) {
   if (!s.abgesagt && !vorbei) teile.push(teilnahme(s));
   if (vorbei && !s.abgesagt) teile.push(ergebnis(s));
 
-  return el("article", { class: `karte${s.abgesagt ? " abgesagt" : ""}` }, ...teile);
+  return el("article", { class: `karte${s.abgesagt ? " abgesagt" : ""}${s.status === "dringend" ? " dringend" : ""}` }, ...teile);
 }
 
 function tagesordnung(s) {
@@ -226,6 +254,18 @@ function ergebnis(s) {
     teile.push(liste);
   } else {
     teile.push(el("p", { class: "meta" }, "Noch keine Notiz."));
+  }
+  if (!s.ichTeilnehmend) {
+    teile.push(
+      el("p", { class: "meta" }, "Notizen können alle schreiben, die bei der Sitzung dabei waren."),
+      el("div", { class: "aktionen" },
+        el("button", {
+          type: "button",
+          class: s.notiz ? "" : "primaer",
+          onclick: (e) => aktion(e.currentTarget, () => api.teilnahme(s.id, "dabei-gewesen")),
+        }, "Ich war dabei"),
+      ),
+    );
   }
   if (s.ichTeilnehmend) {
     teile.push(

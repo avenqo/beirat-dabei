@@ -1,6 +1,6 @@
 import type { Sitzung, Teilnahme } from "./types.js";
 
-export type TeilnahmeAktion = "eintragen" | "austragen" | "nicht-teilgenommen";
+export type TeilnahmeAktion = "eintragen" | "austragen" | "nicht-teilgenommen" | "dabei-gewesen";
 
 export type TeilnahmeFehler = "abgesagt" | "vergangen" | "nicht-vorbei" | "nicht-eingetragen";
 
@@ -67,6 +67,32 @@ export function teilnahmeAnwenden(args: {
       return {
         ok: true,
         aenderung: { art: "aktualisieren", id: aktiv.id, daten: { ausgetragenAm: jetzt } },
+      };
+
+    case "dabei-gewesen":
+      // Nachträglich eintragen: für Sitzungen, die schon stattgefunden haben
+      if (sitzung.abgesagt) return { ok: false, grund: "abgesagt" };
+      if (!begonnen) return { ok: false, grund: "nicht-vorbei" };
+      if (aktiv && !aktiv.nichtTeilgenommen) return { ok: true, aenderung: { art: "keine" } };
+      if (aktiv) {
+        return { ok: true, aenderung: { art: "aktualisieren", id: aktiv.id, daten: { nichtTeilgenommen: false } } };
+      }
+      if (eigene) {
+        return {
+          ok: true,
+          aenderung: {
+            art: "aktualisieren",
+            id: eigene.id,
+            daten: { eingetragenAm: jetzt, ausgetragenAm: null, nichtTeilgenommen: false },
+          },
+        };
+      }
+      return {
+        ok: true,
+        aenderung: {
+          art: "anlegen",
+          daten: { sitzungId: sitzung.id, mitgliedId, eingetragenAm: jetzt, ausgetragenAm: null, nichtTeilgenommen: false },
+        },
       };
 
     case "nicht-teilgenommen":

@@ -2,6 +2,7 @@ import type { Notizfrage, SitzungInfo, Teilnahme, Versand } from "@beirat-dabei/
 import type { BekannteSitzung, NeueSitzung, SitzungsAenderung } from "@beirat-dabei/ris-adapter";
 import type { RegelSpeicher } from "./regellauf.js";
 import type { AbgleichSpeicher } from "./abgleichlauf.js";
+import type { DokumentZeile, OeffentlichSpeicher } from "./oeffentlich.js";
 
 // Minimale Sicht auf den Endpoint-Kontext von Directus; die Typen des SDKs sind für
 // die Services bewusst offen gehalten.
@@ -12,8 +13,15 @@ interface Dienst {
   updateOne(id: string, daten: Record<string, unknown>): Promise<unknown>;
 }
 
+interface AssetDienst {
+  getAsset(id: string): Promise<{ stream: NodeJS.ReadableStream; file: Record<string, any> }>;
+}
+
 export interface Kontext {
-  services: { ItemsService: new (sammlung: string, optionen: Record<string, unknown>) => Dienst };
+  services: {
+    ItemsService: new (sammlung: string, optionen: Record<string, unknown>) => Dienst;
+    AssetsService: new (optionen: Record<string, unknown>) => AssetDienst;
+  };
   getSchema(): Promise<unknown>;
 }
 
@@ -26,7 +34,7 @@ const datum = (v: unknown): Date | null => (v ? new Date(v as string) : null);
 export function speicherAusDirectus(
   kontext: Kontext,
   rollen: { mitglied: string; admin: string },
-): RegelSpeicher & AbgleichSpeicher {
+): RegelSpeicher & AbgleichSpeicher & OeffentlichSpeicher {
   const dienst = async (sammlung: string): Promise<Dienst> =>
     new kontext.services.ItemsService(sammlung, { schema: await kontext.getSchema(), accountability: null });
 
@@ -228,6 +236,49 @@ export function speicherAusDirectus(
       if (d.toVeroeffentlicht !== undefined) daten["to_veroeffentlicht"] = d.toVeroeffentlicht;
       if (d.toLink !== undefined) daten["to_link"] = d.toLink;
       await (await dienst("sitzungen")).updateOne(id, daten);
+    },
+
+    async logoId() {
+      const e = await (await dienst("directus_settings")).readSingleton({ fields: ["project_logo"] });
+      return (e["project_logo"] as string | null) ?? null;
+    },
+
+    async dokumente(): Promise<DokumentZeile[]> {
+      const zeilen = await (await dienst("dokumente")).readByQuery({
+        fields: ["id", "titel", "kategorie", "datum", "beschreibung", "veroeffentlicht", "datei.id", "datei.filename_download", "datei.type", "datei.filesize"],
+        sort: ["-datum"],
+        limit: -1,
+      });
+      return zeilen.map((z) => ({
+        id: z["id"],
+        titel: z["titel"] ?? "",
+        kategorie: z["kategorie"] ?? "sonstiges",
+        datum: z["datum"] ? String(z["datum"]).slice(0, 10) : null,
+        beschreibung: z["beschreibung"] ?? null,
+        veroeffentlicht: Boolean(z["veroeffentlicht"]),
+        hatDatei: Boolean(z["datei"]?.id),
+        dateiName: z["datei"]?.filename_download ?? null,
+        dateiTyp: z["datei"]?.type ?? null,
+        dateiGroesse: z["datei"]?.filesize ? Number(z["datei"].filesize) : null,
+      }));
+    },
+
+    async dateiVonDokument(dokumentId) {
+      const zeilen = await (await dienst("dokumente")).readByQuery({
+        fields: ["datei.id"],
+        filter: { id: { _eq: dokumentId }, veroeffentlicht: { _eq: true } },
+        limit: 1,
+      });
+      const dateiId = zeilen[0]?.["datei"]?.id as string | undefined;
+      if (!dateiId) return null;
+      const assets = new kontext.services.AssetsService({ schema: await kontext.getSchema(), accountability: null });
+      const { stream, file } = await assets.getAsset(dateiId);
+      return {
+        stream,
+        typ: (file["type"] as string) || "application/octet-stream",
+        name: (file["filename_download"] as string) || "datei",
+        groesse: file["filesize"] ? Number(file["filesize"]) : null,
+      };
     },
 
     async notizSpeichern(sitzungId, wert) {

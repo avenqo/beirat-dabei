@@ -74,6 +74,24 @@ describe("teilnahmeAnwenden: nicht-teilgenommen", () => {
   });
 });
 
+describe("teilnahmeAnwenden: dabei-gewesen", () => {
+  it("trägt nachträglich ein, nur nach Beginn", () => {
+    expect(anwenden("dabei-gewesen", [], nachher)).toMatchObject({ ok: true, aenderung: { art: "anlegen", daten: { mitgliedId: "a", sitzungId: "s1" } } });
+    expect(anwenden("dabei-gewesen", [], vorher)).toEqual({ ok: false, grund: "nicht-vorbei" });
+    expect(anwenden("dabei-gewesen", [], nachher, { ...sitzung, abgesagt: true })).toEqual({ ok: false, grund: "abgesagt" });
+  });
+  it("wiederholbar, nimmt 'doch nicht dabei' zurück und belebt Ausgetragene wieder", () => {
+    expect(anwenden("dabei-gewesen", [tn()], nachher)).toEqual({ ok: true, aenderung: { art: "keine" } });
+    expect(anwenden("dabei-gewesen", [tn({ nichtTeilgenommen: true })], nachher)).toEqual({
+      ok: true, aenderung: { art: "aktualisieren", id: "t1", daten: { nichtTeilgenommen: false } },
+    });
+    expect(anwenden("dabei-gewesen", [tn({ ausgetragenAm: d("2026-11-05T00:00:00Z") })], nachher)).toEqual({
+      ok: true,
+      aenderung: { art: "aktualisieren", id: "t1", daten: { eingetragenAm: nachher, ausgetragenAm: null, nichtTeilgenommen: false } },
+    });
+  });
+});
+
 const fragen: Notizfrage[] = [
   { schluessel: "relevant", frage: "Relevant?", typ: "ja-nein", pflicht: true },
   { schluessel: "tops", frage: "TOPs?", typ: "text", pflicht: false },
@@ -138,6 +156,12 @@ describe("dashboardBauen", () => {
     expect(v.vergangen[0]!.status).toBe("dokumentiert");
     expect(v.vergangen[1]!.status).toBe("notiz-fehlt");
     expect(v.kommend[0]!.notiz).toBeNull();
+  });
+  it("wer 'doch nicht dabei' gemeldet hat, steht nicht mehr bei den Teilnehmenden", () => {
+    const z2 = { ...z, jetzt: d("2026-11-19T08:00:00Z"), teilnahmen: [tn({ id: "t1", sitzungId: "s1", mitgliedId: "a", nichtTeilgenommen: true })] };
+    const s1 = dashboardBauen(z2, namen, "a").vergangen.find((s) => s.id === "s1")!;
+    expect(s1.teilnehmer).toEqual([]);
+    expect(s1.ichTeilnehmend).toBe(false);
   });
   it("gibt keine E-Mail-Adressen heraus", () => {
     expect(JSON.stringify(dashboardBauen(z, namen, "a"))).not.toContain("@");

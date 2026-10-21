@@ -4,6 +4,10 @@ export function datumLang(iso, zeitzone = "Europe/Berlin") {
   return `${f({ weekday: "long", day: "numeric", month: "long", year: "numeric" })}, ${f({ hour: "2-digit", minute: "2-digit" })} Uhr`;
 }
 
+export function tagKurz(iso, zeitzone = "Europe/Berlin") {
+  return new Intl.DateTimeFormat("de-DE", { timeZone: zeitzone, weekday: "short", day: "2-digit", month: "2-digit" }).format(new Date(iso));
+}
+
 export function countdown(tage) {
   if (tage === 0) return "heute";
   if (tage === 1) return "morgen";

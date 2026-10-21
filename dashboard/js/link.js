@@ -2,9 +2,11 @@ import * as api from "./api.js";
 import { el, leeren } from "./dom.js";
 import { datumLang, fehlerText } from "./format.js";
 import { notizFormular } from "./notizformular.js";
+import { markeLaden } from "./marke.js";
+
+markeLaden();
 
 const inhalt = document.getElementById("inhalt");
-const titel = document.getElementById("titel");
 
 // Der Token steht im Query-String und wird sofort aus der Adressleiste entfernt.
 const token = new URLSearchParams(location.search).get("token") ?? "";
@@ -48,8 +50,6 @@ async function start() {
   const r = await api.linkInfo(token);
   if (r.status !== 200) return fehlerAnzeige(r.daten);
   const info = r.daten;
-  titel.textContent = info.instanz;
-  document.title = info.instanz;
 
   if (info.sitzung.abgesagt) {
     return leeren(inhalt).append(...sitzungKopf(info), el("p", { class: "meldung" }, "Diese Sitzung ist abgesagt."), el("div", { class: "aktionen" }, zumDashboard()));

@@ -74,7 +74,10 @@ export default defineHook(({ schedule, action }, context) => {
     // Absagen nicht bis zum nächsten Morgen warten.
     schedule(envText(env["RIS_CRON"]) ?? "15 6,12,18 * * *", async () => {
       try {
-        const r = await abgleichAusfuehren({ speicher, http, jetzt: () => new Date(), modus: risModus, log });
+        const r = await abgleichAusfuehren({
+          speicher, http, jetzt: () => new Date(), modus: risModus, log,
+          rueckblickTage: envZahl(env["RIS_RUECKBLICK_TAGE"], 45),
+        });
         if (r.angelegt + r.geaendert > 0) await regelLauf();
       } catch (e) {
         log.error(e, "RIS-Abgleich fehlgeschlagen");

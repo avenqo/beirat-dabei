@@ -64,7 +64,7 @@ Der Kern spricht nur mit einer kleinen Schnittstelle: Sitzungen eines Gremiums a
 
 Gebaut wird zuerst, was die erste Instanz braucht. Weitere Adapter sind als Beitrag willkommen.
 
-**Abgleich.** Dreimal täglich (`RIS_CRON`) werden die Sitzungen der aktiven Gremien mit dem RIS verglichen, von 7 Tagen zurück bis 90 Tage voraus. Erkannt werden neue Sitzungen, Verschiebungen, Orts- und Absageänderungen sowie das Erscheinen einer Tagesordnung. Eine kommende Sitzung, die bei vollständigem Abruf im RIS fehlt, gilt als abgesagt. Zurückgenommen wird nichts automatisch. Wie bei den Regeln steuert `RIS_MODUS` (`aus`, `trocken`, `scharf`) den Betrieb. Der Adapter nutzt einen erkennbaren User-Agent, pausiert zwischen den Abrufen und ruft die Tagesordnung nur ab, solange sie noch nicht als veröffentlicht gilt.
+**Abgleich.** Dreimal täglich (`RIS_CRON`) werden die Sitzungen der aktiven Gremien mit dem RIS verglichen, von 45 Tagen zurück (`RIS_RUECKBLICK_TAGE`) bis 90 Tage voraus. So steht auch die letzte Sitzung im Dashboard, und Notizen lassen sich nachträglich schreiben. Erkannt werden neue Sitzungen, Verschiebungen, Orts- und Absageänderungen sowie das Erscheinen einer Tagesordnung. Eine kommende Sitzung, die bei vollständigem Abruf im RIS fehlt, gilt als abgesagt. Zurückgenommen wird nichts automatisch. Wie bei den Regeln steuert `RIS_MODUS` (`aus`, `trocken`, `scharf`) den Betrieb. Der Adapter nutzt einen erkennbaren User-Agent, pausiert zwischen den Abrufen und ruft die Tagesordnung nur ab, solange sie noch nicht als veröffentlicht gilt.
 
 **Einrichten für KOMFA:** In den Einstellungen `ris_adapter` auf `komfa` und `ris_quelle` auf die Adresse des RIS setzen (z. B. `https://ris-kremmen.komfa.de`). Bei jedem Gremium `ris_kennung` auf den Namen setzen, wie ihn das RIS anzeigt (z. B. `Bau-/Wirtschafts- und Umweltausschuss`).
 
@@ -175,6 +175,12 @@ DIRECTUS_URL=http://localhost:8055 PORT=8056 pnpm dev:dashboard
 
 Lokal über http muss `SESSION_COOKIE_SECURE=false` gesetzt sein.
 
+## Öffentlicher Bereich
+
+`dashboard/oeffentlich.html` zeigt ohne Anmeldung die nächsten Sitzungstermine mit Tagesordnung und die veröffentlichten Unterlagen des Beirats (Geschäftsordnung, Stellungnahmen, Tätigkeitsberichte, weitere Dokumente). Gepflegt wird das in der Verwaltung unter „Dokumente“. Nur Dokumente mit Haken bei `veroeffentlicht` sind sichtbar, und die Dateien laufen über die Extension, nicht über die offene Dateiablage von Directus. Mitglieder und Notizen erscheinen dort nie.
+
+Name und Logo der Instanz stehen in der Kopfzeile aller Seiten, auch auf der Anmeldeseite. Das Logo kommt aus den Projekteinstellungen von Directus, bis dahin gibt es einen Platzhalter.
+
 ## Kalender-Abo
 
 Jedes Mitglied findet im Dashboard unter „Kalender abonnieren“ eine persönliche Adresse für den eigenen Kalender (Google, Apple, Outlook, Thunderbird). Der Feed enthält alle Sitzungen der letzten 60 Tage und der Zukunft mit Ort, Teilnehmenden, Link zur Tagesordnung und Absagen (`STATUS:CANCELLED`). Kalender-Apps laden ihn alle paar Stunden neu, Verschiebungen kommen so von selbst an. Als Dauer gilt `SITZUNGSDAUER_STUNDEN`.
@@ -191,6 +197,9 @@ Alle Pfade unter `/beirat-dabei`. Mitglieder greifen nie direkt auf Daten zu, di
 | `POST /teilnahme` | Directus-Anmeldung | `{sitzung, aktion}` mit `eintragen`, `austragen`, `nicht-teilgenommen` |
 | `POST /notiz` | Directus-Anmeldung | `{sitzung, relevant, antworten}`, nur für Teilnehmende nach der Sitzung |
 | `GET /abo` | Directus-Anmeldung | die persönliche Adresse des Kalender-Abos |
+| `GET /instanz` | öffentlich | Name und Logo für Kopfzeile und Anmeldeseite |
+| `GET /oeffentlich` | öffentlich | nächste Sitzungen und veröffentlichte Unterlagen |
+| `GET /datei/:id` | öffentlich | die Datei eines veröffentlichten Dokuments |
 | `GET /link/:token` | Magic Link | Angaben für die Bestätigungsseite, ändert nichts |
 | `POST /link/:token` | Magic Link | führt die Aktion aus, liefert einen Rückgängig-Link |
 | `GET /ical/:token.ics` | Abo-Token | iCal-Feed mit allen Sitzungsterminen |

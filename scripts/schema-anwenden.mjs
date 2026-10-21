@@ -113,6 +113,27 @@ const sammlungen = [
     ],
   },
   {
+    collection: "dokumente",
+    meta: { icon: "description", note: "Unterlagen für den öffentlichen Bereich: Geschäftsordnung, Stellungnahmen, Tätigkeitsberichte", display_template: "{{titel}}" },
+    felder: [
+      id,
+      text("titel", { note: "Name des Dokuments, so wie er öffentlich erscheint" }),
+      text("kategorie", {
+        interface: "select-dropdown",
+        options: { choices: [
+          { text: "Geschäftsordnung", value: "geschaeftsordnung" },
+          { text: "Stellungnahme", value: "stellungnahme" },
+          { text: "Tätigkeitsbericht", value: "taetigkeitsbericht" },
+          { text: "Weitere Unterlagen", value: "sonstiges" },
+        ] },
+      }, { default_value: "sonstiges" }),
+      { field: "datum", type: "date", meta: { interface: "datetime", note: "Datum des Dokuments, für die Sortierung (neueste zuerst)" }, schema: {} },
+      { field: "beschreibung", type: "text", meta: { interface: "input-multiline", note: "Optional: ein bis zwei Sätze" }, schema: {} },
+      { field: "datei", type: "uuid", meta: { interface: "file", special: ["file"], note: "Die Datei zum Hochladen oder Auswählen" }, schema: {} },
+      bool("veroeffentlicht", false, { note: "Nur mit Haken ist das Dokument ohne Anmeldung sichtbar" }),
+    ],
+  },
+  {
     collection: "benachrichtigungen",
     meta: { icon: "forward_to_inbox", note: "Versandprotokoll, verhindert doppelte Nachrichten" },
     felder: [
@@ -133,6 +154,8 @@ const relationen = [
   ["notizen", "sitzung", "sitzungen"],
   ["benachrichtigungen", "sitzung", "sitzungen"],
   ["benachrichtigungen", "empfaenger", "directus_users"],
+  // Wird eine Datei gelöscht, bleibt das Dokument als Entwurf ohne Datei stehen
+  ["dokumente", "datei", "directus_files", "SET NULL"],
 ];
 
 async function sammlungenAnlegen() {
@@ -160,9 +183,9 @@ async function sammlungenAnlegen() {
   await api("PATCH", "/fields/einstellungen/ris_adapter", { meta: { options: risFeld.meta.options } });
 
   const vorhandene = await api("GET", "/relations");
-  for (const [many, feld, one] of relationen) {
+  for (const [many, feld, one, beimLoeschen] of relationen) {
     if (vorhandene.some((r) => r.collection === many && r.field === feld)) continue;
-    await api("POST", "/relations", { collection: many, field: feld, related_collection: one, schema: { on_delete: "CASCADE" } });
+    await api("POST", "/relations", { collection: many, field: feld, related_collection: one, schema: { on_delete: beimLoeschen ?? "CASCADE" } });
     console.log(`+ Relation ${many}.${feld} -> ${one}`);
   }
 }
@@ -213,6 +236,10 @@ function rechteAdmin(policy) {
     ...alle("notizen"),
     ...alle("einstellungen", ["read", "update"]),
     ...alle("benachrichtigungen", ["read"]),
+    ...alle("dokumente"),
+    // Dateien hochladen und auswählen (Dokumente, Projektlogo)
+    ...alle("directus_files"),
+    ...alle("directus_folders", ["read"]),
     ...alle("directus_users", ["create", "read", "update"]),
   ];
 }

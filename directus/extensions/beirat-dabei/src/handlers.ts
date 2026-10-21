@@ -43,19 +43,29 @@ export interface Abhaengigkeiten {
   sitzungsdauerStunden?: number;
 }
 
+/** Eine Datei, die an die Antwort durchgereicht wird. */
+export interface DateiStrom {
+  stream: NodeJS.ReadableStream;
+  typ: string;
+  name: string;
+  groesse: number | null;
+}
+
 export interface Antwort {
   status: number;
   body: unknown;
   /** Content-Type für Antworten, die kein JSON sind */
   typ?: string;
   kopf?: Record<string, string>;
+  /** Wenn gesetzt, wird die Datei statt des Bodys gesendet */
+  datei?: DateiStrom;
 }
 
 const antwort = (status: number, body: unknown): Antwort => ({ status, body });
 const fehler = (status: number, code: string, extra: object = {}): Antwort =>
   antwort(status, { fehler: code, ...extra });
 
-const AKTIONEN: TeilnahmeAktion[] = ["eintragen", "austragen", "nicht-teilgenommen"];
+const AKTIONEN: TeilnahmeAktion[] = ["eintragen", "austragen", "nicht-teilgenommen", "dabei-gewesen"];
 const STATUS_FUER_GRUND: Record<TeilnahmeFehler, number> = {
   abgesagt: 409,
   vergangen: 409,
@@ -213,7 +223,7 @@ export async function linkInfo(d: Abhaengigkeiten, wert: string): Promise<Antwor
   });
 }
 
-const GEGENAKTION: Partial<Record<TeilnahmeAktion, TeilnahmeAktion>> = {
+const GEGENAKTION: Partial<Record<TeilnahmeAktion, "eintragen" | "austragen">> = {
   eintragen: "austragen",
   austragen: "eintragen",
 };
@@ -278,7 +288,7 @@ export async function ical(d: Abhaengigkeiten, tokenMitEndung: string): Promise<
   const basis = basisUrl(d);
   let domain = "beirat-dabei";
   try {
-    domain = new URL(basis).host || domain;
+    domain = new URL(basis).hostname || domain;
   } catch {
     /* ohne gültige Adresse bleibt der Standard */
   }

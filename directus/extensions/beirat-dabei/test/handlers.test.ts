@@ -123,6 +123,19 @@ describe("dashboard", () => {
   });
 });
 
+describe("nachträglich eintragen", () => {
+  it("'dabei-gewesen' trägt nach der Sitzung ein und macht Notizen möglich", async () => {
+    jetzt = d("2026-11-19T08:00:00Z");
+    expect((await teilnahme(deps(), "a", { sitzung: "s1", aktion: "dabei-gewesen" })).status).toBe(200);
+    expect(teilnahmen).toHaveLength(1);
+    const r = await notiz(deps(), "a", { sitzung: "s1", relevant: true, antworten: { beschluesse: "x" } });
+    expect(r.status).toBe(200);
+  });
+  it("vor der Sitzung nicht", async () => {
+    expect((await teilnahme(deps(), "a", { sitzung: "s1", aktion: "dabei-gewesen" })).status).toBe(409);
+  });
+});
+
 describe("notiz", () => {
   const eingabe = { sitzung: "s1", relevant: true, antworten: { beschluesse: "vertagt" } };
   beforeEach(() => {
