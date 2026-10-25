@@ -1,0 +1,15 @@
+{
+  "name": "beirat-dabei",
+  "private": true,
+  "license": "EUPL-1.2",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "pnpm -r test",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "dev:dashboard": "node scripts/dev-proxy.mjs"
+  }
+}

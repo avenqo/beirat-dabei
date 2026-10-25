@@ -6,7 +6,9 @@ Stand: 20.10.2026 · Entwurf
 
 ## Ausgangslage und Ziel
 
-Ziel: Bei jeder Sitzung des Bau- und Umweltausschusses sitzt ein Mitglied des Umweltbeirats im Publikum, und was dort umweltrelevant war, ist danach festgehalten.
+Ziel: Der Informationsfluss zwischen den Ausschüssen der Kommune (Ratsinformationssystem - RIS) und den Beiräten soll verbessert und transparenter gestaltet werden und die Prozesse innerhalb der Beiräte unterstützt werden.
+
+Bei jeder Sitzung des Bau- und Umweltausschusses sitzt ein Mitglied des Umweltbeirats im Publikum, und was dort umweltrelevant war, ist danach festgehalten.
 
 Die Abstimmung im Beirat erfordert heute, dass jemand Termine und Tagesordnungen im Blick behält, Freiwillige anspricht und Rückmeldungen einsammelt. Das System nimmt diese Arbeit ab. Es zeigt alle Termine an einem Ort und meldet sich nur, wenn etwas zu tun ist.
 
@@ -66,9 +68,9 @@ Oben stehen die anstehenden Sitzungen, darunter die vergangenen mit ihren Notize
 2. Welche TOPs waren umweltrelevant?
 3. Was wurde beschlossen oder vertagt, und muss der Beirat etwas tun?
 
-**Magic Links:** Jeder Link gilt für eine Person und eine Sitzung. Ein Klick trägt ein und zeigt eine Bestätigungsseite mit „Rückgängig machen“. Eine Anmeldung ist nicht nötig.
+**Magic Links:** Jeder Link gilt für eine Person und eine Sitzung. Der Link öffnet eine Bestätigungsseite, erst der Knopf dort (POST) trägt ein. So lösen Mail-Scanner und Link-Vorschauen nichts aus. Danach gibt es „Rückgängig machen“. Der Token ist signiert. Links in Mails gelten bis zum Sitzungsende plus 14 Tage (einstellbar), der „Rückgängig“-Link nach dem Klick 30 Minuten. Eine Anmeldung ist nicht nötig.
 
-**Kalender (optional):** eine iCal-Abo-Adresse mit allen Sitzungsterminen, die Mitglieder in ihren eigenen Kalender übernehmen können.
+**Kalender (optional):** eine persönliche iCal-Abo-Adresse mit allen Sitzungsterminen, die Mitglieder im Dashboard abrufen und in ihren eigenen Kalender übernehmen können. Der Token ist pro Mitglied abgeleitet, gesperrte Mitglieder verlieren den Zugang sofort, und über `abo_version` in den Einstellungen lassen sich alle Adressen widerrufen.
 
 ## Benachrichtigungsregeln
 
@@ -77,7 +79,7 @@ Fünf feste Regeln, geprüft von einem täglichen Lauf am Morgen. Die Fristen si
 | # | Auslöser | Bedingung | Empfänger | Kanal und Inhalt |
 | --- | --- | --- | --- | --- |
 | 1 | Tagesordnung veröffentlicht | – | alle Mitglieder | E-Mail mit Link zur TO und Magic Link „Ich nehme teil“ |
-| 2 | Jemand trägt sich ein | – | alle anderen Mitglieder | Push oder E-Mail: „X nimmt am … teil“ |
+| 2 | Jemand trägt sich ein | – | alle anderen Mitglieder | E-Mail: „X nimmt am … teil“ |
 | 3 | 7 Tage vor der Sitzung | niemand eingetragen | alle Mitglieder | E-Mail mit Magic Link „Ich nehme teil“ |
 | 4 | Letzte Person trägt sich aus | innerhalb der 7 Tage | alle Mitglieder | wie Regel 3 |
 | 5 | 3 Tage nach der Sitzung | keine Notiz vorhanden | die Teilnehmenden | E-Mail mit Link zur Kurznotiz |
@@ -88,7 +90,7 @@ Fünf feste Regeln, geprüft von einem täglichen Lauf am Morgen. Die Fristen si
 - **Verschiebung:** Die Fristen werden neu berechnet. Eingetragene behalten ihren Eintrag und werden informiert.
 - **Absage:** Eine Info geht an die Eingetragenen, danach keine weiteren Nachrichten.
 - **Doch nicht teilgenommen:** Die Erinnerungsmail enthält einen Link, mit dem man das meldet. Danach kommt keine weitere Erinnerung.
-- **Kanalwahl:** Jedes Mitglied wählt selbst, ob es Regel 2 als Push oder E-Mail bekommt. Alle anderen Regeln laufen per E-Mail.
+- **Kanal:** Alle Regeln laufen in Stufe 1 per E-Mail. Push (etwa über Ortsfunk) ist ein möglicher späterer Zusatzkanal für Regel 2.
 
 ## Technische Umsetzung
 
@@ -141,27 +143,45 @@ Der RIS-Adapter füllt Directus. Von dort lesen das Dashboard, die Regeln und di
 | --- | --- |
 | einstellungen | Singleton: Name, Absender, Fristen, Notizfragen, Themenfokus, RIS-Adapter |
 | gremien | Name, Kennung im RIS, aktiv |
-| mitglieder | Name, E-Mail, bevorzugter Kanal (Push/E-Mail), aktiv |
 | sitzungen | Gremium, Datum, Ort, Link ins RIS, TO-Status, abgesagt |
-| teilnahmen | Sitzung, Mitglied, eingetragen am, nicht teilgenommen |
+| teilnahmen | Sitzung, Mitglied (`directus_users`), eingetragen am, ausgetragen am, nicht teilgenommen |
 | notizen | Sitzung, relevant ja/nein, Antworten auf die Notizfragen |
 | benachrichtigungen | Regel, Sitzung, Empfänger, Zeitpunkt (Versandprotokoll) |
+
+**Anmeldung und Mitglieder.** Mitglieder sind Directus-Benutzer (`directus_users`), die Anmeldung läuft über den Directus-Login. Eine eigene Collection `mitglieder` gibt es nicht, `teilnahmen` verweisen auf `directus_users`. Als Kanal ist in Stufe 1 nur E-Mail vorgesehen.
+
+**Grenzen der kostenlosen Directus-Lizenz (Version 12, Core).** Sie erlaubt höchstens 3 Sitze (Benutzer mit Zugang zur Admin-Oberfläche), 25 Collections und 5 Flows. Benutzerdefinierte Berechtigungsregeln gibt es nicht: keine Feldeinschränkungen, keine Filter wie „nur eigene Einträge“. Die Telemetrie lässt sich nicht abschalten. Folgen für den Entwurf:
+
+- Mitglieder bekommen keinen Zugang zur Admin-Oberfläche (belegt keinen Sitz) und nur Lesezugriff auf Sitzungsdaten.
+- Alles andere läuft über die Extension, die Rechte im Code prüft: ein- und austragen, Notizen, die Namen der Mitglieder. Mitglieder lesen `directus_users` nie direkt, E-Mail-Adressen bleiben damit verborgen.
+- Bis zu drei Personen können Administrierende sein.
+
+Der Aufbau mit Directus 11 wäre eine Alternative ohne diese Grenzen. Die Extension-Lösung funktioniert in beiden Versionen.
 
 **Rollen in Directus (Namen je Instanz, hier Kremmen)**
 
 | Rolle | Für wen | Rechte |
 | --- | --- | --- |
-| `ub` | einfache Mitglieder | Dashboard sehen, sich ein- und austragen, Notizen schreiben, eigenen Kanal wählen |
+| `ub` | einfache Mitglieder | Dashboard sehen, sich ein- und austragen, Notizen schreiben (Schreiben über die Extension) |
 | `ub-admin` | Administrierende | zusätzlich Mitglieder und Sitzungen verwalten, Einstellungen ändern |
 
 **RIS-Adapter.** Der Kern spricht nur mit einer kleinen Schnittstelle: Sitzungen eines Gremiums abrufen und die Tagesordnung einer Sitzung abrufen. Der Abgleich läuft alle paar Stunden und erkennt neue Sitzungen, Verschiebungen, Absagen und das Erscheinen einer Tagesordnung. Vorgesehene Adapter:
 
 1. **OParl**, der offene Standard für Ratsinformationssysteme
 2. **iCal oder RSS**, falls das RIS nur Feeds liefert
-3. **Scraper** für verbreitete RIS-Produkte wie SessionNet oder ALLRIS
+3. **Scraper** für verbreitete RIS-Produkte wie SessionNet, ALLRIS oder KOMFA RIS
 4. **Manuell**, damit das System auch ohne Schnittstelle nutzbar ist
 
 Weitere Adapter können andere Instanzen beitragen.
+
+**Kremmen: KOMFA RIS.** Die Stadt nutzt das [KOMFA RIS](https://ris-kremmen.komfa.de/index.php?module=komfaris&action=cal). Ein OParl-Zugang und ein RSS-Feed sind nicht erkennbar. Es gibt aber pro Sitzung eine iCal-Datei und eine Tagesordnungsseite mit nummerierten TOPs, Ort, Uhrzeit, Einladung als PDF und Vorlagen. Der Kremmen-Adapter kombiniert deshalb iCal und Scraping:
+
+1. Monatskalender der nächsten ein bis drei Monate abrufen (`action=cal`) und die Sitzungen des „Bau-/Wirtschafts- und Umweltausschusses“ mit ihrer ID herausfiltern.
+2. Beginn, Ende und Ort aus der iCal-Datei der Sitzung lesen (`action=ic`).
+3. Tagesordnungsseite abrufen (`action=to`). Sind TOPs vorhanden oder steht die Einladung zum Download (`action=dlg`), gilt die TO als veröffentlicht und Regel 1 greift. „Die Tagesordnung ist nicht verfügbar“ heißt: noch nicht veröffentlicht.
+4. Absagen und Verschiebungen durch Vergleich mit dem letzten Abgleich erkennen. Dieselbe Sitzungs-ID mit anderem Beginn ist eine Verschiebung. Fehlt eine kommende Sitzung bei vollständigem Abruf, gilt sie als abgesagt.
+
+Der Adapter fragt nur wenige Male am Tag ab, pausiert zwischen den Abrufen, nutzt einen Cache und sendet einen erkennbaren User-Agent. Getestet wird er gegen gespeicherte Antworten des RIS unter `packages/ris-adapter/test/fixtures/komfa/`.
 
 **Regeln als Code statt Flows.** Die Benachrichtigungsregeln laufen als Hook-Extension, nicht als Directus-Flows. Flows liegen in der Datenbank, sind schwer zu testen und schlecht zu reviewen. Für kleine Automationen einzelner Instanzen bleiben Flows nutzbar.
 
@@ -173,16 +193,16 @@ Weitere Adapter können andere Instanzen beitragen.
 
 Das System muss ohne seinen Erbauer weiterlaufen: In diesem Fall übernehmen andere Beiratsmitglieder den Betrieb.
 
-- **Konfiguration als Code.** Schema, Rollen und Berechtigungen liegen im Git-Repo, exportiert mit einem Sync-Werkzeug wie directus-sync. Der eingebaute Schema-Snapshot erfasst nur Collections, Felder und Relationen.
+- **Konfiguration als Code.** Schema, Rollen und Berechtigungen liegen im Git-Repo, angelegt durch `scripts/schema-anwenden.mjs`. Das Skript ist idempotent und lässt sich auf jeder frischen Instanz ausführen. Es ersetzt directus-sync, das mit Directus 12 nicht geprüft ist.
 - **Ein Stack, eine Datei.** `docker-compose.yml` plus `.env`. Der Umzug auf einen anderen Server ist Repo und Datenbankdatei kopieren, dann starten.
 - **Funktionsadressen statt persönlicher Konten.** Ein SMTP-Konto, das dem Beirat gehört (etwa umweltbeirat@…), und eine Domain umweltbeirat.[ort].de. Bei einem Domainwechsel ändern sich alle Links in alten E-Mails.
 - **Admins über eine Rolle.** Administrieren kann, wer die Rolle `ub-admin` hat. Die Übergabe ist damit eine Rollenzuweisung in Directus.
-- **Backup und Restore als Skript.** Gesichert werden die SQLite-Datei und die Uploads. Die Datei wird mit `sqlite3 .backup` gesichert oder bei kurz gestopptem Container kopiert, nie einfach im laufenden Betrieb. Die Wiederherstellung wird einmal getestet.
-- **Betriebsanleitung im README** für Nicht-Entwickler: starten, aktualisieren, Mitglied anlegen, Backup einspielen.
+- **Backup und Restore als Skript.** Gesichert werden die SQLite-Datei und die Uploads. Die Datei wird mit `sqlite3 .backup` gesichert oder bei kurz gestopptem Container kopiert, nie einfach im laufenden Betrieb. Die Wiederherstellung verschiebt die bisherigen Daten beiseite statt sie zu löschen und wird einmal getestet.
+- **Betriebsanleitung** für Nicht-Entwickler unter [`Betrieb.md`](Betrieb.md): starten, aktualisieren, Mitglied anlegen, Sitzungen pflegen, RIS-Modus umstellen, Backup einspielen, häufige Probleme.
 
 **Repo-Aufteilung.** Der allgemeine Kern liegt öffentlich in `beirat-dabei`, mit einer vollständigen Beispielkonfiguration unter `examples/kremmen/` ohne Geheimnisse. Die `.env` der Kremmener Instanz mit SMTP-Zugang und Schlüsseln liegt nur auf dem Server.
 
-**Neue Instanz.** Die Startkonfiguration steht in einer `instanz.yaml` (Name, Gremien, Fristen, Notizfragen, Rollennamen, Adapter, Themenfokus). `scripts/instanz-anwenden.sh` überträgt sie nach Directus. Danach ist Directus maßgeblich, damit Admins Fristen und Texte in der Oberfläche ändern können. Die vollständige Verzeichnisstruktur steht in der README.
+**Neue Instanz.** Die Startkonfiguration steht in einer `instanz.yaml` (Name, Gremien, Fristen, Notizfragen, Rollennamen, Adapter, Themenfokus). `scripts/instanz-anwenden.mjs` prüft sie, zeigt die Änderungen an und überträgt sie nach Directus. Danach ist Directus maßgeblich, damit Admins Fristen und Texte in der Oberfläche ändern können. Die vollständige Verzeichnisstruktur steht in der README.
 
 **Datenschutz.** Gespeichert werden Name, E-Mail-Adresse, bevorzugter Kanal, Teilnahmen und Notizen. Zugriff haben nur Beiratsmitglieder mit der Rolle `ub` oder `ub-admin`.
 
@@ -211,13 +231,12 @@ Die KI übernimmt das Lesen und Formulieren, die festen Regeln aus Stufe 1 bleib
 
 **Offene Fragen**
 
-- Welches Ratsinformationssystem nutzt Kremmen, und bietet es OParl, iCal oder RSS?
 - Welches E-Mail-Konto nutzt das System als Absender?
 
 **Nächste Schritte**
 
 - [ ] Konzept und Entwürfe im Beirat vorstellen und abstimmen
-- [ ] RIS prüfen und passenden Adapter wählen
+- [x] RIS prüfen und passenden Adapter wählen (KOMFA RIS, Adapter umgesetzt)
 - [ ] Datenmodell und Rollen ub und ub-admin in Directus anlegen
 - [ ] Repo-Gerüst: Compose-Datei, `.env`-Vorlage, Sync-Setup, README
 - [ ] Magic-Link- und iCal-Extension bauen

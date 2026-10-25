@@ -1,0 +1,43 @@
+# Startkonfiguration des Umweltbeirats Kremmen.
+# Übertragen mit: node scripts/instanz-anwenden.mjs examples/kremmen/instanz.yaml
+# Danach ist Directus maßgeblich: Änderungen macht ihr in der Verwaltung. Ein erneutes
+# Ausführen des Skripts zeigt zuerst an, was es überschreiben würde.
+
+name: Umweltbeirat Kremmen
+zeitzone: Europe/Berlin
+
+fristen:
+  vor_sitzung_tage: 7     # Erinnerung, wenn sich noch niemand eingetragen hat
+  nach_sitzung_tage: 3    # Bitte um die Notiz, wenn sie fehlt
+
+# Themenfokus für die spätere KI-Vorsortierung (Ausbaustufe 2)
+themenfokus: Umwelt, Natur, Klima
+
+# Fragen im Notizformular. Die Frage mit dem Schlüssel "relevant" ist immer ja/nein und Pflicht.
+notizfragen:
+  - schluessel: relevant
+    frage: War etwas Relevantes für den Beirat dabei?
+    typ: ja-nein
+    pflicht: true
+  - schluessel: tops
+    frage: Welche TOPs waren umweltrelevant?
+    typ: text
+  - schluessel: beschluesse
+    frage: Was wurde beschlossen oder vertagt, und muss der Beirat etwas tun?
+    typ: text
+
+# Woher die Sitzungen kommen. Adapter: komfa (KOMFA RIS) oder manuell (kein Abgleich).
+ris:
+  adapter: komfa
+  quelle: https://ris-kremmen.komfa.de
+
+# Rollennamen in Directus. Sie müssen zu ROLLE_MITGLIED und ROLLE_ADMIN in der .env passen.
+rollen:
+  mitglied: ub
+  admin: ub-admin
+
+# Begleitete Gremien. ris_kennung ist der Name des Gremiums genau so, wie ihn das RIS anzeigt.
+gremien:
+  - name: Bau-/Wirtschafts- und Umweltausschuss
+    ris_kennung: Bau-/Wirtschafts- und Umweltausschuss
+    aktiv: true

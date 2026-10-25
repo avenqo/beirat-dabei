@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Platzhalter für das Logo">
+  <circle cx="32" cy="32" r="30" fill="#e3efe4" stroke="#2e7d32" stroke-width="3"/>
+  <path d="M18 42c0-13 9-21 28-22 0 14-8 24-21 24-2 0-4 0-7-2z" fill="#2e7d32"/>
+  <path d="M20 46c6-8 12-13 20-17" fill="none" stroke="#e3efe4" stroke-width="2.4" stroke-linecap="round"/>
+</svg>

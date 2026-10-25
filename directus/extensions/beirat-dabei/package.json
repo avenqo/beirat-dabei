@@ -1,0 +1,45 @@
+{
+  "name": "directus-extension-beirat-dabei",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "EUPL-1.2",
+  "directus:extension": {
+    "type": "bundle",
+    "path": {
+      "app": "dist/app.js",
+      "api": "dist/api.js"
+    },
+    "entries": [
+      {
+        "type": "endpoint",
+        "name": "beirat-dabei",
+        "source": "src/endpoint.ts"
+      },
+      {
+        "type": "hook",
+        "name": "regeln",
+        "source": "src/hook.ts"
+      }
+    ],
+    "host": "^12.0.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "directus-extension build",
+    "lint": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@beirat-dabei/core": "workspace:*",
+    "@beirat-dabei/ris-adapter": "workspace:*"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "^18.0.6",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.8"
+  }
+}

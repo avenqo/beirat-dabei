@@ -1,0 +1,134 @@
+<!doctype html>
+<!-- (c) by browserfood-webdesign: 		http://www.browserfood.de -->
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="de"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="de"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="de"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="de"> <!--<![endif]-->
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">      
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">    
+
+<meta name="robots" content="noindex, nofollow">
+<meta name="Title" content="Sitzungskalender  - Ratsinformationssystem Kremmen">
+<meta name="Keywords" content="">
+<meta name="Description" content="Ratsinformationssystem Stadt Kremmen - Informationsportal zu den Sitzungen von Gemeinde-Gremien. ">
+<meta property="og:url" content="https://ris-kremmen.komfa.de/index.php?module=komfaris&amp;action=cal">
+<meta property="og:title" content="Sitzungskalender">
+<meta property="og:site_name" content="Ratsinformationssystem Kremmen">
+<meta property="og:description" content="Ratsinformationssystem Stadt Kremmen - Informationsportal zu den Sitzungen von Gemeinde-Gremien. ">
+<meta property="og:image" content="">
+                          
+<title>Sitzungskalender  - Ratsinformationssystem Kremmen</title>
+<link rel="stylesheet" href="https://ris-kremmen.komfa.de/plugins/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://ris-kremmen.komfa.de/css/default/default.css"/>
+<link rel="stylesheet" href="https://ris-kremmen.komfa.de/css/default/custom.css"/>
+<link rel="Stylesheet" href="https://ris-kremmen.komfa.de/plugins/jquery-ui/themes/smoothness/jquery-ui.min.css"/>
+<link rel="stylesheet" href="https://ris-kremmen.komfa.de/plugins/font-awesome/css/font-awesome.min.css">
+<link rel="Stylesheet" type="text/css" href="https://ris-kremmen.komfa.de/css/default/calendar.css" />
+<link rel="Stylesheet" type="text/css" href="https://ris-kremmen.komfa.de/css/default/komfaris.css" />
+
+<script type="text/javascript" src="https://ris-kremmen.komfa.de/plugins/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="https://ris-kremmen.komfa.de/plugins/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://ris-kremmen.komfa.de/js/browserfood.js"></script>
+
+</head>
+<body>
+  <!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+  <div class="Overall">  
+  <header class="PageHeader"><nav class="navbar navbar-default navbar-fixed-top shadow" role="navigation">
+<div class="navbar-header">
+  <div class="navbar-brand"> <a href="https://www.komfa.de/cms/index.php?module=view&action=ratssitzung&group=2" title="Ratsinformationsystem" target="_blank"> RIS </a> 
+  
+  <a href="http://www.kremmen.de/" target="_blank" class="subheadline">
+  <img src="/gfx/logos/wappen.png" style="height: 150%"> Stadt Kremmen</a></div>
+
+  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar1">
+    <span class="sr-only">Menu</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>  
+</div>
+<div class="collapse navbar-collapse" id="navbar1">
+<ul class="nav nav navbar-nav" id="TopMenü5"><li class="nav-item"><a href="index.php?module=komfaris&amp;action=main" title="Sitzungsübersicht" class="nav navbar-nav_item"><i class="fa fa-list fa-fw"></i> Übersicht</a></li>
+<li class="nav-item active"><a title="Kalender" class="nav navbar-nav_item"><i class="fa fa-calendar fa-fw"></i> Kalender</a></li>
+<li class="nav navbar-nav_item" role="menuitem"><form class="navbar-form navbar-left form-inline" action="/index.php?module=komfaris&action=search&id=1" method="POST" role="search"><!--<input type="hidden" name="module" value="komfaris"><input type="hidden" name="action" value="search">-->
+<div class="form-group">
+<input type="text" class="form-control nomargin" name="suche" placeholder="Suchbegriff..."></div>
+<button class="btn btn-default nomargin" type="submit" style="width:40px;height:34px;"><i class="fa fa-search fa-fw" aria-hidden="true"></i></button></form></li>
+</ul>
+
+<ul class="nav nav navbar-nav navbar-right" id="TopMenuR6"><li class="" role="menuitem"><a href="/content.php?module=komfaris&amp;action=rlogin" title="Anmelden" data-toggle="modal" data-target="#basicModal"><i class="fa fa-user fa-fw"></i> Anmelden </a></li>
+<li class="" role="menuitem"><a href="https://www.kremmen.de/impressum/index.php" target="_blank"><i class="fa fa-info fa-fw"></i> Impressum</a></li>
+</ul>
+</div>
+</nav></header>
+  <div role="main" class="PageMain">    
+    <div class="maincontent">
+       <nav class="MenuSlot" id="msl">
+<div class="nav usermenu" id="Benutzer3">&nbsp;</div></nav>    
+		   <section class="PageContent" id="mpc"><h1>Sitzungskalender</h1><div class="container filter"><form action="index.php?module=komfaris&amp;action=cal" method="POST"><input type="hidden" name="SetFilter" value="1">
+<div class="cols2">
+<div class="formfield"><label>Zeitraum von:</label><input type="text" name="q_calstartdate" id="q_calstartdate" value="01.11.2026" class="datefield"></div>
+<div class="formfield"><label>bis:</label><input type="text" name="q_enddate" id="q_enddate" value="31.03.2027" readonly disabled class="datefield"></div>
+</div>
+<div class="cols2">
+<div class="formfield"><label>Gemeinde:</label><select name="q_gemeinde" id="q_gemeinde"><option value="">&nbsp;</option><option value="CE30F8EE2400E411B4D3E8393536AC9B" selected>Stadt Kremmen</option></select></div>
+<div class="formfield"><label>Gremium:</label><select name="q_gremium" id="q_gremium"><option value="">&nbsp;</option><option value="EAC109EEE697E911899A185680F08105" >Bau-/Wirtschafts- und Umweltausschuss</option><option value="F012D8297399E911899B185680F08105" >DUB</option><option value="8996EEAA95F7E311BD58E8393536AC9B" >Finanzausschuss</option><option value="F4A71785A60AEA1189AF185680F63A14" >Fraktion CDU</option><option value="F21F0255A9B1E8118213E8393536AC9B" >Gemeinsame Finanz- und Kultur-/Sozialausschusssitzung</option><option value="862CB918171B698CC8140A2B481E7914" >Gemeinsame Sitzung aller Ortsbeiräte Beetz, Flatow, Groß-Ziethen, Hohenbruch, Kremmen, Sommerfeld, Staffelde</option><option value="A301739DAACC5EA7E214DD4210894DD0" >Gemeinsame Sitzung der Ortsbeiräte Beetz und Sommerfeld</option><option value="168FBDFC0647EE11AB5B00155DC10A04" >Gemeinsame Sitzung der Ortsbeiräte Groß-Ziethen, Flatow und Staffelde</option><option value="FF65AE3CF680E8118211E8393536AC9B" >Hauptausschusssitzung</option><option value="CC4BB230A3F7E311BD58E8393536AC9B" >Kultur- und Sozialausschuss</option><option value="D2B92BCA7399E911899B185680F08105" >Links und Grün</option><option value="FCA4487AA3F7E311BD58E8393536AC9B" >OBR Beetz</option><option value="0C0A3F73A3F7E311BD58E8393536AC9B" >OBR Flatow</option><option value="1C42046BA3F7E311BD58E8393536AC9B" >OBR Groß-Ziethen</option><option value="CCA0789CA3F7E311BD58E8393536AC9B" >OBR Hohenbruch</option><option value="EC878D8AA3F7E311BD58E8393536AC9B" >OBR Kremmen</option><option value="FC544983A3F7E311BD58E8393536AC9B" >OBR Sommerfeld</option><option value="3EF16094A3F7E311BD58E8393536AC9B" >OBR Staffelde</option><option value="BD17DF56A3F7E311BD58E8393536AC9B" >Stadtverordnetenversammlung</option><option value="FF712F817199E911899B185680F08105" >UWG/IGU/SPD Fraktion</option></select></div>
+<div class="formfield"><label></label>
+<input type="submit" value="Aktualisieren"></div>
+</div>
+<div class="formfield_end"></div>
+<script type="text/javascript">
+$('#q_calstartdate').datepicker();
+$('#q_enddate').datepicker();</script>
+<script type="text/javascript" src="plugins/jquery-ui/ui/i18n/datepicker-de.js"></script>
+</form></div>
+<table width="100%"><tr>
+<th width="33%" style="text-align:left;"><b>Kalender </b></th>
+<th width="33%" style="text-align:center;"><b>November 2026</b></th>
+<th width="33%" style="text-align:right;"><b><a href="index.php?module=komfaris&amp;action=cal&amp;SetFilter=calmode&amp;FilterValue=week" title="Wochenansicht">Wochenansicht</a>&nbsp;&nbsp;&nbsp;Monat <a href="index.php?module=komfaris&amp;action=cal&amp;SetFilter=calstartdate&amp;FilterValue=2026-10-01" title="zurück">zurück</a> /  <a href="index.php?module=komfaris&amp;action=cal&amp;SetFilter=calstartdate&amp;FilterValue=2026-12-01" title="vor">vor</a></b></th>
+</tr></table>
+<table class="cal_table"><tr class="cal_row"><th class="cal_headw"><span class="day_montag">Montag</span></th><th class="cal_headw"><span class="day_dienstag">Dienstag</span></th><th class="cal_headw"><span class="day_mittwoch">Mittwoch</span></th><th class="cal_headw"><span class="day_donnerstag">Donnerstag</span></th><th class="cal_headw"><span class="day_freitag">Freitag</span></th><th class="cal_headw"><span class="day_samstag">Samstag</span></th><th class="cal_headw"><span class="day_sonntag">Sonntag</span></th></tr><tr class="cal_row"><td class="cal_cellm cal_monday"></td><td class="cal_cellm cal_tuesday"></td><td class="cal_cellm cal_wednesday"></td><td class="cal_cellm cal_thursday"></td><td class="cal_cellm cal_friday"></td><td class="cal_cellm cal_saturday"></td><td class="cal_cellm cal_sunday"><div class="cal_headm">01</div></td></tr><tr class="cal_row"><td class="cal_cellm cal_monday"><div class="cal_headm">02</div></td><td class="cal_cellm cal_tuesday"><div class="cal_headm">03</div></td><td class="cal_cellm cal_wednesday"><div class="cal_headm">04</div></td><td class="cal_cellm cal_thursday"><div class="cal_headm">05</div><div class="cal_event"><div class="cal_eventtime">19:00 <a href="index.php?module=komfaris&amp;action=ic&amp;id=EB093BDD9780FF94F9141E073C7883E0" title="iCalendar-Datei" class="piwik_download" rel="nofollow"><i class="fa fa-calendar-plus-o fa-fw"></i></a></div><div class="cal_eventtitle">Stadt Kremmen, Gemeinsame Finanz- und Kultur-/Sozialausschusssitzung</div></div></td><td class="cal_cellm cal_friday"><div class="cal_headm">06</div></td><td class="cal_cellm cal_saturday"><div class="cal_headm">07</div></td><td class="cal_cellm cal_sunday"><div class="cal_headm">08</div></td></tr><tr class="cal_row"><td class="cal_cellm cal_monday"><div class="cal_headm">09</div></td><td class="cal_cellm cal_tuesday"><div class="cal_headm">10</div><div class="cal_event"><div class="cal_eventtime">19:00 <a href="index.php?module=komfaris&amp;action=ic&amp;id=EC7315859A41F585E714D1586435F285" title="iCalendar-Datei" class="piwik_download" rel="nofollow"><i class="fa fa-calendar-plus-o fa-fw"></i></a></div><div class="cal_eventtitle">Stadt Kremmen, Kultur- und Sozialausschuss</div></div></td><td class="cal_cellm cal_wednesday"><div class="cal_headm">11</div></td><td class="cal_cellm cal_thursday"><div class="cal_headm">12</div><div class="cal_event"><div class="cal_eventtime">19:00 <a href="index.php?module=komfaris&amp;action=ic&amp;id=EC7315859A41F585E714D258948A4DB8" title="iCalendar-Datei" class="piwik_download" rel="nofollow"><i class="fa fa-calendar-plus-o fa-fw"></i></a></div><div class="cal_eventtitle">Stadt Kremmen, Bau-/Wirtschafts- und Umweltausschuss</div></div></td><td class="cal_cellm cal_friday"><div class="cal_headm">13</div></td><td class="cal_cellm cal_saturday"><div class="cal_headm">14</div></td><td class="cal_cellm cal_sunday"><div class="cal_headm">15</div></td></tr><tr class="cal_row"><td class="cal_cellm cal_monday"><div class="cal_headm">16</div></td><td class="cal_cellm cal_tuesday"><div class="cal_headm">17</div></td><td class="cal_cellm cal_wednesday"><div class="cal_headm">18</div></td><td class="cal_cellm cal_thursday"><div class="cal_headm">19</div><div class="cal_event"><div class="cal_eventtime">19:00 <a href="index.php?module=komfaris&amp;action=ic&amp;id=EC7315859A41F585E714D458B456643B" title="iCalendar-Datei" class="piwik_download" rel="nofollow"><i class="fa fa-calendar-plus-o fa-fw"></i></a></div><div class="cal_eventtitle">Stadt Kremmen, Stadtverordnetenversammlung</div></div></td><td class="cal_cellm cal_friday"><div class="cal_headm">20</div></td><td class="cal_cellm cal_saturday"><div class="cal_headm">21</div></td><td class="cal_cellm cal_sunday"><div class="cal_headm">22</div></td></tr><tr class="cal_row"><td class="cal_cellm cal_monday"><div class="cal_headm">23</div></td><td class="cal_cellm cal_tuesday"><div class="cal_headm">24</div></td><td class="cal_cellm cal_wednesday"><div class="cal_headm">25</div></td><td class="cal_cellm cal_thursday"><div class="cal_headm">26</div></td><td class="cal_cellm cal_friday"><div class="cal_headm">27</div></td><td class="cal_cellm cal_saturday"><div class="cal_headm">28</div></td><td class="cal_cellm cal_sunday"><div class="cal_headm">29</div></td></tr><tr class="cal_row"><td class="cal_cellm cal_monday"><div class="cal_headm">30</div></td><td class="cal_cellm cal_tuesday"></td><td class="cal_cellm cal_wednesday"></td><td class="cal_cellm cal_thursday"></td><td class="cal_cellm cal_friday"></td><td class="cal_cellm cal_saturday"></td><td class="cal_cellm cal_sunday"></td></tr></table>
+
+<nav class="pagenav clearfix"></nav><div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" id="bmc">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">Ã—</button>
+            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <h3>Modal Body</h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+    </div>
+  </div>
+</div>
+<script>
+$(document).ready(function(){
+  $('body').on('hidden.bs.modal', '.modal', function () {
+    $(this).removeData('bs.modal');
+  });
+});
+</script>
+</section>
+    </div>
+    <nav class="FootMenu"><div><a href="index.php?module=view&amp;action=login" title="_" class="menu_item"> _</a></div>
+</nav>
+  </div>  
+  <footer class="PageFooter"><div class="center">
+	<a href="index.php?module=view&action=datenschutz">Datenschutzerklärung</a><br>
+	<small>&copy; <a href="http://www.kommunalfabrik.de" target="_blank">kommunalfabrik</a>- Alle Rechte vorbehalten. </small>
+</div>
+</footer>
+  </div>
+  
+<script type="text/javascript" src="https://ris-kremmen.komfa.de/plugins/tether/dist/js/tether.min.js"></script>
+<script type="text/javascript" src="https://ris-kremmen.komfa.de/plugins/bootstrap/dist/js/bootstrap.min.js"></script>
+</body>
+</html><br>0.0883<br>NO_ENCODEbool(false)

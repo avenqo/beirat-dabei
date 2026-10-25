@@ -1,0 +1,67 @@
+# Beirat dabei: ein Stack pro Instanz. Konfiguration über .env (siehe .env.example).
+services:
+  directus:
+    image: directus/directus:12.5.0 # Version fest, Updates bewusst durchführen
+    restart: unless-stopped
+    volumes:
+      - ./data/database:/directus/database
+      - ./data/uploads:/directus/uploads
+      - ./directus/extensions:/directus/extensions
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-true}
+      PASSWORD_RESET_URL_ALLOW_LIST: ${PUBLIC_URL}/admin/reset-password
+      KEY: ${KEY}
+      SECRET: ${SECRET}
+      DB_CLIENT: sqlite3
+      DB_FILENAME: /directus/database/data.db
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      EMAIL_FROM: ${EMAIL_FROM}
+      EMAIL_TRANSPORT: smtp
+      EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST}
+      EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT:-587}
+      EMAIL_SMTP_USER: ${EMAIL_SMTP_USER}
+      EMAIL_SMTP_PASSWORD: ${EMAIL_SMTP_PASSWORD}
+      EMAIL_SMTP_SECURE: ${EMAIL_SMTP_SECURE:-false}
+      MAGIC_LINK_SECRET: ${MAGIC_LINK_SECRET}
+      MAGIC_LINK_NACHLAUF_TAGE: ${MAGIC_LINK_NACHLAUF_TAGE:-14}
+      SITZUNGSDAUER_STUNDEN: ${SITZUNGSDAUER_STUNDEN:-3}
+      DASHBOARD_URL: ${DASHBOARD_URL:-}
+      REGELN_MODUS: ${REGELN_MODUS:-trocken}
+      REGELN_CRON: ${REGELN_CRON:-0 7 * * *}
+      RIS_MODUS: ${RIS_MODUS:-trocken}
+      RIS_CRON: ${RIS_CRON:-15 6,12,18 * * *}
+      RIS_USER_AGENT: ${RIS_USER_AGENT:-}
+      RIS_RUECKBLICK_TAGE: ${RIS_RUECKBLICK_TAGE:-45}
+      # Aktivitätsprotokoll (Anmeldungen, Änderungen) und Versionsverlauf nach dieser Zeit löschen
+      ACTIVITY_RETENTION: ${ACTIVITY_RETENTION:-90d}
+      REVISIONS_RETENTION: ${REVISIONS_RETENTION:-90d}
+      ROLLE_MITGLIED: ${ROLLE_MITGLIED:-mitglied}
+      ROLLE_ADMIN: ${ROLLE_ADMIN:-admin}
+      TZ: ${TZ:-Europe/Berlin}
+      TELEMETRY: "false"
+    # Anwendungsprotokoll begrenzen: enthält aufgerufene Adressen, auch persönliche Links
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      # 127.0.0.1 statt localhost: im Container löst localhost zuerst zu IPv6 auf. /server/health verlangt eine Anmeldung.
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8055/server/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  # Eine Adresse für Dashboard und Directus
+  web:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    depends_on:
+      - directus
+    ports:
+      - "${PORT:-8055}:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./dashboard:/srv/dashboard:ro

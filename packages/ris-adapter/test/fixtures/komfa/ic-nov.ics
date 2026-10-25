@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Kommunalfabrik Ratsinformationssystem https://ris-kremmen.komfa.de/
+X-WR-TIMEZONE:Europe/Berlin
+X-WR-CALNAME:Sitzungskalender
+X-WR-CALDESC:Ratsinformationssystem Kremmen
+BEGIN:VEVENT
+UID:EC7315859A41F585E714D258948A4DB8
+ORGANIZER;CN="":MAILTO:
+LOCATION:Rathaus Ratssaal, Am Markt 1 Eingang Mühlenstraße
+SUMMARY:Bau-/Wirtschafts- und Umweltausschuss
+DESCRIPTION:Bau-/Wirtschafts- und Umweltausschuss, Stadt Kremmen, Bau-/Wirtschafts- und Umweltausschuss, Rathaus Ratssaal, Am Markt 1, Eingang Mühlenstraße
+CLASS:CONFIDENTIAL
+DTSTART:20261112T180000Z
+DTEND:20261112T203000Z
+DTSTAMP:20261020T083225Z
+END:VEVENT
+END:VCALENDAR

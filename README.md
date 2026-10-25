@@ -24,7 +24,7 @@ Für jedes Gremium, das öffentliche Ausschusssitzungen begleiten will, zum Beis
 
 | Allgemein (Kern) | Pro Instanz einstellbar |
 | --- | --- |
-| Dashboard, Teilnahme, Magic Links, iCal | Name, Logo, Farben, Absender, Domain |
+| Dashboard, Teilnahme, Magic Links, iCal | Name, Logo, Farben, Absender (`EMAIL_FROM`), Domain |
 | Regel-Engine für Benachrichtigungen | Fristen vor und nach der Sitzung |
 | Kurznotiz | Fragen im Notizformular |
 | Datenmodell mit Gremien | begleitete Gremien |
@@ -44,7 +44,11 @@ Eine vollständige Beispielkonfiguration liegt unter [`examples/kremmen/`](examp
 | 4 | Letzte Person trägt sich aus | innerhalb dieser Frist | alle Mitglieder |
 | 5 | *m* Tage nach der Sitzung (Standard: 3) | keine Notiz vorhanden | die Teilnehmenden |
 
-Die Regeln werden einmal täglich geprüft. Ein Versandprotokoll verhindert doppelte Nachrichten.
+Die Regeln werden einmal täglich um 7 Uhr geprüft, außerdem kurz nach jeder Änderung an einer Teilnahme. Ein Versandprotokoll verhindert doppelte Nachrichten. Schlägt ein Versand fehl, wird er beim nächsten Lauf wiederholt.
+
+`REGELN_MODUS` steuert den Versand: `aus`, `trocken` (nur ins Log schreiben, Standard) oder `scharf`. Erst auf `scharf` stellen, wenn die Sitzungen im System stimmen, sonst gehen beim ersten Lauf Mails zu allem Bestehenden raus. Sitzungen, die mehr als 60 Tage zurückliegen, werden nicht mehr bewertet.
+
+Links in Mails gelten bis zum Sitzungsende plus 14 Tage (`MAGIC_LINK_NACHLAUF_TAGE`, `SITZUNGSDAUER_STUNDEN`). Der Rückgängig-Link nach einem Klick gilt 30 Minuten. Die Mails verweisen auf `DASHBOARD_URL/link.html?token=…`. Die Seite zeigt eine Bestätigung, erst der Knopf führt die Aktion aus, danach gibt es „Rückgängig machen“.
 
 ## RIS-Adapter
 
@@ -52,12 +56,17 @@ Der Kern spricht nur mit einer kleinen Schnittstelle: Sitzungen eines Gremiums a
 
 | Adapter | Wann | Status |
 | --- | --- | --- |
+| `komfa` | [KOMFA RIS](https://www.komfa.de): Monatskalender, iCal je Sitzung und Tagesordnungsseite | umgesetzt (Kremmen) |
 | OParl | das RIS bietet den offenen [OParl-Standard](https://oparl.org) | geplant |
 | iCal / RSS | das RIS liefert nur Feeds | geplant |
-| Scraper | für verbreitete RIS-Produkte ohne Schnittstelle | nach Bedarf |
-| Manuell | Termine werden von Hand gepflegt | geplant |
+| Scraper für andere Produkte | z. B. SessionNet oder ALLRIS | nach Bedarf |
+| `manuell` | Termine werden von Hand in Directus gepflegt, kein Abgleich | umgesetzt |
 
 Gebaut wird zuerst, was die erste Instanz braucht. Weitere Adapter sind als Beitrag willkommen.
+
+**Abgleich.** Dreimal täglich (`RIS_CRON`) werden die Sitzungen der aktiven Gremien mit dem RIS verglichen, von 45 Tagen zurück (`RIS_RUECKBLICK_TAGE`) bis 90 Tage voraus. So steht auch die letzte Sitzung im Dashboard, und Notizen lassen sich nachträglich schreiben. Erkannt werden neue Sitzungen, Verschiebungen, Orts- und Absageänderungen sowie das Erscheinen einer Tagesordnung. Eine kommende Sitzung, die bei vollständigem Abruf im RIS fehlt, gilt als abgesagt. Zurückgenommen wird nichts automatisch. Wie bei den Regeln steuert `RIS_MODUS` (`aus`, `trocken`, `scharf`) den Betrieb. Der Adapter nutzt einen erkennbaren User-Agent, pausiert zwischen den Abrufen und ruft die Tagesordnung nur ab, solange sie noch nicht als veröffentlicht gilt.
+
+**Einrichten für KOMFA:** In den Einstellungen `ris_adapter` auf `komfa` und `ris_quelle` auf die Adresse des RIS setzen (z. B. `https://ris-kremmen.komfa.de`). Bei jedem Gremium `ris_kennung` auf den Namen setzen, wie ihn das RIS anzeigt (z. B. `Bau-/Wirtschafts- und Umweltausschuss`).
 
 ## Architektur
 
@@ -97,17 +106,19 @@ beirat-dabei/
 ├── pnpm-workspace.yaml
 ├── packages/
 │   ├── core/                    # Regeln, Fristen, Magic-Link-Token, iCal
-│   └── ris-adapter/             # Schnittstelle + oparl/, ical/, manuell/
+│   ├── instanz/                 # instanz.yaml lesen, prüfen, mit Directus vergleichen
+│   └── ris-adapter/             # Schnittstelle, KOMFA-Adapter, Abgleich
 ├── directus/
-│   ├── extensions/beirat-dabei/ # Bundle: Endpoints (Magic Link, iCal),
-│   │                            # Hooks (Regeln, RIS-Abgleich)
-│   ├── templates/               # E-Mail-Vorlagen (Liquid)
-│   └── sync/                    # Schema, Rollen, Rechte (directus-sync)
-├── dashboard/                   # statisches Frontend (Vite)
+│   └── extensions/beirat-dabei/ # Bundle: Endpoints (Dashboard-API, Magic Link, iCal),
+│                                # Hooks (Regeln mit Mailversand, RIS-Abgleich)
+├── dashboard/                   # statisches Frontend (HTML, CSS, ES-Module)
+├── Caddyfile                    # Dashboard und Directus unter einer Adresse
 ├── examples/
-│   └── kremmen/                 # instanz.yaml, .env.example, Branding
+│   └── kremmen/                 # instanz.yaml, .env.example
 ├── scripts/
-│   ├── instanz-anwenden.sh      # instanz.yaml → Directus
+│   ├── schema-anwenden.mjs      # Datenmodell, Rollen, Rechte → Directus
+│   ├── dev-proxy.mjs            # Dashboard + Directus lokal unter einer Adresse
+│   ├── instanz-anwenden.mjs     # instanz.yaml → Directus
 │   ├── backup.sh
 │   └── restore.sh
 ├── docs/                        # Konzept, Betrieb, neue Instanz, Adapter schreiben
@@ -127,7 +138,7 @@ cp .env.example .env    # Werte eintragen, siehe unten
 docker compose up -d
 ```
 
-Danach die Instanz konfigurieren: `examples/kremmen/instanz.yaml` kopieren, anpassen (Name, Gremien, Fristen, Notizfragen, Rollennamen, RIS-Adapter) und mit `scripts/instanz-anwenden.sh` übertragen. Spätere Änderungen erfolgen in der Admin-Oberfläche.
+Danach die Instanz konfigurieren: `examples/kremmen/instanz.yaml` kopieren, anpassen (Name, Gremien, Fristen, Notizfragen, Rollennamen, RIS-Adapter) und mit `node scripts/instanz-anwenden.mjs examples/kremmen/instanz.yaml` übertragen (zuerst `scripts/schema-anwenden.mjs`, siehe [Betriebsanleitung](docs/Betrieb.md#neue-instanz-einrichten)). Das Skript zeigt vorher an, was sich ändert. Spätere Änderungen erfolgen in der Admin-Oberfläche.
 
 Wichtige Werte in `.env`:
 
@@ -140,7 +151,67 @@ Wichtige Werte in `.env`:
 | `MAGIC_LINK_SECRET` | Schlüssel zum Signieren der Magic Links |
 | `TZ=Europe/Berlin` | Zeitzone für die Fristen |
 
+Die Extension muss einmal gebaut werden, bevor der Stack startet:
+
+```bash
+pnpm install
+pnpm -r build
+```
+
+Danach das Datenmodell anlegen: `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `DIRECTUS_URL` und die Rollennamen aus der `.env` setzen und `node scripts/schema-anwenden.mjs` ausführen.
+
 **Keine echten Werte committen.** Die `.env` steht in `.gitignore`.
+
+## Dashboard
+
+Eine statische Seite ohne Framework unter `dashboard/` (`index.html` für Mitglieder, `link.html` für Magic Links). Der Stack enthält einen Caddy-Dienst (`Caddyfile`), der unter einer Adresse das Dashboard auf `/dashboard/` ausliefert und alles andere an Directus weiterreicht. Die Anmeldung nutzt den Directus-Login mit Sitzungs-Cookie. Die Seite kann also ohne Cross-Origin-Einstellungen mit der API sprechen.
+
+Zur Entwicklung gegen einen lokalen Directus:
+
+```bash
+DIRECTUS_URL=http://localhost:8055 PORT=8056 pnpm dev:dashboard
+# http://localhost:8056/dashboard/
+```
+
+Lokal über http muss `SESSION_COOKIE_SECURE=false` gesetzt sein.
+
+## Öffentlicher Bereich
+
+`dashboard/oeffentlich.html` zeigt ohne Anmeldung die nächsten Sitzungstermine mit Tagesordnung und die veröffentlichten Unterlagen des Beirats (Geschäftsordnung, Stellungnahmen, Tätigkeitsberichte, weitere Dokumente). Gepflegt wird das in der Verwaltung unter „Dokumente“. Nur Dokumente mit Haken bei `veroeffentlicht` sind sichtbar, und die Dateien laufen über die Extension, nicht über die offene Dateiablage von Directus. Mitglieder und Notizen erscheinen dort nie. Die Seite ist wie das Dashboard in Abschnitte gegliedert (Termine, je eine Kategorie von Unterlagen) mit einer Sprungleiste und für Handys ausgelegt.
+
+Name und Logo der Instanz stehen in der Kopfzeile aller Seiten, auch auf der Anmeldeseite. Das Logo kommt aus den Projekteinstellungen von Directus, bis dahin gibt es einen Platzhalter.
+
+## Alte Sitzungen
+
+Vergangene Sitzungen erscheinen im Dashboard nach Jahr gegliedert: das neueste Jahr ist aufgeklappt, ältere sind eingeklappt, bei jedem Jahr steht die Anzahl. Ab sieben vergangenen Sitzungen gibt es ein Suchfeld. Es durchsucht Gremium, Ort, Datum und die Antworten in den Notizen (mehrere Wörter müssen alle vorkommen) und klappt bei einer Suche die Jahre mit Treffern auf. Gespeichert bleibt alles unbegrenzt, eine automatische Löschfrist gibt es noch nicht. Mit fünf Jahren Testdaten (180 Sitzungen mit Notizen) antwortet das Dashboard in etwa 70 ms.
+
+## Impressum und Datenschutz
+
+Impressum und Datenschutzerklärung (nach Art. 13 DSGVO) sind in der Fußzeile jeder Seite verlinkt und werden in den Einstellungen der Instanz gepflegt. Die Vorlagen unter `docs/vorlagen/` werden beim Einrichten eingetragen. Offene Platzhalter erscheinen gelb markiert. Die Vorlagen sind eine Arbeitsgrundlage und müssen vor der Veröffentlichung geprüft werden.
+
+## Kalender-Abo
+
+Jedes Mitglied findet im Dashboard unter „Kalender abonnieren“ eine persönliche Adresse für den eigenen Kalender (Google, Apple, Outlook, Thunderbird). Der Feed enthält alle Sitzungen der letzten 60 Tage und der Zukunft mit Ort, Teilnehmenden, Link zur Tagesordnung und Absagen (`STATUS:CANCELLED`). Kalender-Apps laden ihn alle paar Stunden neu, Verschiebungen kommen so von selbst an. Als Dauer gilt `SITZUNGSDAUER_STUNDEN`.
+
+Der Token ist pro Mitglied aus dem `MAGIC_LINK_SECRET` abgeleitet und nirgends gespeichert. Gesperrte Mitglieder bekommen sofort 404. Alle Abo-Adressen auf einmal ungültig machen: in den Einstellungen `abo_version` erhöhen, danach holen sich die Mitglieder im Dashboard die neue Adresse. Wer die Adresse weitergibt, gibt die Termine weiter, nicht mehr.
+
+## Schnittstelle der Extension
+
+Alle Pfade unter `/beirat-dabei`. Mitglieder greifen nie direkt auf Daten zu, die Extension prüft die Rechte im Code.
+
+| Pfad | Zugang | Zweck |
+| --- | --- | --- |
+| `GET /dashboard` | Directus-Anmeldung | kommende und vergangene Sitzungen, Teilnehmende (nur Namen), Notizfragen |
+| `POST /teilnahme` | Directus-Anmeldung | `{sitzung, aktion}` mit `eintragen`, `austragen`, `nicht-teilgenommen` |
+| `POST /notiz` | Directus-Anmeldung | `{sitzung, relevant, antworten}`, nur für Teilnehmende nach der Sitzung |
+| `POST /notiz/loeschen` | Directus-Anmeldung | `{sitzung}`, löscht die Notiz endgültig, nur für Teilnehmende |
+| `GET /abo` | Directus-Anmeldung | die persönliche Adresse des Kalender-Abos |
+| `GET /instanz` | öffentlich | Name und Logo für Kopfzeile und Anmeldeseite |
+| `GET /oeffentlich` | öffentlich | nächste Sitzungen und veröffentlichte Unterlagen |
+| `GET /datei/:id` | öffentlich | die Datei eines veröffentlichten Dokuments |
+| `GET /link/:token` | Magic Link | Angaben für die Bestätigungsseite, ändert nichts |
+| `POST /link/:token` | Magic Link | führt die Aktion aus, liefert einen Rückgängig-Link |
+| `GET /ical/:token.ics` | Abo-Token | iCal-Feed mit allen Sitzungsterminen |
 
 ## Rollen
 
@@ -153,10 +224,15 @@ Die Rollennamen sind je Instanz frei wählbar.
 
 ## Betrieb
 
-- **Konfiguration als Code:** Schema, Rollen und Berechtigungen werden mit [directus-sync](https://github.com/tractr/directus-sync) im Repo gehalten.
-- **Backup:** `scripts/backup.sh` sichert die SQLite-Datei per `sqlite3 .backup` und die Uploads. Die Datenbankdatei nie im laufenden Betrieb einfach kopieren.
-- **Wiederherstellung:** `scripts/restore.sh`. Einmal testen, bevor es ernst wird.
-- **Übergabe:** Neue Administrierende bekommen die Admin-Rolle. Eine Betriebsanleitung für Nicht-Entwickler liegt unter `docs/`.
+- **Konfiguration als Code:** Datenmodell, Rollen und Berechtigungen legt `scripts/schema-anwenden.mjs` idempotent in Directus an. Das Skript liegt im Repo und lässt sich beliebig oft ausführen.
+- **Backup:** `scripts/backup.sh` sichert die SQLite-Datei per `sqlite3 .backup` (auch bei laufendem Betrieb konsistent) und die Uploads in ein Archiv unter `backups/`. Die neuesten 14 Archive bleiben erhalten (`BACKUP_KEEP`). Ohne `sqlite3` auf dem Host stoppt das Skript Directus kurz und kopiert die Datei. Die Datenbankdatei nie im laufenden Betrieb einfach kopieren. Das Archiv enthält personenbezogene Daten und ist nur für den Eigentümer lesbar. Die `.env` ist nicht enthalten und muss getrennt aufbewahrt werden.
+- **Wiederherstellung:** `scripts/restore.sh backups/<Archiv>` prüft das Archiv, fragt nach, stoppt Directus, verschiebt die bisherigen Daten nach `data/vorher-<Zeit>` (nichts wird gelöscht) und spielt die Sicherung ein. Mit `--yes` ohne Rückfrage. Als Benutzer ausführen, dem das Datenverzeichnis gehört. Einmal testen, bevor es ernst wird.
+- **Regelmäßig sichern:** zum Beispiel täglich per Cron, und das Archiv zusätzlich an einen anderen Ort kopieren:
+
+  ```bash
+  15 3 * * * cd /pfad/zu/beirat-dabei && scripts/backup.sh >> backups/backup.log 2>&1
+  ```
+- **Übergabe:** Neue Administrierende bekommen die Admin-Rolle. Die [Betriebsanleitung für Nicht-Entwickler](docs/Betrieb.md) erklärt Starten, Aktualisieren, Mitglieder, Sitzungen, Backup und häufige Probleme.
 
 ## Datenschutz
 
@@ -190,4 +266,4 @@ Fragen, Ideen, neue RIS-Adapter und Fehlermeldungen gern als Issue oder Pull Req
 
 Geänderte Versionen, auch solche, die als Webdienst betrieben werden, müssen unter der EUPL oder einer kompatiblen Lizenz offen bleiben. So kommen neue Adapter und Verbesserungen allen Instanzen zugute.
 
-Die Lizenz gilt für den Code in diesem Repository. [Directus](https://directus.io) selbst steht unter eigener Lizenz (Business Source License), deren Bedingungen für den Betrieb einer Instanz zu beachten sind.
+Die Lizenz gilt für den Code in diesem Repository. [Directus](https://directus.io) selbst steht ab Version 12 unter der Monospace Sustainable Core License (MSCL-1.0-GPL), einer „source-available“-Lizenz, deren Bedingungen für den Betrieb einer Instanz zu beachten sind. Die kostenlose Core-Stufe hat Grenzen (3 Zugänge zur Verwaltung, 25 Collections, keine eigenen Berechtigungsregeln) und sendet anonyme Nutzungsdaten, die sich dort nicht abschalten lassen. Beim ersten Anmelden in der Verwaltung fragt Directus nach einer E-Mail-Adresse des „Project Owner“ (verschiebbar mit „Remind Later“). Wird sie eingetragen, oder über `PROJECT_OWNER` gesetzt, wird sie an Directus übermittelt. Mit `PROJECT_OWNER_ENABLED=false` in der `.env` unterbleibt das.
