@@ -6,7 +6,9 @@ Stand: 20.10.2026 · Entwurf
 
 ## Ausgangslage und Ziel
 
-Ziel: Bei jeder Sitzung des Bau- und Umweltausschusses sitzt ein Mitglied des Umweltbeirats im Publikum, und was dort umweltrelevant war, ist danach festgehalten.
+Ziel: Der Informationsfluss zwischen den Ausschüssen der Kommune (Ratsinformationssystem - RIS) und den Beiräten soll verbessert und transparenter gestaltet werden und die Prozesse innerhalb der Beiräte unterstützt werden.
+
+Bei jeder Sitzung des Bau- und Umweltausschusses sitzt ein Mitglied des Umweltbeirats im Publikum, und was dort umweltrelevant war, ist danach festgehalten.
 
 Die Abstimmung im Beirat erfordert heute, dass jemand Termine und Tagesordnungen im Blick behält, Freiwillige anspricht und Rückmeldungen einsammelt. Das System nimmt diese Arbeit ab. Es zeigt alle Termine an einem Ort und meldet sich nur, wenn etwas zu tun ist.
 
