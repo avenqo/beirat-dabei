@@ -4,6 +4,7 @@ WORKDIR /bau
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY packages ./packages
 COPY app ./app
+COPY docs/vorlagen ./docs/vorlagen
 COPY dashboard/package.json ./dashboard/package.json
 RUN pnpm install --frozen-lockfile
 RUN pnpm --filter @beirat-dabei/core build \

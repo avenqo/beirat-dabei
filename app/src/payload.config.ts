@@ -12,6 +12,7 @@ import { endpoints } from './endpoints'
 import { emailAdapter } from './email'
 import { migrations } from './migrations'
 import { laeufeStarten } from './laeufe'
+import { vorlagenEintragen } from './vorlagen'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const publicUrl = process.env.PUBLIC_URL ?? 'http://localhost:3000'
@@ -24,7 +25,10 @@ export default buildConfig({
   collections: [Users, Gremien, Sitzungen, Teilnahmen, Notizen, Dokumente, Medien, Benachrichtigungen],
   globals: [Einstellungen],
   endpoints,
-  onInit: async (payload) => laeufeStarten(payload),
+  onInit: async (payload) => {
+    await vorlagenEintragen(payload)
+    laeufeStarten(payload)
+  },
   editor: lexicalEditor(),
   email: emailAdapter(),
   csrf: [publicUrl],

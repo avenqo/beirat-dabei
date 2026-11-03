@@ -19,7 +19,7 @@ import {
   type Token,
 } from "@beirat-dabei/core";
 
-/** Zugriff auf die Daten. Die Directus-Anbindung implementiert das; Tests nutzen eine Attrappe. */
+/** Zugriff auf die Daten. Die Anbindung an Payload implementiert das (app/src/speicher.ts); Tests nutzen eine Attrappe. */
 export interface Speicher {
   einstellungen(): Promise<{ einstellungen: Einstellungen; notizfragen: Notizfrage[]; name?: string; aboVersion?: number }>;
   /** Alle Personen mit Mitglieds- oder Admin-Rolle. Ohne E-Mail-Adressen. */
@@ -285,7 +285,7 @@ function basisUrl(d: Abhaengigkeiten): string {
   return (d.publicUrl ?? "").replace(/\/$/, "");
 }
 
-/** Mit Directus-Anmeldung: die persönliche Abo-Adresse. */
+/** Mit Anmeldung: die persönliche Abo-Adresse. */
 export async function abo(d: Abhaengigkeiten, nutzerId: string | null): Promise<Antwort> {
   if (!nutzerId) return fehler(401, "nicht-angemeldet");
   if (!(await aktiveMitglieder(d)).has(nutzerId)) return fehler(403, "kein-mitglied");
