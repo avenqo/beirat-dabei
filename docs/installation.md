@@ -289,13 +289,23 @@ sudo certbot renew --dry-run
 
 Erwartet: Antwort über HTTPS, über HTTP ein `301` mit `Location: https://…`, beim Probelauf `all simulated renewals succeeded`.
 
+**Wenn der Probelauf mit `Connection reset by peer` scheitert,** obwohl alles andere läuft: Er benutzt den Staging-Server von Let's Encrypt, den manche Netze oder Hoster blockieren. Das ist dann kein Fehler deiner Einrichtung. Prüfe stattdessen, dass der Live-Server erreichbar ist, die Zertifikate gültig sind und der Erneuerungs-Timer läuft:
+
+```bash
+curl -4 -sS -o /dev/null -w "%{http_code}\n" https://acme-v02.api.letsencrypt.org/directory
+sudo certbot certificates
+systemctl list-timers | grep -i certbot
+```
+
+Erwartet: `200`, ein Ablaufdatum in der Zukunft und ein Eintrag mit nächstem Lauf. Ob die Erneuerung wirklich klappt, zeigt sich erst, wenn weniger als 30 Tage übrig sind: Prüfe dann mit `sudo certbot certificates`, dass das Ablaufdatum wieder etwa 90 Tage entfernt liegt.
+
 **Optional: HSTS.** `Strict-Transport-Security` (HSTS) ist ein Header, mit dem der Server dem Browser sagt: „Ruf diese Adresse in der nächsten Zeit nur noch über HTTPS auf.“ Der Browser merkt sich das und stellt danach sogar eine eingetippte `http://`-Adresse selbst auf `https://` um, ohne dass überhaupt eine unverschlüsselte Anfrage das Gerät verlässt.
 
 Warum das sinnvoll ist: Die Weiterleitung von HTTP auf HTTPS (certbot richtet sie ein) schützt nicht vor allem. Die allererste Anfrage eines Mitglieds, etwa im Café-WLAN, kann noch unverschlüsselt sein, und genau dort kann jemand im Netz eine Weiterleitung auf eine gefälschte Seite einschmuggeln (SSL-Stripping). Das Dashboard enthält Anmeldedaten und persönliche Links. Mit HSTS ist das nach dem ersten Besuch ausgeschlossen. Außerdem verhindert es, dass jemand versehentlich über HTTP einen Link aufruft und dabei das Sitzungs-Cookie preisgibt.
 
 Der Preis: Der Browser hält sich an die Dauer, auch wenn du sie später bereuen würdest. Läuft das Zertifikat ab oder geht die HTTPS-Einrichtung kaputt, **blockiert** der Browser die Seite, statt eine Warnung mit „Trotzdem fortfahren“ zu zeigen. Gehe deshalb schrittweise vor:
 
-1. Erst alles prüfen (Schritt 9, `certbot renew --dry-run` muss erfolgreich sein).
+1. Erst alles prüfen (Schritt 9: `certbot renew --dry-run` erfolgreich, oder, wenn er wegen des Staging-Servers scheitert, Live-Server, Zertifikat und Timer wie dort beschrieben in Ordnung).
 2. Mit kurzer Dauer beginnen, im `server`-Block mit `listen 443 ssl` (certbot hat ihn angelegt):
 
    ```nginx
