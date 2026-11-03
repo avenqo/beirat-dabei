@@ -1,0 +1,24 @@
+# Eine Adresse für alles: Dashboard unter /dashboard/, der Rest geht an die Anwendung
+# (Verwaltung unter /admin, API unter /api, Links und Kalender unter /beirat-dabei).
+# TLS übernimmt der vorgeschaltete Reverse Proxy des Servers.
+:80 {
+	encode gzip
+
+	redir / /dashboard/ temporary
+	redir /dashboard /dashboard/ permanent
+
+	handle_path /dashboard/* {
+		root * /srv/dashboard
+		header Cache-Control "no-cache"
+		# Links in Mails enthalten Zugangsdaten in der Adresse: nie als Referrer weitergeben
+		header Referrer-Policy "no-referrer"
+		header X-Content-Type-Options "nosniff"
+		header X-Frame-Options "DENY"
+		header Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+		file_server
+	}
+
+	handle {
+		reverse_proxy app:3000
+	}
+}

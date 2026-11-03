@@ -1,0 +1,16 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Beispiel Ratsinformationssystem https://ris.musterstadt.example/
+X-WR-TIMEZONE:Europe/Berlin
+X-WR-CALNAME:Sitzungskalender
+BEGIN:VEVENT
+UID:A1B2C3D4E5F60718293A4B5C6D7E8F03
+LOCATION:Rathaus Sitzungssaal, Musterstraße 1
+SUMMARY:Bau- und Umweltausschuss
+DESCRIPTION:Bau- und Umweltausschuss, Stadt Musterstadt, Rathaus Sitzungssaal, Musterstraße 1
+CLASS:CONFIDENTIAL
+DTSTART:20261210T180000Z
+DTEND:20261210T203000Z
+DTSTAMP:20261020T083225Z
+END:VEVENT
+END:VCALENDAR

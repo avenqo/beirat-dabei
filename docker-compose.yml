@@ -1,0 +1,36 @@
+# Beirat dabei: ein Stack pro Instanz. Konfiguration über .env (siehe .env.example).
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: file:/bau/app/data/beirat.db
+      UPLOADS_DIR: /bau/app/data/uploads
+      TZ: ${TZ:-Europe/Berlin}
+    volumes:
+      - ./data:/bau/app/data
+    # Anwendungsprotokoll begrenzen: enthält aufgerufene Adressen, auch persönliche Links
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/users/me').then(r=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  # Eine Adresse für Dashboard und Anwendung
+  web:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "127.0.0.1:${PORT:-8055}:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./dashboard:/srv/dashboard:ro

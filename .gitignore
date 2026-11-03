@@ -1,0 +1,70 @@
+# --- Geheimnisse und Instanz-Konfiguration ----------------------------
+# Echte Werte nur auf dem Server, nie im Repo.
+.env
+.env.*
+!.env.example
+!examples/**/.env.example
+
+# Instanzkonfiguration im Wurzelverzeichnis (Vorlage liegt unter examples/).
+# Zeile entfernen, falls sie bewusst versioniert werden soll.
+/instanz.yaml
+
+# --- Laufzeitdaten der Instanz -----------------------------------------
+# Datenbank, Uploads, Backups und beim Wiederherstellen beiseite
+# geschobene Altdaten (data/vorher-<Zeit>). Enthalten personenbezogene Daten.
+data/
+uploads/
+backups/
+*.db
+*.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+*.db-journal
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
+
+# Fehlerprotokolle zur Weitergabe (siehe Betrieb.md, „Häufige Probleme“)
+fehler.txt
+
+# --- Node: Extensions, Adapter, Dashboard ------------------------------
+node_modules/
+dist/
+build/
+.npm/
+.pnpm-store/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Tests und Werkzeuge -----------------------------------------------
+coverage/
+.vitest/
+.cache/
+tmp/
+*.log
+
+# --- Docker -------------------------------------------------------------
+docker-compose.override.yml
+
+# --- Editor und Betriebssystem -----------------------------------------
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Arbeitsnotizen zur Weiterentwicklung (nicht veröffentlichen)
+docs/aenderungsbedarf.md
+
+
+# Next.js
+.next/
+next-env.d.ts
+app/AGENTS.md
+app/CLAUDE.md
