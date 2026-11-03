@@ -289,7 +289,22 @@ sudo certbot renew --dry-run
 
 Erwartet: Antwort über HTTPS, über HTTP ein `301` mit `Location: https://…`, beim Probelauf `all simulated renewals succeeded`.
 
-Optional: im HTTPS-Block `add_header Strict-Transport-Security "max-age=31536000" always;`, sobald alles läuft.
+**Optional: HSTS.** `Strict-Transport-Security` (HSTS) ist ein Header, mit dem der Server dem Browser sagt: „Ruf diese Adresse in der nächsten Zeit nur noch über HTTPS auf.“ Der Browser merkt sich das und stellt danach sogar eine eingetippte `http://`-Adresse selbst auf `https://` um, ohne dass überhaupt eine unverschlüsselte Anfrage das Gerät verlässt.
+
+Warum das sinnvoll ist: Die Weiterleitung von HTTP auf HTTPS (certbot richtet sie ein) schützt nicht vor allem. Die allererste Anfrage eines Mitglieds, etwa im Café-WLAN, kann noch unverschlüsselt sein, und genau dort kann jemand im Netz eine Weiterleitung auf eine gefälschte Seite einschmuggeln (SSL-Stripping). Das Dashboard enthält Anmeldedaten und persönliche Links. Mit HSTS ist das nach dem ersten Besuch ausgeschlossen. Außerdem verhindert es, dass jemand versehentlich über HTTP einen Link aufruft und dabei das Sitzungs-Cookie preisgibt.
+
+Der Preis: Der Browser hält sich an die Dauer, auch wenn du sie später bereuen würdest. Läuft das Zertifikat ab oder geht die HTTPS-Einrichtung kaputt, **blockiert** der Browser die Seite, statt eine Warnung mit „Trotzdem fortfahren“ zu zeigen. Gehe deshalb schrittweise vor:
+
+1. Erst alles prüfen (Schritt 9, `certbot renew --dry-run` muss erfolgreich sein).
+2. Mit kurzer Dauer beginnen, im `server`-Block mit `listen 443 ssl` (certbot hat ihn angelegt):
+
+   ```nginx
+   add_header Strict-Transport-Security "max-age=300" always;
+   ```
+
+3. Nach einigen Tagen auf ein Jahr erhöhen: `max-age=31536000`.
+
+`always` sorgt dafür, dass der Header auch bei Fehlerseiten kommt. Lege den Header in den `server`-Block, nicht in ein einzelnes `location`: Sobald ein `location` eigene `add_header`-Zeilen hat, erbt es die des `server`-Blocks nicht mehr. Nicht dazunehmen: `includeSubDomains` (würde auch andere Subdomains auf HTTPS zwingen, die vielleicht keins haben) und `preload` (lässt sich praktisch nicht zurücknehmen). Nach `sudo nginx -t` und `sudo systemctl reload nginx` prüfst du mit `curl -sI https://umweltbeirat.example.de/dashboard/ | grep -i strict`.
 
 ---
 
@@ -631,6 +646,7 @@ Wenn `data/` dem Benutzer 1000 gehört und du ein anderer Benutzer bist, das Skr
 | Über die Subdomain kommt `404 Not Found` von nginx | nginx kennt den neuen `server`-Block noch nicht | `sudo nginx -T 2>/dev/null \| grep -nE 'server_name\|# configuration file'` zeigt, ob die Datei geladen wird. Danach `sudo nginx -t` und `sudo systemctl reload nginx`. |
 | `502 Bad Gateway` von nginx | `proxy_pass` zeigt auf einen falschen Port, oder der Stack läuft nicht | Port in nginx und `.env` vergleichen, `sudo docker compose ps` |
 | Browser landet auf einer anderen Adresse | Weiterleitung beim Domain-Anbieter | Weiterleitung entfernen, `A`-Eintrag setzen (Schritt 2). Zum Testen privates Browserfenster, da Browser `301`-Weiterleitungen zwischenspeichern. |
+| `certbot renew --dry-run` meldet `Connection reset by peer` oder `Connection aborted` (auch für andere Zertifikate auf dem Server) | Der Server erreicht den Let's-Encrypt-Staging-Server nicht (IPv6 ohne Ausgang, Firewall, Netzstörung). Es liegt nicht an der Konfiguration des Beirats. | `curl -4 -sS https://acme-staging-v02.api.letsencrypt.org/directory` und dasselbe mit `-6` und mit `acme-v02` ausprobieren. Bricht nur IPv6 ab: IPv4 bevorzugen (`echo 'precedence ::ffff:0:0/96 100' \| sudo tee -a /etc/gai.conf`). Sonst `sudo tail -n 60 /var/log/letsencrypt/letsencrypt.log`. Beheben, bevor das Zertifikat abläuft (90 Tage). |
 | Anmeldung klappt, danach wieder Login | `COOKIE_SECURE=true`, aber Aufruf über HTTP | Immer über HTTPS aufrufen (Schritt 9) |
 | Eintrag in Einstellungen oder Gremien ist nach dem Neuladen weg | nicht gespeichert | oben rechts **Speichern** klicken, bevor man die Seite verlässt |
 | RIS-Abgleich im Log immer `0 angelegt, 0 geändert` im Modus `trocken` | im Trockenlauf normal | auf Zeilen `[trocken] RIS-Abgleich: neue Sitzung …` achten (Schritt 14a) |
