@@ -14,12 +14,11 @@ RUN pnpm --filter @beirat-dabei/core build \
 RUN cd app && PAYLOAD_SECRET=bau MAGIC_LINK_SECRET=bau PUBLIC_URL=http://localhost pnpm build
 
 FROM node:22-slim
-RUN corepack enable
-ENV NODE_ENV=production
+ENV NODE_ENV=production NODE_OPTIONS=--no-deprecation
 WORKDIR /bau
 COPY --from=bau /bau /bau
 RUN mkdir -p /bau/app/data && chown -R node:node /bau/app/data /bau/app/.next
 USER node
 WORKDIR /bau/app
 EXPOSE 3000
-CMD ["pnpm", "start"]
+CMD ["node_modules/.bin/next", "start"]

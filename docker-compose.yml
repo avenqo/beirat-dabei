@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
+      # Die Anwendung hört im Container immer auf 3000; PORT aus der .env gilt nur für den Host (web)
+      PORT: "3000"
       DATABASE_URL: file:/bau/app/data/beirat.db
       UPLOADS_DIR: /bau/app/data/uploads
       TZ: ${TZ:-Europe/Berlin}

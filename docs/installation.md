@@ -295,7 +295,7 @@ Optional: im HTTPS-Block `add_header Strict-Transport-Security "max-age=31536000
 
 ## 10. Technisches Administratorkonto anlegen
 
-`https://umweltbeirat.example.de/admin` aufrufen. Beim ersten Aufruf erscheint ein Formular zum Anlegen des ersten Kontos. Name, E-Mail-Adresse und ein langes Passwort eintragen. Diese erste Person wird das **technische Administratorkonto**. Es darf Mitglieder anlegen und ändern, ist aber selbst kein Mitglied und bekommt keine Mails. Das Passwort sicher aufbewahren.
+`https://umweltbeirat.example.de/admin` aufrufen. Beim ersten Aufruf erscheint ein Formular zum Anlegen des ersten Kontos. Name, E-Mail-Adresse und ein langes Passwort eintragen. Die Felder *Rolle* und *Status* kannst du ignorieren: Das erste Konto wird in jedem Fall das **technische Administratorkonto**. Es darf Mitglieder anlegen und ändern, ist aber selbst kein Mitglied und bekommt keine Mails. Das Passwort sicher aufbewahren.
 
 **Das Formular steht jedem offen, solange es kein Konto gibt.** Lege das Konto deshalb sofort nach dem ersten Start an, bevor die Adresse bekannt wird.
 

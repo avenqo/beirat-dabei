@@ -23,7 +23,8 @@ export function emailAdapter() {
       host: process.env.EMAIL_SMTP_HOST,
       port: Number(process.env.EMAIL_SMTP_PORT ?? 587),
       secure: process.env.EMAIL_SMTP_SECURE === 'true',
-      auth: { user: process.env.EMAIL_SMTP_USER, pass: process.env.EMAIL_SMTP_PASSWORD },
+      // Ohne Benutzer keine Anmeldung (zum Beispiel bei einem lokalen Testserver)
+      ...(process.env.EMAIL_SMTP_USER ? { auth: { user: process.env.EMAIL_SMTP_USER, pass: process.env.EMAIL_SMTP_PASSWORD } } : {}),
     },
   })
 }
