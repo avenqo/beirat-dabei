@@ -56,7 +56,7 @@ beirat-dabei: Regellauf (scharf): 3 fällig, 3 gesendet, 0 fehlgeschlagen
 
 Den Server richtet die [Installationsanleitung](installation.md) ein. Danach:
 
-1. **Das technische Administratorkonto anlegen.** Rufe `PUBLIC_URL/admin` auf. Beim ersten Aufruf fragt die Seite nach Name, E-Mail-Adresse und Passwort. Diese erste Person wird das **technische Administratorkonto** (die Felder *Rolle* und *Status* im Formular kannst du ignorieren): Es darf Mitglieder anlegen und ändern, ist aber selbst kein Mitglied und bekommt keine Mails. Wähle ein langes Passwort und bewahre es sicher auf.
+1. **Das technische Administratorkonto anlegen.** Rufe `PUBLIC_URL/admin` auf. Beim ersten Aufruf fragt die Seite nach Name, E-Mail-Adresse und Passwort. Diese erste Person wird das **technische Administratorkonto** (im Formular ist die Rolle vorgewählt, prüfe sie nach dem Anlegen): Es darf Mitglieder anlegen und ändern, ist aber selbst kein Mitglied und bekommt keine Mails. Wähle ein langes Passwort und bewahre es sicher auf.
 2. **Einstellungen** ausfüllen, **Gremium** und **Mitglieder** anlegen, wie in den folgenden Abschnitten beschrieben. Formulare speichern erst, wenn du oben rechts auf **Speichern** klickst. Ein ungespeichertes Gremium war bei einer Installation der Grund für „0 angelegt“.
 3. **Benachrichtigungen bleiben zunächst im Trockenmodus** (siehe [unten](#ris-abgleich-und-benachrichtigungen-umstellen)). Erst wenn die Sitzungen stimmen, schaltest du sie scharf.
 

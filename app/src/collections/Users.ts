@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, PayloadRequest } from 'payload'
 import { APIError } from 'payload'
 import { istAdmin, istSuperadmin, nurSuperadmin, rolleVon, feldNurSuperadmin, type Rolle } from '../access'
 
@@ -58,7 +58,11 @@ export const Users: CollectionConfig = {
       name: 'rolle',
       label: 'Rolle',
       type: 'select',
-      defaultValue: 'mitglied',
+      // Im Formular für das erste Konto ist das technische Administratorkonto vorgewählt
+      defaultValue: async ({ req }: { req: PayloadRequest }) => {
+        const { totalDocs } = await req.payload.count({ collection: 'users', overrideAccess: true })
+        return totalDocs === 0 ? 'superadmin' : 'mitglied'
+      },
       required: true,
       saveToJWT: true,
       options: [

@@ -320,7 +320,7 @@ Der Preis: Der Browser hält sich an die Dauer, auch wenn du sie später bereuen
 
 ## 10. Technisches Administratorkonto anlegen
 
-`https://umweltbeirat.example.de/admin` aufrufen. Beim ersten Aufruf erscheint ein Formular zum Anlegen des ersten Kontos. Name, E-Mail-Adresse und ein langes Passwort eintragen. Die Felder *Rolle* und *Status* kannst du ignorieren: Das erste Konto wird in jedem Fall das **technische Administratorkonto**. Es darf Mitglieder anlegen und ändern, ist aber selbst kein Mitglied und bekommt keine Mails. Das Passwort sicher aufbewahren.
+`https://umweltbeirat.example.de/admin` aufrufen. Beim ersten Aufruf erscheint ein Formular zum Anlegen des ersten Kontos. Name, E-Mail-Adresse und ein langes Passwort eintragen. Im Formular ist die *Rolle* schon auf „Technisches Administratorkonto“ vorgewählt (bei älteren Fassungen stand dort „Mitglied“, dann wähle sie selbst aus). Prüfe nach dem Anlegen in der Verwaltung unter *Mitglieder*, dass die Rolle stimmt. Das erste Konto soll das **technische Administratorkonto** sein. Es darf Mitglieder anlegen und ändern, ist aber selbst kein Mitglied und bekommt keine Mails. Das Passwort sicher aufbewahren.
 
 **Das Formular steht jedem offen, solange es kein Konto gibt.** Lege das Konto deshalb sofort nach dem ersten Start an, bevor die Adresse bekannt wird.
 
