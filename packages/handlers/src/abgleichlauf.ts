@@ -62,9 +62,13 @@ export async function abgleichAusfuehren(o: AbgleichOptionen): Promise<AbgleichE
       bis: new Date(jetzt.getTime() + (o.vorschauTage ?? 90) * 86_400_000),
     };
 
-    for (const g of (await o.speicher.gremien()).filter((x) => x.aktiv && x.risKennung)) {
+    const gremien = (await o.speicher.gremien()).filter((x) => x.aktiv && x.risKennung);
+    if (gremien.length === 0) o.log.info("RIS-Abgleich: kein aktives Gremium mit RIS-Kennung angelegt");
+
+    for (const g of gremien) {
       try {
         const { sitzungen, vollstaendig } = await adapter.sitzungen(g.risKennung, zeitraum);
+        o.log.info(`RIS-Abgleich: ${g.name} (Kennung "${g.risKennung}"): ${sitzungen.length} Sitzung(en) im RIS gefunden${vollstaendig ? "" : ", Kalender unvollständig"}`);
         const bekannt = await o.speicher.sitzungenBekannt(g.id);
 
         // Tagesordnung nur abrufen, wo sie noch nicht als veröffentlicht gilt
