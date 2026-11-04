@@ -21,7 +21,7 @@ import {
 
 /** Zugriff auf die Daten. Die Anbindung an Payload implementiert das (app/src/speicher.ts); Tests nutzen eine Attrappe. */
 export interface Speicher {
-  einstellungen(): Promise<{ einstellungen: Einstellungen; notizfragen: Notizfrage[]; name?: string; aboVersion?: number }>;
+  einstellungen(): Promise<{ einstellungen: Einstellungen; notizfragen: Notizfrage[]; name?: string; aboVersion?: number; akzent?: string }>;
   /** Alle Personen mit Mitglieds- oder Admin-Rolle. Ohne E-Mail-Adressen. */
   mitglieder(): Promise<{ id: string; aktiv: boolean; name: string }[]>;
   sitzungen(): Promise<SitzungInfo[]>;

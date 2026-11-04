@@ -10,6 +10,7 @@ const ID2 = "22222222-2222-4222-8222-222222222222";
 const ID3 = "33333333-3333-4333-8333-333333333333";
 const ID4 = "44444444-4444-4444-8444-444444444444";
 
+let akzent: string | undefined;
 let logo: string | null;
 let dokumente: DokumentZeile[];
 let geliefert: string[];
@@ -28,7 +29,7 @@ const dok = (extra: Partial<DokumentZeile>): DokumentZeile => ({
 });
 
 const speicher = {
-  einstellungen: async () => ({ einstellungen: STANDARD_EINSTELLUNGEN, notizfragen: [], name: "Umweltbeirat Kremmen" }),
+  einstellungen: async () => ({ einstellungen: STANDARD_EINSTELLUNGEN, notizfragen: [], name: "Umweltbeirat Kremmen", akzent }),
   mitglieder: async () => [],
   sitzungen: async () => sitzungen,
   logoUrl: async () => logo,
@@ -46,6 +47,7 @@ const deps = (): OeffentlichAbhaengigkeiten => ({
 
 beforeEach(() => {
   logo = null;
+  akzent = undefined;
   geliefert = [];
   dokumente = [];
   rechtstexte = { impressum: "# Impressum\n\nMuster", datenschutz: "# Datenschutz\n\nText" };
@@ -55,11 +57,22 @@ describe("instanz", () => {
   it("liefert Namen, ohne Logo null", async () => {
     const r = await instanz(deps());
     expect(r.status).toBe(200);
-    expect(r.body).toEqual({ name: "Umweltbeirat Kremmen", logo: null });
+    expect(r.body).toEqual({ name: "Umweltbeirat Kremmen", logo: null, akzent: null });
   });
   it("liefert die Adresse des Projektlogos", async () => {
     logo = "/api/medien/file/logo.png";
     expect((await instanz(deps())).body).toMatchObject({ logo: "/api/medien/file/logo.png" });
+  });
+});
+
+describe("Akzentfarbe", () => {
+  it("wird als Hex-Wert geliefert", async () => {
+    akzent = "#1f4a2e";
+    expect((await instanz(deps())).body).toMatchObject({ akzent: "#1f4a2e" });
+  });
+  it("ungültige Werte werden nicht ausgeliefert", async () => {
+    akzent = "red; background:url(x)";
+    expect((await instanz(deps())).body).toMatchObject({ akzent: null });
   });
 });
 

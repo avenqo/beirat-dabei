@@ -36,13 +36,16 @@ export const KATEGORIEN = [
 
 const fehler = (status: number, code: string): Antwort => ({ status, body: { fehler: code } });
 const URL_PRUEFEN = /^https?:\/\//;
+const FARBE = /^#[0-9a-f]{6}$/i;
+/** Nur ein gültiger Hex-Wert verlässt den Server; alles andere bleibt Standard. */
+const farbe = (wert: string | undefined): string | null => (wert && FARBE.test(wert) ? wert : null);
 
 /** Öffentlich: Name und Logo für Kopfzeile und Anmeldeseite. */
 export async function instanz(d: OeffentlichAbhaengigkeiten): Promise<Antwort> {
-  const [{ name }, logo] = await Promise.all([d.speicher.einstellungen(), d.speicher.logoUrl()]);
+  const [{ name, akzent }, logo] = await Promise.all([d.speicher.einstellungen(), d.speicher.logoUrl()]);
   return {
     status: 200,
-    body: { name: name ?? "Beirat dabei", logo },
+    body: { name: name ?? "Beirat dabei", logo, akzent: farbe(akzent) },
     kopf: { "cache-control": "public, max-age=300" },
   };
 }
@@ -50,7 +53,7 @@ export async function instanz(d: OeffentlichAbhaengigkeiten): Promise<Antwort> {
 /** Öffentlich: nächste Sitzungstermine und veröffentlichte Unterlagen. Keine Namen, keine Notizen. */
 export async function oeffentlich(d: OeffentlichAbhaengigkeiten): Promise<Antwort> {
   const jetzt = d.jetzt().getTime();
-  const [{ name, einstellungen }, logo, sitzungen, dokumente] = await Promise.all([
+  const [{ name, einstellungen, akzent }, logo, sitzungen, dokumente] = await Promise.all([
     d.speicher.einstellungen(),
     d.speicher.logoUrl(),
     d.speicher.sitzungen(),
@@ -92,7 +95,7 @@ export async function oeffentlich(d: OeffentlichAbhaengigkeiten): Promise<Antwor
   return {
     status: 200,
     body: {
-      instanz: { name: name ?? "Beirat dabei", logo, zeitzone: einstellungen.zeitzone },
+      instanz: { name: name ?? "Beirat dabei", logo, akzent: farbe(akzent), zeitzone: einstellungen.zeitzone },
       sitzungen: kommend,
       kategorien,
     },

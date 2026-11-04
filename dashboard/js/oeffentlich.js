@@ -32,7 +32,7 @@ async function laden() {
   } catch {
     return void leeren(inhalt).append(el("p", { class: "fehler", role: "alert" }, "Die Unterlagen konnten nicht geladen werden. Bitte versuche es später noch einmal."));
   }
-  markeSetzen(daten.instanz.name, daten.instanz.logo);
+  markeSetzen(daten.instanz.name, daten.instanz.logo, daten.instanz.akzent);
   document.title = `Öffentliche Unterlagen – ${daten.instanz.name}`;
   leeren(inhalt);
 

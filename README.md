@@ -150,7 +150,7 @@ Der öffentliche Bereich zeigt die nächsten Sitzungstermine mit Tagesordnung un
 
 Vergangene Sitzungen erscheinen nach Jahr gegliedert, ältere Jahre eingeklappt, ab sieben Sitzungen mit Suchfeld (Gremium, Ort, Datum, Notizen). Gespeichert bleibt alles unbegrenzt, eine automatische Löschfrist gibt es noch nicht.
 
-Name und Logo der Instanz stehen in der Kopfzeile aller Seiten. Das Logo lädt man in den Einstellungen hoch, bis dahin erscheint ein Platzhalter.
+Name und Logo der Instanz stehen in der Kopfzeile aller Seiten. Das Logo lädt man in den Einstellungen hoch, bis dahin erscheint ein Platzhalter. Dort lässt sich auch die Akzentfarbe wählen.
 
 ## Impressum und Datenschutz
 
@@ -173,7 +173,7 @@ Die Endpoints liegen unter `/beirat-dabei/…` (intern `/api/beirat-dabei/…`).
 | `POST /notiz` | angemeldet | `{sitzung, relevant, antworten}`, nur für Teilnehmende nach der Sitzung |
 | `POST /notiz/loeschen` | angemeldet | `{sitzung}`, löscht die Notiz endgültig, nur für Teilnehmende |
 | `GET /abo` | angemeldet | die persönliche Adresse des Kalender-Abos |
-| `GET /instanz` | öffentlich | Name und Logo für Kopfzeile und Anmeldeseite |
+| `GET /instanz` | öffentlich | Name, Logo und Akzentfarbe für Kopfzeile und Anmeldeseite |
 | `GET /oeffentlich` | öffentlich | nächste Sitzungen und veröffentlichte Unterlagen |
 | `GET /rechtliches` | öffentlich | Impressum und Datenschutzerklärung |
 | `GET /datei/:id` | öffentlich | die Datei eines veröffentlichten Dokuments |

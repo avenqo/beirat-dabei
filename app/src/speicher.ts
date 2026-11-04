@@ -37,6 +37,7 @@ export function speicherAusPayload(payload: Payload): VollerSpeicher {
         notizfragen: (e.notizfragen as Notizfrage[] | null) ?? STANDARD_FRAGEN,
         name: e.name ?? undefined,
         aboVersion: e.aboVersion ?? 1,
+        akzent: e.akzentfarbe ?? undefined,
       }
     },
     async mitglieder() {

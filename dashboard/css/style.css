@@ -1,27 +1,37 @@
 :root {
-  --bg: #f6f7f5;
-  --karte: #ffffff;
-  --text: #1c211c;
-  --leise: #5b645b;
-  --linie: #dde2dc;
-  --akzent: #2e7d32;
-  --akzent-text: #ffffff;
-  --gelb: #f2c14e;
+  /* Von der Instanz gesetzt (Einstellungen → Akzentfarbe), sonst das Standardgrün */
+  --basis: var(--akzent-basis, #1f4a2e);
+  --basis-text: var(--akzent-basis-text, #ffffff);
+  --bg: #f4f1e8;
+  --karte: #fffdf8;
+  --text: #1d2a20;
+  --leise: #5b6556;
+  --linie: #d9d4c3;
+  --akzent: var(--basis);
+  --akzent-text: var(--basis-text);
+  --kopf: var(--basis);
+  --kopf-text: var(--basis-text);
+  --sonne: #d9a441;
+  --link: var(--basis);
+  --gelb: #d9a441;
   --rot: #b3261e;
   --blau: #2457a6;
   --alarm: #c62828;
   --alarm-text: #ffffff;
-  --radius: 10px;
+  --radius: 12px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #14181a;
-    --karte: #1d2326;
-    --text: #e8ece8;
-    --leise: #a1aba1;
-    --linie: #303a3d;
-    --akzent: #66bb6a;
-    --akzent-text: #0e1a0f;
+    --bg: #151a16;
+    --karte: #1e251f;
+    --text: #ebeee6;
+    --leise: #a7b0a2;
+    --linie: #323d34;
+    --akzent: color-mix(in srgb, var(--basis) 45%, #ffffff);
+    --akzent-text: #0f1a11;
+    --kopf: color-mix(in srgb, var(--basis) 75%, #000000);
+    --kopf-text: #f4f1e8;
+    --link: color-mix(in srgb, var(--basis) 35%, #ffffff);
     --gelb: #e0b23d;
     --rot: #f2928b;
     --blau: #8ab4f8;
@@ -41,16 +51,18 @@ body {
 }
 .kopf {
   display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem 1rem;
-  max-width: 46rem; margin: 0 auto; padding: 1rem 16px 0;
+  margin: 0; padding: .75rem max(16px, calc((100vw - 46rem) / 2 + 16px));
+  background: var(--kopf); color: var(--kopf-text); border-bottom: 4px solid var(--sonne);
 }
+.kopf a, .kopf button.link, .kopf .marke { color: var(--kopf-text); }
 .kopf h1 { font-size: 1.25rem; margin: 0; }
 .marke { display: flex; align-items: center; gap: .75rem; color: var(--text); text-decoration: none; min-width: 0; }
-.marke img { width: 44px; height: 44px; object-fit: contain; flex: none; }
+.marke img { width: 44px; height: 44px; object-fit: contain; flex: none; border-radius: 10px; background: #f4f1e8; }
 .navi { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-main { max-width: 46rem; margin: 0 auto; padding: 1rem 16px 3rem; }
+main { max-width: 46rem; margin: 0 auto; padding: 1.25rem 16px 3rem; }
 h2 { font-size: 1.05rem; margin: 2rem 0 .75rem; color: var(--leise); text-transform: uppercase; letter-spacing: .04em; }
 h3 { font-size: 1.1rem; margin: 0; }
-a { color: var(--blau); }
+a { color: var(--link); }
 .hinweis { color: var(--leise); }
 .hinweis.abstand { margin-top: 1.5rem; }
 .leer { color: var(--leise); padding: 1rem 0; }
@@ -195,7 +207,6 @@ button.gefahr.primaer { background: var(--alarm); color: var(--alarm-text); }
   .bereich { margin-top: 1.75rem; padding: .9rem .6rem .75rem; }
   .bereich > h2 { font-size: 1.25rem; }
   .karte { padding: .85rem; }
-  .kopf { padding-top: .75rem; }
   button, .knopf { min-height: 2.75rem; }
   .alarm, .hinweisbox { padding: .8rem .85rem; }
   .alarm-zeile button { width: 100%; }

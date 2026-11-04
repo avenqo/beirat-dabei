@@ -118,9 +118,9 @@ Der RIS-Abgleich legt Sitzungen automatisch an. Von Hand brauchst du es, wenn da
 
 **Was die Fristen auslösen,** steht in der README unter „Benachrichtigungsregeln“. Kurz: sieben Tage vor der Sitzung geht eine Erinnerung raus, wenn niemand eingetragen ist, und drei Tage danach eine Bitte um die Notiz an die Teilnehmenden. Austragen setzt das Ende der Teilnahme und löst sofort einen Regellauf aus. Eine Nachricht gibt es nur, wenn sich in der letzten Woche vor der Sitzung die letzte Person austrägt. Austragen außerhalb der Frist bleibt still, das ist so entschieden.
 
-### Logo und Name
+### Logo, Name und Farbe
 
-Name und Logo erscheinen in der Kopfzeile und auf der Anmeldeseite, auch ohne Anmeldung. Beides stellst du in den **Einstellungen** ein: Name und Logo (Bild hochladen). Solange keins eingestellt ist, erscheint ein neutrales Platzhalter-Symbol. Der Absendername der Mails steht dagegen in der `.env` (`EMAIL_FROM_NAME`).
+Name und Logo erscheinen in der Kopfzeile und auf der Anmeldeseite, auch ohne Anmeldung. Alles stellst du in den **Einstellungen** ein: Name, Logo (Bild hochladen) und **Akzentfarbe** (Hex-Wert wie `#1f4a2e`, leer lassen für das Standardgrün). Die Akzentfarbe färbt Kopfzeile, Knöpfe und Markierungen, im hellen wie im dunklen Modus. Wähle einen eher dunklen Ton, weil darauf weiße Schrift steht. Bei sehr hellen Farben wechselt die Schrift automatisch auf dunkel. Die Änderung gilt nach spätestens fünf Minuten für alle (Zwischenspeicher). Solange keins eingestellt ist, erscheint ein neutrales Platzhalter-Symbol. Der Absendername der Mails steht dagegen in der `.env` (`EMAIL_FROM_NAME`).
 
 ### Öffentliche Unterlagen
 
@@ -161,6 +161,7 @@ Verwaltung → **Einstellungen** (es gibt genau einen Eintrag).
 | --- | --- |
 | Name der Instanz | Anzeigename, zum Beispiel `Seniorenbeirat Musterstadt` |
 | Logo | Bild für die Kopfzeile |
+| Akzentfarbe | Hauptfarbe des Dashboards als Hex-Wert, leer = Standardgrün |
 | Frist vor der Sitzung (Tage) | für die Erinnerung (Standard 7) |
 | Frist nach der Sitzung (Tage) | für die Bitte um die Notiz (Standard 3) |
 | Zeitzone | `Europe/Berlin` |

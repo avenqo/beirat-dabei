@@ -584,6 +584,10 @@ export interface Einstellungen {
   aboVersion?: number | null;
   logo?: (string | null) | Medien;
   /**
+   * Hauptfarbe des Dashboards als Hex-Wert, z. B. #1f4a2e. Leer lassen für das Standardgrün. Dunkle Töne wirken am besten.
+   */
+  akzentfarbe?: string | null;
+  /**
    * Für die optionale KI-Vorsortierung
    */
   themenfokus?: string | null;
@@ -617,6 +621,7 @@ export interface EinstellungenSelect<T extends boolean = true> {
   zeitzone?: T;
   aboVersion?: T;
   logo?: T;
+  akzentfarbe?: T;
   themenfokus?: T;
   risAdapter?: T;
   risQuelle?: T;
