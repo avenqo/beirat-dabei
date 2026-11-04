@@ -1,6 +1,6 @@
 # Beirat dabei – Kurzanleitung für Mitglieder
 
-Stand: 03.11.2026
+Stand: 04.11.2026
 
 ## Worum es geht
 
@@ -18,6 +18,17 @@ Dein Konto legt die Verwaltung des Beirats für dich an, mit deiner E-Mail-Adres
 4. Mit E-Mail-Adresse und Passwort anmelden.
 
 Tipp: Speichere die Adresse als Lesezeichen oder auf dem Startbildschirm deines Handys.
+
+## Das Dashboard im Überblick
+
+Nach der Anmeldung siehst du:
+
+- **Hinweise** (nur wenn etwas zu tun ist): Sitzungen, die dringend jemanden brauchen, und Notizen, die noch fehlen.
+- **Anstehende Sitzungen:** Termin, Ort, Link zur Tagesordnung und deine Teilnahme. Abgesagte oder verschobene Sitzungen sind markiert.
+- **Vergangene Sitzungen:** nach Jahren geordnet, mit den Notizen und einer Suche.
+- **Kalender:** Hier kannst du alle Sitzungstermine in deinem eigenen Kalender abonnieren (siehe unten).
+
+Über die Leiste oben springst du zwischen den Abschnitten.
 
 ## Für eine Sitzung eintragen
 
@@ -38,11 +49,14 @@ Absender ist immer „Umweltbeirat Kremmen“.
 | --- | --- | --- |
 | Die Tagesordnung einer Sitzung ist erschienen | Termin und Link zur Tagesordnung | reinschauen, bei Interesse **Ich nehme teil** |
 | Jemand hat sich eingetragen | Die Sitzung ist besetzt | nichts, nur zur Info |
-| 7 Tage vor der Sitzung ist noch niemand eingetragen | Der Beirat wäre nicht vertreten | wenn möglich **Ich nehme teil** |
+| Eine Woche vor der Sitzung ist noch niemand eingetragen | Der Beirat wäre nicht vertreten | wenn möglich **Ich nehme teil** |
 | Die letzte Person hat sich in der letzten Woche ausgetragen | Die Sitzung ist wieder offen | wenn möglich einspringen |
-| 3 Tage nach einer Sitzung, an der du teilgenommen hast, fehlt die Notiz | Erinnerung an die Kurznotiz | Notiz schreiben |
+| Eine Sitzung, für die du dich eingetragen hast, ist abgesagt oder verschoben worden | neuer Stand der Sitzung | ggf. Teilnahme neu planen |
+| 3 Tage nach einer Sitzung, an der du teilgenommen hast, fehlt die Notiz | Erinnerung an die Kurznotiz | Notiz schreiben, oder **Ich war doch nicht dabei**, falls du doch nicht teilgenommen hast |
 
-Die Nachricht über eine neue Teilnahme kommt kurz nach dem Eintragen, alle anderen morgens.
+Die Fristen (7 und 3 Tage) sind die Voreinstellung und können in der Verwaltung angepasst werden.
+
+Die Nachricht über eine neue Teilnahme kommt kurz nach dem Eintragen. Die übrigen kommen in der Regel morgens. Meldet das Ratsinformationssystem eine Änderung wie eine Absage oder eine neue Tagesordnung, kann die Nachricht dazu auch zu einer anderen Tageszeit eintreffen, kurz nach dem Abgleich.
 
 ## Nach der Sitzung: Kurznotiz
 
@@ -56,6 +70,7 @@ Die Notiz sehen alle Mitglieder. Waren mehrere von euch da, ergänzt ihr dieselb
 
 ## Gut zu wissen
 
+- **Termine im eigenen Kalender:** Im Dashboard unter **Kalender → Kalender abonnieren** bekommst du eine persönliche Adresse für deine Kalender-App. Sie aktualisiert sich von selbst. Bitte gib sie nicht weiter, sie gehört nur dir.
 - **Passwort vergessen:** Im Dashboard auf **Passwort vergessen** klicken, wie bei der ersten Anmeldung.
 - **Keine E-Mails von Beirat dabei?** Bitte im Spam-Ordner nachsehen und den Absender als vertrauenswürdig markieren.
 - **Öffentliche Termine und Unterlagen** sind auch ohne Anmeldung einsehbar, über den Link auf der Anmeldeseite. Notizen und Teilnahmen sehen nur Mitglieder.
