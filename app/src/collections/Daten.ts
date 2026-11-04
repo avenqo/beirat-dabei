@@ -4,14 +4,16 @@ import { regellaufBald } from '../laeufe'
 
 const verwaltung = { create: nurAdmins, update: nurAdmins, delete: nurAdmins, read: nurAdmins }
 
+const bereinigen = { beforeValidate: [({ value }: { value?: unknown }) => (typeof value === 'string' ? value.trim() : value)] }
+
 export const Gremien: CollectionConfig = {
   slug: 'gremien',
   labels: { singular: 'Gremium', plural: 'Gremien' },
   admin: { useAsTitle: 'name', group: 'Inhalt' },
   access: verwaltung,
   fields: [
-    { name: 'name', label: 'Name', type: 'text', required: true },
-    { name: 'risKennung', label: 'RIS-Kennung', type: 'text', admin: { description: 'Name des Gremiums im Kalender des RIS. Bei Handpflege leer lassen.' } },
+    { name: 'name', label: 'Name', type: 'text', required: true, hooks: bereinigen },
+    { name: 'risKennung', label: 'RIS-Kennung', type: 'text', hooks: bereinigen, admin: { description: 'Name des Gremiums im Kalender des RIS. Bei Handpflege leer lassen.' } },
     { name: 'aktiv', label: 'Aktiv', type: 'checkbox', defaultValue: true },
   ],
 }

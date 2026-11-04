@@ -148,7 +148,7 @@ export function speicherAusPayload(payload: Payload): VollerSpeicher {
     },
     async gremien() {
       const r = await payload.find({ collection: 'gremien', ...opt })
-      return r.docs.map((g) => ({ id: id(g.id), name: g.name, risKennung: g.risKennung ?? '', aktiv: Boolean(g.aktiv) }))
+      return r.docs.map((g) => ({ id: id(g.id), name: g.name.trim(), risKennung: (g.risKennung ?? '').trim(), aktiv: Boolean(g.aktiv) }))
     },
     async sitzungenBekannt(gremiumId): Promise<BekannteSitzung[]> {
       const r = await payload.find({ collection: 'sitzungen', ...opt, where: { gremium: { equals: gremiumId } } })
