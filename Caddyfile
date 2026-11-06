@@ -5,6 +5,13 @@
 	encode gzip
 
 	redir / /dashboard/ temporary
+
+	# Browser fragen das Symbol oft ohne Hinweis in der Seite direkt unter /favicon.ico ab
+	handle /favicon.ico {
+		root * /srv/dashboard/img
+		header Cache-Control "public, max-age=86400"
+		file_server
+	}
 	redir /dashboard /dashboard/ permanent
 
 	handle_path /dashboard/* {

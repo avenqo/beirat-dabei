@@ -59,6 +59,7 @@ body {
 .marke { display: flex; align-items: center; gap: .75rem; color: var(--text); text-decoration: none; min-width: 0; }
 .marke img { width: 44px; height: 44px; object-fit: contain; flex: none; border-radius: 10px; background: #f4f1e8; }
 .navi { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.angemeldet { font-size: .9rem; opacity: .9; overflow-wrap: anywhere; }
 main { max-width: 46rem; margin: 0 auto; padding: 1.25rem 16px 3rem; }
 h2 { font-size: 1.05rem; margin: 2rem 0 .75rem; color: var(--leise); text-transform: uppercase; letter-spacing: .04em; }
 h3 { font-size: 1.1rem; margin: 0; }

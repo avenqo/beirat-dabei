@@ -54,7 +54,7 @@ Mitglieder können eine persönliche Adresse für ihren Kalender abrufen. Wer di
 
 ## 7. Cookies und lokale Speicherung
 
-Nach der Anmeldung setzt die Website ein technisch notwendiges Sitzungs-Cookie (`payload-token`). Es dient nur dazu, die angemeldete Person wiederzuerkennen, gilt 14 Tage, ist für Skripte der Seite nicht lesbar und wird beim Abmelden gelöscht. Rechtsgrundlage sind § 25 Abs. 2 Nr. 2 TDDDG und Art. 6 Abs. 1 lit. f DSGVO. Dafür ist keine Einwilligung nötig, deshalb gibt es keinen Cookie-Hinweis.
+Nach der Anmeldung setzt die Website ein technisch notwendiges Sitzungs-Cookie (`payload-token`). Es dient nur dazu, die angemeldete Person wiederzuerkennen, läuft nach 120 Minuten ohne Aktivität ab, ist für Skripte der Seite nicht lesbar und wird beim Abmelden gelöscht. Rechtsgrundlage sind § 25 Abs. 2 Nr. 2 TDDDG und Art. 6 Abs. 1 lit. f DSGVO. Dafür ist keine Einwilligung nötig, deshalb gibt es keinen Cookie-Hinweis.
 
 Die Verwaltungsoberfläche, die nur Administrierende nutzen, kann zusätzlich technisch notwendige Einstellungen im Browser speichern.
 

@@ -7,6 +7,7 @@ import { notizFormular } from "./notizformular.js";
 
 const inhalt = document.getElementById("inhalt");
 const abmelden = document.getElementById("abmelden");
+const angemeldet = document.getElementById("angemeldet");
 
 // Wie weit zurück der Hinweis „Notiz fehlt“ erscheint (Tage)
 const NOTIZ_HINWEIS_TAGE = 90;
@@ -16,15 +17,75 @@ let filter = ""; // gewähltes Gremium
 let meldung = null; // { text, fehler }
 
 abmelden.addEventListener("click", async () => {
+  sitzungBeenden();
   await api.logout();
   daten = null;
   zeigeLogin();
 });
 
+// --- Automatische Abmeldung ---------------------------------------------
+// Die Anmeldung läuft nach einer festen Zeit ohne Aktivität ab (ANMELDUNG_MINUTEN, Standard 120).
+// Wer im Dashboard klickt oder tippt, verlängert sie, höchstens alle paar Minuten ein Aufruf.
+// Läuft sie ab, zeigt das Dashboard wieder die Anmeldung, statt mit veralteten Daten stehen zu bleiben.
+
+const VERLAENGERN_ALLE_MS = 5 * 60 * 1000;
+let ablauf = 0; // Zeitpunkt (ms), zu dem die Anmeldung abläuft; 0 = nicht angemeldet
+let ablaufTimer = null;
+let letzteVerlaengerung = 0;
+
+function sitzungBeobachten(expSekunden) {
+  if (!Number.isFinite(expSekunden)) return;
+  ablauf = expSekunden * 1000;
+  ablaufPlanen();
+}
+
+function sitzungBeenden() {
+  ablauf = 0;
+  letzteVerlaengerung = 0; // nach der nächsten Anmeldung verlängert schon die erste Aktivität
+  clearTimeout(ablaufTimer);
+}
+
+function ablaufPlanen() {
+  clearTimeout(ablaufTimer);
+  if (!ablauf) return;
+  // Lange Wartezeiten kappen: Browser drosseln Timer in Hintergrund-Tabs, darum regelmäßig neu prüfen
+  ablaufTimer = setTimeout(ablaufPruefen, Math.min(Math.max(0, ablauf - Date.now()) + 1000, 60 * 1000));
+}
+
+async function ablaufPruefen() {
+  if (!ablauf) return;
+  if (Date.now() < ablauf) return ablaufPlanen();
+  sitzungBeenden();
+  daten = null;
+  for (const d of document.querySelectorAll("dialog")) d.remove();
+  await api.logout();
+  zeigeLogin("Du wurdest nach längerer Zeit ohne Aktivität automatisch abgemeldet. Bitte melde dich neu an.");
+}
+
+async function aktivitaet() {
+  if (!ablauf) return;
+  if (Date.now() >= ablauf) return ablaufPruefen();
+  if (Date.now() - letzteVerlaengerung < VERLAENGERN_ALLE_MS) return;
+  letzteVerlaengerung = Date.now();
+  const r = await api.verlaengern();
+  if (r.status === 200 && Number.isFinite(r.daten?.exp)) {
+    ablauf = r.daten.exp * 1000;
+    ablaufPlanen();
+  }
+}
+
+for (const art of ["pointerdown", "keydown"]) document.addEventListener(art, aktivitaet, { passive: true });
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) void ablaufPruefen();
+});
+
 // --- Anmeldung ---------------------------------------------------------
 
 async function zeigeLogin(hinweis) {
+  sitzungBeenden();
   abmelden.hidden = true;
+  angemeldet.hidden = true;
+  angemeldet.textContent = "";
   const name = await markeLaden();
   leeren(inhalt);
   const fehler = el("p", { class: "fehler", role: "alert", hidden: !hinweis }, hinweis ?? "");
@@ -76,8 +137,8 @@ async function zeigeLogin(hinweis) {
 // --- Daten laden und anzeigen -------------------------------------------
 
 async function laden() {
-  const r = await api.dashboard();
-  if (r.status === 401) return zeigeLogin();
+  const [r, konto] = await Promise.all([api.dashboard(), api.ich()]);
+  if (r.status === 401) return zeigeLogin(ablauf ? "Deine Anmeldung ist abgelaufen. Bitte melde dich neu an." : undefined);
   if (r.status === 403) {
     await api.logout();
     return zeigeLogin(fehlerText(r.daten?.fehler));
@@ -87,14 +148,28 @@ async function laden() {
     return;
   }
   daten = r.daten;
+  kontoAnzeigen(konto);
   abmelden.hidden = false;
   zeichnen();
+}
+
+/** Kopfzeile: als wer man angemeldet ist. Startet die Überwachung des Ablaufs. */
+function kontoAnzeigen(konto) {
+  const nutzer = konto?.status === 200 ? konto.daten?.user : null;
+  if (!nutzer) {
+    angemeldet.hidden = true;
+    return;
+  }
+  angemeldet.textContent = `Angemeldet als ${nutzer.name || nutzer.email}`;
+  angemeldet.title = nutzer.email ?? "";
+  angemeldet.hidden = false;
+  sitzungBeobachten(konto.daten.exp);
 }
 
 async function aktion(knopf, aufruf) {
   knopf.disabled = true;
   const r = await aufruf();
-  if (r.status === 401) return zeigeLogin();
+  if (r.status === 401) return zeigeLogin("Deine Anmeldung ist abgelaufen. Bitte melde dich neu an.");
   meldung = r.status === 200 ? null : { text: fehlerText(r.daten?.fehler), fehler: true };
   await laden();
 }

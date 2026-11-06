@@ -69,7 +69,7 @@ const uploadVerzeichnis = (name: string) => `${process.env.UPLOADS_DIR ?? './dat
 export const Dokumente: CollectionConfig = {
   slug: 'dokumente',
   labels: { singular: 'Dokument', plural: 'Dokumente' },
-  admin: { useAsTitle: 'titel', defaultColumns: ['titel', 'kategorie', 'veroeffentlicht'], group: 'Inhalt', description: 'Unterlagen für den öffentlichen Bereich: Geschäftsordnung, Stellungnahmen, Tätigkeitsberichte' },
+  admin: { useAsTitle: 'titel', defaultColumns: ['titel', 'kategorie', 'veroeffentlicht'], group: 'Inhalt', description: 'Unterlagen für den öffentlichen Bereich: Geschäftsordnung, Stellungnahmen, Tätigkeitsberichte, Protokolle' },
   // Öffentlich zugänglich ist nur, was der Endpoint /beirat-dabei/datei/:id ausliefert (veröffentlichte Dokumente)
   access: verwaltung,
   upload: {
@@ -87,6 +87,7 @@ export const Dokumente: CollectionConfig = {
         { label: 'Geschäftsordnung', value: 'geschaeftsordnung' },
         { label: 'Stellungnahme', value: 'stellungnahme' },
         { label: 'Tätigkeitsbericht', value: 'taetigkeitsbericht' },
+        { label: 'Protokoll', value: 'protokoll' },
         { label: 'Weitere Unterlagen', value: 'sonstiges' },
       ],
     },

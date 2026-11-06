@@ -31,6 +31,7 @@ export const KATEGORIEN = [
   { id: "geschaeftsordnung", titel: "Geschäftsordnung" },
   { id: "stellungnahme", titel: "Stellungnahmen" },
   { id: "taetigkeitsbericht", titel: "Tätigkeitsberichte" },
+  { id: "protokoll", titel: "Protokolle" },
   { id: "sonstiges", titel: "Weitere Unterlagen" },
 ] as const;
 

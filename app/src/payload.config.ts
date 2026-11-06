@@ -20,7 +20,19 @@ const publicUrl = process.env.PUBLIC_URL ?? 'http://localhost:3000'
 export default buildConfig({
   serverURL: publicUrl,
   secret: process.env.PAYLOAD_SECRET || '',
-  admin: { user: Users.slug, importMap: { baseDir: path.resolve(dirname) }, meta: { titleSuffix: ' · Beirat dabei' } },
+  admin: {
+    user: Users.slug,
+    importMap: { baseDir: path.resolve(dirname) },
+    meta: {
+      titleSuffix: ' · Beirat dabei',
+      // Dieselben Symbole wie im Dashboard (liefert der Webserver unter /dashboard/ aus)
+      icons: [
+        { rel: 'icon', type: 'image/svg+xml', url: '/dashboard/img/favicon.svg' },
+        { rel: 'icon', sizes: '32x32', url: '/favicon.ico' },
+        { rel: 'apple-touch-icon', url: '/dashboard/img/apple-touch-icon.png' },
+      ],
+    },
+  },
   i18n: { supportedLanguages: { de }, fallbackLanguage: 'de' },
   collections: [Users, Gremien, Sitzungen, Teilnahmen, Notizen, Dokumente, Medien, Benachrichtigungen],
   globals: [Einstellungen],

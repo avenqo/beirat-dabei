@@ -29,6 +29,10 @@ export const login = async (email, passwort) => {
   return r;
 };
 export const logout = () => anfrage("POST", "/api/users/logout");
+/** Angemeldetes Konto und Ablauf der Anmeldung ({ user, exp } mit exp in Sekunden). */
+export const ich = () => anfrage("GET", "/api/users/me");
+/** Anmeldung verlängern, solange jemand im Dashboard aktiv ist. Liefert ein neues exp. */
+export const verlaengern = () => anfrage("POST", "/api/users/refresh-token");
 export const passwortVergessen = (email) => anfrage("POST", "/api/users/forgot-password", { email });
 export const passwortSetzen = (token, passwort) => anfrage("POST", "/api/users/reset-password", { token, password: passwort });
 

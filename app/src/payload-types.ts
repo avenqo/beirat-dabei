@@ -230,7 +230,7 @@ export interface Notizen {
   createdAt: string;
 }
 /**
- * Unterlagen für den öffentlichen Bereich: Geschäftsordnung, Stellungnahmen, Tätigkeitsberichte
+ * Unterlagen für den öffentlichen Bereich: Geschäftsordnung, Stellungnahmen, Tätigkeitsberichte, Protokolle
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "dokumente".
@@ -241,7 +241,7 @@ export interface Dokumente {
    * Name des Dokuments, so wie er öffentlich erscheint
    */
   titel: string;
-  kategorie?: ('geschaeftsordnung' | 'stellungnahme' | 'taetigkeitsbericht' | 'sonstiges') | null;
+  kategorie?: ('geschaeftsordnung' | 'stellungnahme' | 'taetigkeitsbericht' | 'protokoll' | 'sonstiges') | null;
   /**
    * Für die Sortierung (neueste zuerst)
    */

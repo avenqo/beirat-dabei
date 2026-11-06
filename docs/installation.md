@@ -517,8 +517,10 @@ sudo docker compose logs --since 5m app | grep -vE "\] (GET|HEAD) "
 ```
 
 - Steht dort `[mail] an …` mit dem Text der Nachricht, ist `EMAIL_SMTP_HOST` nicht gesetzt (Schritt 5).
-- Steht dort ein Fehler vom Versand, stimmen Zugangsdaten, Port oder Absender nicht. Dann Schritt 15 wiederholen.
-- Steht dort nichts, existiert kein Konto mit genau dieser Adresse, oder es ist gesperrt.
+- `Passwort vergessen: kein Konto mit der Adresse …`: Die Adresse stimmt nicht mit der im Konto überein.
+- `Passwort vergessen: Link an … verschickt` und `Mail an … übergeben`: Der SMTP-Server hat die Mail angenommen. Spam-Ordner prüfen und ob das Postfach dieser Adresse existiert.
+- `Mail an … nicht verschickt` mit Fehler: Zugangsdaten, Port oder Absender stimmen nicht. Dann Schritt 15 wiederholen.
+- Steht dort nichts davon, kam die Anfrage innerhalb von 15 Sekunden nach der vorigen und wurde verworfen. Kurz warten und neu anfordern.
 
 ---
 
@@ -665,7 +667,8 @@ Wenn `data/` dem Benutzer 1000 gehört und du ein anderer Benutzer bist, das Skr
 | Dashboard: „Dieses Konto ist kein aktives Mitglied“ | Konto mit Rolle *Technisches Administratorkonto* oder gesperrt | Mitglied anlegen (Schritt 16) |
 | Mitglieder können sich nicht anmelden, „zu viele Fehlversuche“ | Konto nach fünf falschen Passwörtern zehn Minuten gesperrt | warten oder über *Passwort vergessen* ein neues setzen |
 | *Passwort vergessen*: keine E-Mail, im Log `[mail] an …` | `EMAIL_SMTP_HOST` nicht gesetzt | Schritt 5, dann `sudo docker compose up -d` |
-| *Passwort vergessen*: keine E-Mail, kein Fehler im Log, SMTP-Test klappt | kein Konto mit genau dieser Adresse, oder das Konto ist gesperrt | Adresse zeichengenau eingeben, Konten in der Verwaltung prüfen |
+| *Passwort vergessen*: keine E-Mail, im Log `kein Konto mit der Adresse …` | kein Konto mit genau dieser Adresse | Adresse zeichengenau eingeben, Konten in der Verwaltung prüfen |
+| *Passwort vergessen*: keine E-Mail, im Log `Mail an … übergeben` | SMTP-Server hat angenommen, Zustellung scheitert danach | Spam-Ordner, Postfach der Adresse prüfen (beim technischen Administratorkonto oft eine ungelesene Adresse) |
 | SMTP-Test mit curl klappt, aber die Anwendung versendet nicht | `EMAIL_FROM` enthält einen Anzeigenamen, oder Port und Verschlüsselung passen nicht (`465` mit `true`, `587` mit `false`) | Werte in der `.env` korrigieren (Schritt 5), `up -d` |
 | Regellauf meldet nichts, `printenv REGELN_CRON` zeigt nichts oder `0 7 * * *` | Zeitplan bei `RIS_CRON` statt `REGELN_CRON` eingetragen | `.env` prüfen (Schritt 17a) |
 | Keine Nachricht, wenn sich jemand austrägt | gewollt: nur die letzte Person innerhalb der 7 Tage löst R4 aus | – |

@@ -98,11 +98,13 @@ describe("oeffentlich", () => {
       dok({ id: ID4, titel: "Entwurf", kategorie: "stellungnahme", veroeffentlicht: false }),
       dok({ id: "55555555-5555-4555-8555-555555555555", titel: "Ohne Datei", hatDatei: false }),
       dok({ id: "66666666-6666-4666-8666-666666666666", titel: "Unbekannte Kategorie", kategorie: "xyz", datum: null }),
+      dok({ id: "77777777-7777-4777-8777-777777777777", titel: "Protokoll Oktober", kategorie: "protokoll", datum: "2026-10-19" }),
     ];
     const b = (await oeffentlich(deps())).body as { kategorien: { id: string; dokumente: { titel: string; url: string }[] }[] };
-    expect(b.kategorien.map((k) => k.id)).toEqual(["geschaeftsordnung", "stellungnahme", "sonstiges"]);
+    expect(b.kategorien.map((k) => k.id)).toEqual(["geschaeftsordnung", "stellungnahme", "protokoll", "sonstiges"]);
     expect(b.kategorien[1]!.dokumente.map((x) => x.titel)).toEqual(["Stellungnahme Solarpark", "Stellungnahme B-Plan"]);
-    expect(b.kategorien[2]!.dokumente.map((x) => x.titel)).toEqual(["Unbekannte Kategorie"]);
+    expect(b.kategorien[2]!.dokumente.map((x) => x.titel)).toEqual(["Protokoll Oktober"]);
+    expect(b.kategorien[3]!.dokumente.map((x) => x.titel)).toEqual(["Unbekannte Kategorie"]);
     expect(b.kategorien[0]!.dokumente[0]!.url).toBe(`/beirat-dabei/datei/${ID1}`);
   });
 

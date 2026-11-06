@@ -41,6 +41,17 @@ export function markeSetzen(name, logo, akzent) {
     if (logo) bild.src = logo;
     else bild.src = PLATZHALTER;
   }
+  symbolSetzen(logo);
+}
+
+/** Ist in den Einstellungen ein Logo hinterlegt, erscheint es auch als Symbol im Browser-Tab. */
+function symbolSetzen(logo) {
+  if (!logo) return;
+  for (const link of document.querySelectorAll('link[rel="icon"]')) link.remove();
+  const link = document.createElement("link");
+  link.rel = "icon";
+  link.href = logo;
+  document.head.append(link);
 }
 
 /**
