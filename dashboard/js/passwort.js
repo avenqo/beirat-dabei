@@ -10,7 +10,6 @@ const inhalt = document.getElementById("inhalt");
 const token = new URLSearchParams(location.search).get("token") ?? "";
 history.replaceState(null, "", location.pathname);
 
-const zumDashboard = () => el("a", { class: "knopf", href: "./" }, "Zum Dashboard");
 const zurAnmeldung = () => el("a", { class: "knopf", href: "./" }, "Zurück zur Anmeldung");
 
 /** Ohne Token: Link zum Zurücksetzen per E-Mail anfordern. */
@@ -80,8 +79,8 @@ function formular() {
           knopf.disabled = false;
           if (r.status === 200) {
             leeren(inhalt).append(
-              el("p", { class: "meldung", role: "status" }, "Dein Passwort ist gespeichert. Du kannst dich jetzt anmelden."),
-              el("div", { class: "aktionen" }, zumDashboard()),
+              el("p", { class: "meldung", role: "status" }, "Dein Passwort ist gespeichert. Aus Sicherheitsgründen bist du jetzt auf allen Geräten abgemeldet. Melde dich mit dem neuen Passwort an."),
+              el("div", { class: "aktionen" }, el("a", { class: "knopf primaer", href: "./" }, "Zur Anmeldung")),
             );
             return;
           }

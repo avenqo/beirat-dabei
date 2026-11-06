@@ -70,6 +70,23 @@ export const Users: CollectionConfig = {
         a.req?.payload.logger.info(`beirat-dabei: Passwort vergessen: Link an ${String(a.data?.email ?? '').toLowerCase().trim()} verschickt`)
       },
     ],
+    // Nach dem Zurücksetzen des Passworts nicht automatisch anmelden (Empfehlung OWASP):
+    // Wer nur den Link aus der Mail hat, soll sich mit dem neuen Passwort selbst anmelden.
+    // Payload legt beim Zurücksetzen eine Sitzung an und setzt das Cookie. Die Sitzung wird hier
+    // wieder entfernt (alle früheren hat Payload schon beendet) und das Token aus der Antwort
+    // genommen. Das Cookie bleibt dann leer, man ist auf allen Geräten abgemeldet.
+    afterOperation: [
+      async ({ operation, result, req }) => {
+        if (operation !== 'resetPassword') return result
+        const r = result as { token?: string; user?: { id?: string | number; email?: string } }
+        const id = r.user?.id
+        if (id !== undefined) {
+          await req.payload.db.updateOne({ collection: 'users', id, data: { sessions: [] }, req, returning: false })
+          req.payload.logger.info(`beirat-dabei: Passwort für ${r.user?.email ?? id} neu gesetzt, alle Sitzungen beendet`)
+        }
+        return { ...r, token: undefined, user: undefined }
+      },
+    ],
     beforeLogin: [
       ({ user }) => {
         if ((user as { status?: string }).status === 'gesperrt') {
