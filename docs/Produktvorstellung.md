@@ -80,6 +80,22 @@ Der **Kern** ist für jeden Beirat gleich: Dashboard, Teilnahme, Notizen, Benach
 
 **Wer es nutzen kann:** Umwelt-, Senioren-, Jugend- und Behindertenbeiräte, Ortsbeiräte, Bürgerinitiativen, grundsätzlich jede Gruppe, die öffentliche Sitzungen begleiten will.
 
+### Beispielimplementierung: Umweltbeirat Kremmen
+
+Die erste Instanz begleitet für den Umweltbeirat der Stadt Kremmen einen einzigen Ausschuss. So sieht die Einstellung dort aus:
+
+| Was | Kremmen |
+| --- | --- |
+| Name und Adresse | Umweltbeirat Kremmen, umweltbeirat.kremmener.info |
+| Begleitetes Gremium | Bau- und Umweltausschuss (im RIS: „Bau-/Wirtschafts- und Umweltausschuss“) |
+| RIS | KOMFA RIS der Stadt Kremmen, Adapter `komfa` |
+| Fristen | Erinnerung 7 Tage vorher, wenn niemand eingetragen ist; Notiz-Erinnerung 3 Tage danach |
+| Notizfragen | War etwas Relevantes für den Beirat dabei? (ja/nein, Pflicht) · Welche TOPs waren umweltrelevant? · Was wurde beschlossen oder vertagt, und muss der Beirat etwas tun? |
+| Themenfokus (für Stufe 2) | Umwelt, Natur, Klima |
+| Betrieb | eigener Docker-Stack auf einem vorhandenen Server, Mails über ein Postfach des Beirats |
+
+Alles in der Tabelle ist Einstellung, nichts davon steht im Code. Ein Senioren- oder Jugendbeirat derselben Stadt bräuchte nur andere Gremien und andere Notizfragen.
+
 ## 6. Stand und ehrliche Grenzen
 
 **Fertig und getestet** (mit automatischen Tests, lokal im Docker-Stack und im Browser): Dashboard, Teilnahme per Link, Notizen, die fünf Regeln (zunächst im Trockenmodus), RIS-Abgleich für KOMFA gegen Beispieldaten, Kalender-Feed, öffentliche Seite, Backup und Wiederherstellung, Anmeldung und Passwort-Reset, Zugriffsregeln, Betriebsanleitung.

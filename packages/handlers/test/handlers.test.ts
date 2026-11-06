@@ -42,7 +42,7 @@ const mitglieder = [
 const speicher: Speicher = {
   einstellungen: async () => ({
     einstellungen: STANDARD_EINSTELLUNGEN,
-    name: "Umweltbeirat Kremmen",
+    name: "Beirat Musterstadt",
     aboVersion,
     notizfragen: [
       { schluessel: "relevant", frage: "Relevant?", typ: "ja-nein", pflicht: true },
@@ -125,7 +125,7 @@ describe("dashboard", () => {
     const body = r.body as { kommend: { id: string; teilnehmer: { name: string }[]; ichTeilnehmend: boolean }[]; notizfragen: unknown[] };
     expect(body.kommend[0]).toMatchObject({ id: "s1", ichTeilnehmend: false, teilnehmer: [{ name: "Bernd" }] });
     expect(body.notizfragen).toHaveLength(2);
-    expect(r.body).toMatchObject({ instanz: { name: "Umweltbeirat Kremmen", zeitzone: "Europe/Berlin" }, ich: "a" });
+    expect(r.body).toMatchObject({ instanz: { name: "Beirat Musterstadt", zeitzone: "Europe/Berlin" }, ich: "a" });
   });
 });
 
@@ -269,7 +269,7 @@ describe("Kalender-Abo", () => {
     expect(r.kopf?.["cache-control"]).toContain("private");
     const t = r.body as string;
     expect(t).toContain("BEGIN:VCALENDAR");
-    expect(t).toContain("X-WR-CALNAME:Umweltbeirat Kremmen");
+    expect(t).toContain("X-WR-CALNAME:Beirat Musterstadt");
     expect(t).toContain("UID:s1@beirat.example");
     expect(t).toContain("DTSTART:20261118T170000Z");
     expect(t).toContain("DTEND:20261118T200000Z");

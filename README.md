@@ -2,7 +2,7 @@
 
 Sitzungsbegleitung für Beiräte und Initiativen, die die Ausschüsse ihrer Kommune verfolgen: Termine im Blick behalten, Teilnahme abstimmen, Ergebnisse festhalten.
 
-> **Status:** Vorabversion. Der Code läuft lokal und im Docker-Stack. Der Betrieb auf einem Server mit echtem Mailversand wird gerade erprobt. Erste Instanz ist der Umweltbeirat Kremmen.
+> **Status:** Vorabversion. Der Code läuft lokal und im Docker-Stack. Der Betrieb auf einem Server mit echtem Mailversand wird gerade erprobt.
 
 ## Worum es geht
 
@@ -27,9 +27,9 @@ Für jedes Gremium, das öffentliche Ausschusssitzungen begleiten will, zum Beis
 | --- | --- |
 | [Installation](docs/installation.md) | Schritt für Schritt auf einen Server mit Docker, Reverse Proxy, HTTPS und Mailversand |
 | [Betrieb](docs/Betrieb.md) | Alltag: Mitglieder, Gremien, Sitzungen, Einstellungen, Aktualisieren, Backup, Probleme |
-| [Kurzanleitung für Mitglieder](docs/Beirat%20dabei%20–%20Kurzanleitung%20für%20Mitglieder.md) | zum Weitergeben an die Beiratsmitglieder |
+| [Kurzanleitung für Mitglieder](docs/Kurzanleitung-Mitglieder.md) | zum Weitergeben an die Beiratsmitglieder |
 | [Produktvorstellung](docs/Produktvorstellung.md) | für Beiräte, die entscheiden, ob es etwas für sie ist |
-| [Konzept](docs/Beirat-dabei-Konzept.md) | Entwurf, Regeln und Grenzfälle |
+| [Konzept](docs/Konzept.md) | Entwurf, Regeln und Grenzfälle |
 | [Sicherheit](SECURITY.md) | Schwachstellen melden, Annahmen, Härtung |
 
 ## Benachrichtigungsregeln
@@ -222,11 +222,7 @@ KI-Inhalte sind immer als solche gekennzeichnet. Für Notizen und Aufnahmen komm
 
 ## Instanzen
 
-| Instanz | Gremien | Seit |
-| --- | --- | --- |
-| Umweltbeirat Kremmen | Bau-/Wirtschafts- und Umweltausschuss | in Vorbereitung |
-
-Du betreibst eine eigene Instanz? Ergänze sie gern per Pull Request.
+Noch keine Instanz ist hier eingetragen. Du betreibst eine eigene Instanz? Ergänze sie gern per Pull Request.
 
 ## Mitmachen
 

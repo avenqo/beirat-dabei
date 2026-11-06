@@ -177,7 +177,7 @@ Beispiel für die Notizfragen:
 ```json
 [
   { "schluessel": "relevant", "frage": "War etwas Relevantes für den Beirat dabei?", "typ": "ja-nein", "pflicht": true },
-  { "schluessel": "tops", "frage": "Welche TOPs waren umweltrelevant?", "typ": "text", "pflicht": false },
+  { "schluessel": "tops", "frage": "Welche TOPs betrafen die Themen des Beirats?", "typ": "text", "pflicht": false },
   { "schluessel": "beschluesse", "frage": "Was wurde beschlossen oder vertagt?", "typ": "text", "pflicht": false }
 ]
 ```

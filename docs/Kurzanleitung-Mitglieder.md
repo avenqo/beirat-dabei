@@ -2,9 +2,11 @@
 
 Stand: 06.11.2026
 
+> **Vorlage:** Die Stellen in eckigen Klammern für eure Instanz ausfüllen, dann an die Mitglieder verteilen.
+
 ## Worum es geht
 
-Beirat dabei sorgt dafür, dass bei jeder Sitzung des Bau-/Wirtschafts- und Umweltausschusses jemand vom Umweltbeirat dabei ist. Du siehst alle Sitzungstermine an einem Ort, trägst dich mit einem Klick ein und hältst nach der Sitzung kurz fest, was für den Beirat wichtig war.
+Beirat dabei sorgt dafür, dass bei jeder Sitzung von \[Gremium eintragen, z. B. Bauausschuss\] jemand vom Beirat dabei ist. Du siehst alle Sitzungstermine an einem Ort, trägst dich mit einem Klick ein und hältst nach der Sitzung kurz fest, was für den Beirat wichtig war.
 
 E-Mails bekommst du nur, wenn etwas zu tun ist.
 
@@ -12,7 +14,7 @@ E-Mails bekommst du nur, wenn etwas zu tun ist.
 
 Dein Konto legt die Verwaltung des Beirats für dich an, mit deiner E-Mail-Adresse. Ein Passwort vergibst du selbst:
 
-1. [umweltbeirat.kremmener.info/dashboard/](https://umweltbeirat.kremmener.info/dashboard/) öffnen.
+1. \[Adresse eurer Instanz eintragen\]/dashboard/ öffnen.
 2. Unter dem Passwortfeld auf **Passwort vergessen?** klicken, deine E-Mail-Adresse eingeben und **Link anfordern**.
 3. In der E-Mail auf den Link klicken und ein Passwort festlegen.
 4. Mit E-Mail-Adresse und Passwort anmelden.
@@ -43,7 +45,7 @@ Nach dem Eintragen bekommen die anderen Mitglieder eine kurze Nachricht. So wei�
 
 ## Welche E-Mails du bekommst
 
-Absender ist immer „Umweltbeirat Kremmen“.
+Absender ist immer „\[Name der Instanz eintragen\]“.
 
 | Wann | Worum es geht | Was du tun kannst |
 | --- | --- | --- |
@@ -63,7 +65,7 @@ Die Nachricht über eine neue Teilnahme kommt kurz nach dem Eintragen. Die übri
 Wer teilgenommen hat, hält im Dashboard kurz fest, was für den Beirat wichtig war. Ein paar Sätze reichen, zum Beispiel:
 
 - War etwas für den Beirat relevant?
-- Welche Tagesordnungspunkte betrafen Umwelt, Natur oder Klima?
+- Welche Tagesordnungspunkte betrafen die Themen des Beirats?
 - Muss der Beirat etwas tun, etwa eine Stellungnahme schreiben oder nachfragen?
 
 Die Notiz sehen alle Mitglieder. Waren mehrere von euch da, ergänzt ihr dieselbe Notiz. Fehlt sie nach 3 Tagen, kommt eine Erinnerung.

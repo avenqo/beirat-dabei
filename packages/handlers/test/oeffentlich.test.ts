@@ -29,7 +29,7 @@ const dok = (extra: Partial<DokumentZeile>): DokumentZeile => ({
 });
 
 const speicher = {
-  einstellungen: async () => ({ einstellungen: STANDARD_EINSTELLUNGEN, notizfragen: [], name: "Umweltbeirat Kremmen", akzent }),
+  einstellungen: async () => ({ einstellungen: STANDARD_EINSTELLUNGEN, notizfragen: [], name: "Beirat Musterstadt", akzent }),
   mitglieder: async () => [],
   sitzungen: async () => sitzungen,
   logoUrl: async () => logo,
@@ -57,7 +57,7 @@ describe("instanz", () => {
   it("liefert Namen, ohne Logo null", async () => {
     const r = await instanz(deps());
     expect(r.status).toBe(200);
-    expect(r.body).toEqual({ name: "Umweltbeirat Kremmen", logo: null, akzent: null });
+    expect(r.body).toEqual({ name: "Beirat Musterstadt", logo: null, akzent: null });
   });
   it("liefert die Adresse des Projektlogos", async () => {
     logo = "/api/medien/file/logo.png";
@@ -79,7 +79,7 @@ describe("Akzentfarbe", () => {
 describe("oeffentlich", () => {
   it("liefert die Zeitzone der Instanz mit", async () => {
     const b = (await oeffentlich(deps())).body as { instanz: { name: string; zeitzone: string } };
-    expect(b.instanz).toMatchObject({ name: "Umweltbeirat Kremmen", zeitzone: "Europe/Berlin" });
+    expect(b.instanz).toMatchObject({ name: "Beirat Musterstadt", zeitzone: "Europe/Berlin" });
   });
 
   it("nennt nur kommende Sitzungen, sortiert, ohne gefährliche Links", async () => {
@@ -135,7 +135,7 @@ describe("rechtliches", () => {
   it("liefert Impressum und Datenschutzerklärung aus den Einstellungen, ohne Anmeldung", async () => {
     const r = await rechtliches(deps());
     expect(r.status).toBe(200);
-    expect(r.body).toEqual({ instanz: "Umweltbeirat Kremmen", impressum: "# Impressum\n\nMuster", datenschutz: "# Datenschutz\n\nText" });
+    expect(r.body).toEqual({ instanz: "Beirat Musterstadt", impressum: "# Impressum\n\nMuster", datenschutz: "# Datenschutz\n\nText" });
   });
   it("leere Texte bleiben leer (die Seite zeigt dann einen Hinweis)", async () => {
     rechtstexte = { impressum: "", datenschutz: "" };

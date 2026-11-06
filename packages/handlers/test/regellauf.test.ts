@@ -19,7 +19,7 @@ const leute: Empfaenger[] = [
 ];
 
 const speicher: RegelSpeicher = {
-  einstellungen: async () => ({ einstellungen: STANDARD_EINSTELLUNGEN, notizfragen: [], name: "Umweltbeirat Kremmen" }),
+  einstellungen: async () => ({ einstellungen: STANDARD_EINSTELLUNGEN, notizfragen: [], name: "Beirat Musterstadt" }),
   mitglieder: async () => leute,
   empfaenger: async () => leute,
   sitzungen: async () => sitzungen,

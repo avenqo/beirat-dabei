@@ -2,13 +2,13 @@
 
 Stand: 03.11.2026 · Entwurf
 
-**Beirat dabei** ist eine allgemeine Sitzungsbegleitung für Beiräte und Initiativen, die Ausschüsse ihrer Kommune verfolgen. Der Umweltbeirat Kremmen ist die erste Instanz. Repo und Container heißen `beirat-dabei`.
+**Beirat dabei** ist eine allgemeine Sitzungsbegleitung für Beiräte und Initiativen, die Ausschüsse ihrer Kommune verfolgen. Repo und Container heißen `beirat-dabei`.
 
 ## Ausgangslage und Ziel
 
 Ziel: Der Informationsfluss zwischen den Ausschüssen der Kommune (Ratsinformationssystem - RIS) und den Beiräten soll verbessert und transparenter gestaltet werden und die Prozesse innerhalb der Beiräte unterstützt werden.
 
-Bei jeder Sitzung des Bau- und Umweltausschusses sitzt ein Mitglied des Umweltbeirats im Publikum, und was dort umweltrelevant war, ist danach festgehalten.
+Bei jeder Sitzung der begleiteten Ausschüsse sitzt ein Mitglied des Beirats im Publikum, und was dort für den Beirat relevant war, ist danach festgehalten.
 
 Die Abstimmung im Beirat erfordert heute, dass jemand Termine und Tagesordnungen im Blick behält, Freiwillige anspricht und Rückmeldungen einsammelt. Das System nimmt diese Arbeit ab. Es zeigt alle Termine an einem Ort und meldet sich nur, wenn etwas zu tun ist.
 
@@ -19,23 +19,23 @@ Das System wird in zwei Ausbaustufen umgesetzt:
 
 Die Entwürfe der Oberflächen liegen im [Design-Canvas](https://claude.ai/artifact/LC4Hc6zD3mKhUgsWYcmDhb).
 
-## Allgemeiner Kern, Kremmen als Instanz
+## Allgemeiner Kern, Einstellungen pro Instanz
 
 Der Kern ist für jeden Beirat nutzbar. Ortsspezifisch sind nur die Anbindung an das Ratsinformationssystem und die Konfiguration.
 
-| Allgemein (Kern) | Pro Instanz einstellbar | Kremmen |
+| Allgemein (Kern) | Pro Instanz einstellbar | Beispiel |
 | --- | --- | --- |
-| Dashboard, Teilnahme, Magic Links, iCal | Name, Logo, Domain, Absender | Beirat dabei · Umweltbeirat Kremmen |
+| Dashboard, Teilnahme, Magic Links, iCal | Name, Logo, Domain, Absender | Beirat dabei · Beirat Musterstadt |
 | Regel-Engine für Benachrichtigungen | Fristen vor und nach der Sitzung | 7 Tage vorher, 3 Tage danach |
 | Kurznotiz | Fragen im Notizformular | drei Fragen, siehe Ausbaustufe 1 |
-| Datenmodell mit Gremien | begleitete Gremien | nur Bau- und Umweltausschuss (im RIS: „Bau-/Wirtschafts- und Umweltausschuss“) |
+| Datenmodell mit Gremien | begleitete Gremien | ein Ausschuss, z. B. Bauausschuss |
 | Rollenmodell Mitglied/Admin/technisches Konto | – | Mitglied, Admin, technisches Konto |
 | Schnittstelle für RIS-Adapter | Adapter und Quelle | KOMFA-Adapter (Kalender, iCal, Tagesordnungsseite) |
-| KI-Vorsortierung (Stufe 2) | Themenfokus | Umwelt, Natur, Klima |
+| KI-Vorsortierung (Stufe 2) | Themenfokus | die Themen des Beirats |
 
 **Eine Instanz pro Beirat.** Jeder Beirat betreibt seinen eigenen Stack. Eine Plattform für viele Beiräte ist nicht vorgesehen. Das hält Rechte, Daten und Übergabe einfach.
 
-**Kremmen bleibt der Maßstab.** Allgemein wird nur, was wenig kostet: Werte in die Konfiguration, RIS-Zugriff hinter eine Schnittstelle. Gebaut wird zunächst nur der Adapter, den Kremmen braucht.
+**Die erste Instanz ist der Maßstab.** Allgemein wird nur, was wenig kostet: Werte in die Konfiguration, RIS-Zugriff hinter eine Schnittstelle. Gebaut wird zunächst nur der Adapter, den die erste Instanz braucht (KOMFA RIS).
 
 ## Ausbaustufe 1: Funktionen
 
@@ -61,12 +61,12 @@ Das Dashboard im Browser ist die zentrale Ansicht. Ergänzt wird es durch E-Mail
 | Nicht besetzt | Sitzung vorbei, niemand eingetragen |
 | Dokumentiert | Sitzung vorbei, Notiz vorhanden |
 
-Oben stehen die anstehenden Sitzungen, darunter die vergangenen mit ihren Notizen. Begleitet eine Instanz mehrere Gremien, kommt ein Filter nach Gremium dazu. Kremmen begleitet nur den Bau- und Umweltausschuss.
+Oben stehen die anstehenden Sitzungen, darunter die vergangenen mit ihren Notizen. Begleitet eine Instanz mehrere Gremien, kommt ein Filter nach Gremium dazu.
 
-**Kurznotiz:** eine gemeinsame Notiz pro Sitzung, die alle Teilnehmenden ergänzen können. Die Fragen sind je Instanz einstellbar. Kremmen nutzt drei, nur die erste ist Pflicht:
+**Kurznotiz:** eine gemeinsame Notiz pro Sitzung, die alle Teilnehmenden ergänzen können. Die Fragen sind je Instanz einstellbar. Ein Beispiel mit drei Fragen, nur die erste ist Pflicht:
 
 1. War etwas Relevantes für den Beirat dabei? (ja/nein)
-2. Welche TOPs waren umweltrelevant?
+2. Welche TOPs betrafen die Themen des Beirats?
 3. Was wurde beschlossen oder vertagt, und muss der Beirat etwas tun?
 
 **Magic Links:** Jeder Link gilt für eine Person und eine Sitzung. Der Link öffnet eine Bestätigungsseite, erst der Knopf dort (POST) trägt ein. So lösen Mail-Scanner und Link-Vorschauen nichts aus. Danach gibt es „Rückgängig machen“. Der Token ist signiert. Links in Mails gelten bis zum Sitzungsende plus 14 Tage (einstellbar), der „Rückgängig“-Link nach dem Klick 30 Minuten. Eine Anmeldung ist nicht nötig.
@@ -75,7 +75,7 @@ Oben stehen die anstehenden Sitzungen, darunter die vergangenen mit ihren Notize
 
 ## Benachrichtigungsregeln
 
-Fünf feste Regeln, geprüft von einem täglichen Lauf am Morgen (7:00 Uhr). Zusätzlich läuft die Prüfung sofort, wenn sich jemand ein- oder austrägt. Regel 2 geht deshalb ohne Verzögerung raus. Die Fristen sind je Instanz einstellbar, die Werte unten gelten für Kremmen. Ein Versandprotokoll stellt sicher, dass niemand dieselbe Nachricht zweimal erhält.
+Fünf feste Regeln, geprüft von einem täglichen Lauf am Morgen (7:00 Uhr). Zusätzlich läuft die Prüfung sofort, wenn sich jemand ein- oder austrägt. Regel 2 geht deshalb ohne Verzögerung raus. Die Fristen sind je Instanz einstellbar, die Werte unten sind die Voreinstellung. Ein Versandprotokoll stellt sicher, dass niemand dieselbe Nachricht zweimal erhält.
 
 | # | Auslöser | Bedingung | Empfänger | Kanal und Inhalt |
 | --- | --- | --- | --- | --- |
@@ -93,23 +93,23 @@ Fünf feste Regeln, geprüft von einem täglichen Lauf am Morgen (7:00 Uhr). Zus
 - **Doch nicht teilgenommen:** Die Erinnerungsmail enthält einen Link, mit dem man das meldet. Danach kommt keine weitere Erinnerung.
 - **Austragen außerhalb der 7-Tage-Frist** löst keine Nachricht aus (bewusst so entschieden).
 - **Später aufgenommene Mitglieder** bekommen offene Hinweise zu bestehenden Sitzungen beim nächsten Lauf nachträglich. Das Versandprotokoll gilt pro Person.
-- **Kanal:** Alle Regeln laufen in Stufe 1 per E-Mail. Push (etwa über Ortsfunk) ist ein möglicher späterer Zusatzkanal für Regel 2.
+- **Kanal:** Alle Regeln laufen in Stufe 1 per E-Mail. Push (etwa über eine vorhandene Bürger-App der Kommune) ist ein möglicher späterer Zusatzkanal für Regel 2.
 
 ## Technische Umsetzung
 
-Entscheidung: ein eigener Webservice auf Basis von Payload CMS, als eigener Docker-Stack. Er läuft zunächst auf dem Ortsfunk-Server und lässt sich später auf jeden anderen Server umziehen.
+Entscheidung: ein eigener Webservice auf Basis von Payload CMS, als eigener Docker-Stack. Er kann neben anderen Diensten auf einem vorhandenen Server laufen und lässt sich auf jeden anderen Server umziehen.
 
 **Geprüfte Optionen**
 
 | Option | Bewertung |
 | --- | --- |
-| Ortsfunk-App | Backend, Login und Nutzergruppen vorhanden, Push bisher nicht personalisiert. Ortsfunk ist aber öffentlich, jedes Mitglied müsste die App installieren, und Änderungen laufen durch den Store-Review. Geeignet für den öffentlichen Teil (Sitzungstermine), nicht für den internen Ablauf. |
+| Vorhandene Bürger-App | Backend, Login und Nutzergruppen oft schon vorhanden. Eine solche App ist aber öffentlich, jedes Mitglied müsste die App installieren, und Änderungen laufen durch den Store-Review. Geeignet für den öffentlichen Teil (Sitzungstermine), nicht für den internen Ablauf. |
 | KI-Agent als Kern | Fristen müssen jedes Mal zuverlässig greifen. Ein Sprachmodell ist dafür nicht deterministisch genug. Sinnvoll als Zusatz, siehe Ausbaustufe 2. |
 | **Eigener Webservice (gewählt)** | Deckt Dashboard, Magic Links und iCal ohne Installation ab. Payload CMS liefert Datenmodell, Rollen, Zugriffsregeln, Anmeldung und Admin-Oberfläche. |
 | Low-Code (n8n, Nextcloud) | Schnell als Pilot, aber Logik über mehrere Werkzeuge verteilt, Dashboard nur mühsam. |
 | Bordmittel des RIS | Eventuell Benachrichtigung bei neuen Dokumenten. Deckt nur Regel 1 ab, wird aber als Datenquelle geprüft. |
 
-**Eigene Instanz statt Mitnutzung von Ortsfunk.** Das Beiratssystem bekommt eine eigene Instanz und eine eigene Datenbank. So bekommen Nachfolger Adminrechte ohne Zugriff auf Ortsfunk-Daten, der Umzug ist ein Umzug von Container und Datenbank, und Störungen bleiben getrennt.
+**Eigene Instanz statt Mitnutzung einer vorhandenen App.** Das Beiratssystem bekommt eine eigene Instanz und eine eigene Datenbank. So bekommen Nachfolger Adminrechte ohne Zugriff auf fremde Daten, der Umzug ist ein Umzug von Container und Datenbank, und Störungen bleiben getrennt.
 
 ```
                      ┌─ Docker-Stack beirat-dabei ─────────────────┐
@@ -183,9 +183,9 @@ Der RIS-Adapter füllt die Datenbank. Von dort lesen das Dashboard, die Regeln u
 
 Weitere Adapter können andere Instanzen beitragen.
 
-**Kremmen: KOMFA RIS.** Die Stadt nutzt das [KOMFA RIS](https://ris-kremmen.komfa.de/index.php?module=komfaris&action=cal). Ein OParl-Zugang und ein RSS-Feed sind nicht erkennbar. Es gibt aber pro Sitzung eine iCal-Datei und eine Tagesordnungsseite mit nummerierten TOPs, Ort, Uhrzeit, Einladung als PDF und Vorlagen. Der KOMFA-Adapter kombiniert deshalb iCal und Scraping:
+**Beispiel KOMFA RIS.** Beim [KOMFA RIS](https://www.komfa.de) sind ein OParl-Zugang und ein RSS-Feed nicht erkennbar. Es gibt aber pro Sitzung eine iCal-Datei und eine Tagesordnungsseite mit nummerierten TOPs, Ort, Uhrzeit, Einladung als PDF und Vorlagen. Der KOMFA-Adapter kombiniert deshalb iCal und Scraping:
 
-1. Monatskalender der nächsten ein bis drei Monate abrufen (`action=cal`) und die Sitzungen des „Bau-/Wirtschafts- und Umweltausschusses“ mit ihrer ID herausfiltern.
+1. Monatskalender der nächsten ein bis drei Monate abrufen (`action=cal`) und die Sitzungen des begleiteten Gremiums (RIS-Kennung) mit ihrer ID herausfiltern.
 2. Beginn, Ende und Ort aus der iCal-Datei der Sitzung lesen (`action=ic`).
 3. Tagesordnungsseite abrufen (`action=to`). Sind TOPs vorhanden oder steht die Einladung zum Download (`action=dlg`), gilt die TO als veröffentlicht und Regel 1 greift. „Die Tagesordnung ist nicht verfügbar“ heißt: noch nicht veröffentlicht.
 4. Absagen und Verschiebungen durch Vergleich mit dem letzten Abgleich erkennen. Dieselbe Sitzungs-ID mit anderem Beginn ist eine Verschiebung. Fehlt eine kommende Sitzung bei vollständigem Abruf, gilt sie als abgesagt.
@@ -196,7 +196,7 @@ Der Adapter fragt nur wenige Male am Tag ab, pausiert zwischen den Abrufen, nutz
 
 **Testbarkeit.** Fristen, Regeln, Magic-Link-Token und iCal sind reine Funktionen in `packages/core`: Eingabe ist der Zustand, Ausgabe sind die fälligen Nachrichten. Unit-Tests decken sie vollständig ab, auch die Grenzfälle aus dem Regelabschnitt. Die Adapter werden gegen gespeicherte RIS-Antworten getestet und sind so unabhängig vom echten RIS.
 
-**Ortsfunk als Zusatzkanal.** Später können die öffentlichen Sitzungstermine mit Link zur TO in Ortsfunk erscheinen. Personalisierter Push für eine Gruppe „Beirat“ wäre ein weiterer Kanal für Regel 2. Interne Daten bleiben im Beiratssystem.
+**Bürger-App als Zusatzkanal.** Später können die öffentlichen Sitzungstermine mit Link zur TO in einer Bürger-App der Kommune erscheinen. Personalisierter Push für eine Gruppe „Beirat“ wäre ein weiterer Kanal für Regel 2. Interne Daten bleiben im Beiratssystem.
 
 ## Betrieb und Übergabe
 
@@ -204,12 +204,12 @@ Das System muss ohne seinen Erbauer weiterlaufen: In diesem Fall übernehmen and
 
 - **Konfiguration als Code.** Datenmodell, Rollen und Zugriffsregeln liegen im Git-Repo, die Datenbank wird beim Start per Migration aufgebaut.
 - **Ein Stack, eine Datei.** `docker-compose.yml` plus `.env`. Der Umzug auf einen anderen Server ist Repo und Datenbankdatei kopieren, dann starten.
-- **Funktionsadressen statt persönlicher Konten.** Ein SMTP-Konto, das dem Beirat gehört (etwa umweltbeirat@…), und eine Domain umweltbeirat.[ort].de. Bei einem Domainwechsel ändern sich alle Links in alten E-Mails. Der Absender darf eine Weiterleitungsadresse sein, angemeldet wird mit dem eigentlichen Postfach (`EMAIL_SMTP_USER`). Für die Übergabe sollte es ein Postfach des Beirats sein, kein persönliches.
+- **Funktionsadressen statt persönlicher Konten.** Ein SMTP-Konto, das dem Beirat gehört (etwa beirat@…) und eine Domain beirat.[ort].de. Bei einem Domainwechsel ändern sich alle Links in alten E-Mails. Der Absender darf eine Weiterleitungsadresse sein, angemeldet wird mit dem eigentlichen Postfach (`EMAIL_SMTP_USER`). Für die Übergabe sollte es ein Postfach des Beirats sein, kein persönliches.
 - **Admins über eine Rolle.** Administrieren kann, wer die Rolle *Admin* hat. Mitglieder anlegt das technische Konto, dessen Zugang zur Übergabe gehört.
 - **Backup und Restore als Skript.** Gesichert werden die SQLite-Datei und die Uploads. Die Datei wird mit `sqlite3 .backup` gesichert oder bei kurz gestopptem Container kopiert, nie einfach im laufenden Betrieb. Die Wiederherstellung verschiebt die bisherigen Daten beiseite statt sie zu löschen und wird einmal getestet.
 - **Betriebsanleitung** für Nicht-Entwickler unter [`Betrieb.md`](Betrieb.md): starten, aktualisieren, Mitglied anlegen, Sitzungen pflegen, RIS-Modus umstellen, Backup einspielen, häufige Probleme.
 
-**Repo-Aufteilung.** Der allgemeine Kern liegt öffentlich in `beirat-dabei`, mit einer `.env.example` ohne Geheimnisse. Die `.env` der Kremmener Instanz mit SMTP-Zugang und Schlüsseln liegt nur auf dem Server.
+**Repo-Aufteilung.** Der allgemeine Kern liegt öffentlich in `beirat-dabei`, mit einer `.env.example` ohne Geheimnisse. Die `.env` einer Instanz mit SMTP-Zugang und Schlüsseln liegt nur auf dem Server.
 
 **Neue Instanz.** Name, Logo, Fristen, Notizfragen, RIS-Adapter, Gremien und Texte stehen in der Verwaltung der Instanz. Ein Import aus einer Datei (`instanz.yaml`) wie in der Directus-Fassung gibt es noch nicht. Die Verzeichnisstruktur steht in der README.
 
@@ -217,7 +217,7 @@ Das System muss ohne seinen Erbauer weiterlaufen: In diesem Fall übernehmen and
 
 ## Ausbaustufe 2: KI-Unterstützung (optional, später)
 
-Die KI übernimmt das Lesen und Formulieren, die festen Regeln aus Stufe 1 bleiben unverändert. Der Themenfokus der Vorsortierung ist je Instanz einstellbar, für Kremmen Umwelt, Natur und Klima. Stufe 2 beginnt erst, wenn Stufe 1 stabil läuft.
+Die KI übernimmt das Lesen und Formulieren, die festen Regeln aus Stufe 1 bleiben unverändert. Der Themenfokus der Vorsortierung ist je Instanz einstellbar, zum Beispiel Umwelt, Natur und Klima. Stufe 2 beginnt erst, wenn Stufe 1 stabil läuft.
 
 | Funktion | Was passiert | Nutzen |
 | --- | --- | --- |

@@ -4,7 +4,7 @@ Schritt-für-Schritt-Anleitung, um eine Instanz von *Beirat dabei* auf einem Lin
 
 > **Stand:** Die Anleitung beschreibt den Aufbau mit Payload CMS. Der Docker-Stack ist lokal getestet (Start, Migration, Anmeldung, Passwort-Reset, Links, Regellauf im Trockenmodus). Die Schritte auf einem echten Server mit nginx, HTTPS und SMTP (8 bis 18) werden mit der ersten Installation erprobt. Fehler bitte als Issue melden.
 
-Beispielwerte: Subdomain `umweltbeirat.example.de`, lokaler Port `8056`. Ersetze sie durch deine eigenen.
+Beispielwerte: Subdomain `beirat.example.de`, lokaler Port `8056`. Ersetze sie durch deine eigenen.
 
 ---
 
@@ -78,7 +78,7 @@ Der Anbieter ist bei jedem Aufruf beteiligt, und der Browser zeigt danach eine a
 
 **DNS-Eintrag, der richtige Weg:**
 ```
-Browser: „Welche IP hat umweltbeirat.example.de?“
+Browser: „Welche IP hat beirat.example.de?“
 Nameserver des Anbieters: „Die IP deines Servers“
 Browser → direkt zu deinem Server
 ```
@@ -90,21 +90,21 @@ In der DNS-Verwaltung des Anbieters:
 
 | Typ | Name | Wert |
 | --- | --- | --- |
-| `A` | `umweltbeirat` | IPv4-Adresse des Servers |
-| `AAAA` | `umweltbeirat` | IPv6-Adresse des Servers (optional) |
+| `A` | `beirat` | IPv4-Adresse des Servers |
+| `AAAA` | `beirat` | IPv6-Adresse des Servers (optional) |
 
 Ist die Subdomain beim Anbieter zusätzlich als Weiterleitung angelegt, diese Weiterleitung löschen.
 
 ### Prüfen
 
 ```bash
-getent ahosts umweltbeirat.example.de | awk '{print $1}' | sort -u
+getent ahosts beirat.example.de | awk '{print $1}' | sort -u
 ```
 
 Die Ausgabe darf nur die Adressen deines Servers enthalten. Steht dort eine fremde Adresse, ist beim Anbieter ein alter Eintrag übrig.
 
 ```bash
-curl -sI http://umweltbeirat.example.de | grep -iE '^(HTTP|location|server)'
+curl -sI http://beirat.example.de | grep -iE '^(HTTP|location|server)'
 ```
 
 Erscheint keine `Location:`-Zeile, gibt es keine Weiterleitung. Solange nginx die Subdomain noch nicht kennt, antwortet er mit seinem Standardeintrag. Ein `200` oder `404` von deinem nginx ist an dieser Stelle normal.
@@ -144,12 +144,12 @@ nano .env
 
 | Variable | Wert |
 | --- | --- |
-| `PUBLIC_URL` | `https://umweltbeirat.example.de`, ohne Schrägstrich am Ende |
+| `PUBLIC_URL` | `https://beirat.example.de`, ohne Schrägstrich am Ende |
 | `PORT` | der Port aus Schritt 4 |
 | `COOKIE_SECURE` | `true` (nicht ändern, wenn die Instanz über HTTPS läuft) |
 | `PAYLOAD_SECRET`, `MAGIC_LINK_SECRET` | die beiden Zufallswerte, **verschieden** |
-| `EMAIL_FROM` | **nur die Adresse**, z. B. `umweltbeirat@example.de`, ohne Anzeigenamen |
-| `EMAIL_FROM_NAME` | Absendername, z. B. `Umweltbeirat Musterstadt` |
+| `EMAIL_FROM` | **nur die Adresse**, z. B. `beirat@example.de`, ohne Anzeigenamen |
+| `EMAIL_FROM_NAME` | Absendername, z. B. `Beirat Musterstadt` |
 | `EMAIL_SMTP_HOST` | Server des Mailanbieters. **Ohne diesen Wert werden Mails nur ins Protokoll geschrieben.** |
 | `EMAIL_SMTP_PORT`, `EMAIL_SMTP_SECURE` | empfohlen `465` mit `true` (von Anfang an verschlüsselt). Nur wenn der Anbieter kein 465 kennt: `587` mit `false` (STARTTLS). Port und Wert müssen zusammenpassen. |
 | `EMAIL_SMTP_USER`, `EMAIL_SMTP_PASSWORD` | Zugang des Postfachs. Das Passwort ohne Anführungszeichen eintragen, wenn es keine Leerzeichen enthält. |
@@ -214,7 +214,7 @@ Unter Debian liegen sie in `sites-available/` und sind per Verknüpfung in `site
 **8b. Neue Datei anlegen:**
 
 ```bash
-sudo nano /etc/nginx/sites-available/umweltbeirat
+sudo nano /etc/nginx/sites-available/beirat
 ```
 
 ```nginx
@@ -222,7 +222,7 @@ limit_req_zone $binary_remote_addr zone=bd_auth:10m rate=10r/m;
 
 server {
     listen 80;
-    server_name umweltbeirat.example.de;
+    server_name beirat.example.de;
 
     client_max_body_size 20m;
 
@@ -253,7 +253,7 @@ server {
 **8c. Aktivieren, prüfen, neu laden:**
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/umweltbeirat /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/beirat /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -263,8 +263,8 @@ sudo systemctl reload nginx
 **8d. Über die Subdomain testen.** Zuerst auf dem Server, dann noch einmal vom eigenen Rechner, um eine Firewall beim Hoster auszuschließen:
 
 ```bash
-curl -s  http://umweltbeirat.example.de/api/users/me; echo
-curl -sI http://umweltbeirat.example.de/dashboard/ | head -n 1
+curl -s  http://beirat.example.de/api/users/me; echo
+curl -sI http://beirat.example.de/dashboard/ | head -n 1
 ```
 
 Erwartet: `{"user":null,…}` und `HTTP/1.1 200 OK`.
@@ -274,7 +274,7 @@ Erwartet: `{"user":null,…}` und `HTTP/1.1 200 OK`.
 ## 9. HTTPS-Zertifikat holen
 
 ```bash
-sudo certbot --nginx -d umweltbeirat.example.de
+sudo certbot --nginx -d beirat.example.de
 ```
 
 certbot holt das Zertifikat bei Let's Encrypt, ergänzt die Datei aus Schritt 8 selbst um einen HTTPS-Block und leitet HTTP auf HTTPS um. Fragt er nach einer Umleitung, *Redirect* wählen. Die Erneuerung richtet certbot automatisch ein.
@@ -282,8 +282,8 @@ certbot holt das Zertifikat bei Let's Encrypt, ergänzt die Datei aus Schritt 8 
 **Prüfen:**
 
 ```bash
-curl -s  https://umweltbeirat.example.de/api/users/me; echo
-curl -sI http://umweltbeirat.example.de/dashboard/ | grep -iE '^(HTTP|location)'
+curl -s  https://beirat.example.de/api/users/me; echo
+curl -sI http://beirat.example.de/dashboard/ | grep -iE '^(HTTP|location)'
 sudo certbot renew --dry-run
 ```
 
@@ -314,13 +314,13 @@ Der Preis: Der Browser hält sich an die Dauer, auch wenn du sie später bereuen
 
 3. Nach einigen Tagen auf ein Jahr erhöhen: `max-age=31536000`.
 
-`always` sorgt dafür, dass der Header auch bei Fehlerseiten kommt. Lege den Header in den `server`-Block, nicht in ein einzelnes `location`: Sobald ein `location` eigene `add_header`-Zeilen hat, erbt es die des `server`-Blocks nicht mehr. Nicht dazunehmen: `includeSubDomains` (würde auch andere Subdomains auf HTTPS zwingen, die vielleicht keins haben) und `preload` (lässt sich praktisch nicht zurücknehmen). Nach `sudo nginx -t` und `sudo systemctl reload nginx` prüfst du mit `curl -sI https://umweltbeirat.example.de/dashboard/ | grep -i strict`.
+`always` sorgt dafür, dass der Header auch bei Fehlerseiten kommt. Lege den Header in den `server`-Block, nicht in ein einzelnes `location`: Sobald ein `location` eigene `add_header`-Zeilen hat, erbt es die des `server`-Blocks nicht mehr. Nicht dazunehmen: `includeSubDomains` (würde auch andere Subdomains auf HTTPS zwingen, die vielleicht keins haben) und `preload` (lässt sich praktisch nicht zurücknehmen). Nach `sudo nginx -t` und `sudo systemctl reload nginx` prüfst du mit `curl -sI https://beirat.example.de/dashboard/ | grep -i strict`.
 
 ---
 
 ## 10. Technisches Administratorkonto anlegen
 
-`https://umweltbeirat.example.de/admin` aufrufen. Beim ersten Aufruf erscheint ein Formular zum Anlegen des ersten Kontos. Name, E-Mail-Adresse und ein langes Passwort eintragen. Im Formular ist die *Rolle* schon auf „Technisches Administratorkonto“ vorgewählt (bei älteren Fassungen stand dort „Mitglied“, dann wähle sie selbst aus). Prüfe nach dem Anlegen in der Verwaltung unter *Mitglieder*, dass die Rolle stimmt. Das erste Konto soll das **technische Administratorkonto** sein. Es darf Mitglieder anlegen und ändern, ist aber selbst kein Mitglied und bekommt keine Mails. Das Passwort sicher aufbewahren.
+`https://beirat.example.de/admin` aufrufen. Beim ersten Aufruf erscheint ein Formular zum Anlegen des ersten Kontos. Name, E-Mail-Adresse und ein langes Passwort eintragen. Im Formular ist die *Rolle* schon auf „Technisches Administratorkonto“ vorgewählt (bei älteren Fassungen stand dort „Mitglied“, dann wähle sie selbst aus). Prüfe nach dem Anlegen in der Verwaltung unter *Mitglieder*, dass die Rolle stimmt. Das erste Konto soll das **technische Administratorkonto** sein. Es darf Mitglieder anlegen und ändern, ist aber selbst kein Mitglied und bekommt keine Mails. Das Passwort sicher aufbewahren.
 
 **Das Formular steht jedem offen, solange es kein Konto gibt.** Lege das Konto deshalb sofort nach dem ersten Start an, bevor die Adresse bekannt wird.
 
@@ -332,7 +332,7 @@ Verwaltung → **Einstellungen**:
 
 | Feld | Eintrag |
 | --- | --- |
-| Name der Instanz | z. B. `Umweltbeirat Musterstadt` |
+| Name der Instanz | z. B. `Beirat Musterstadt` |
 | RIS-Adapter | `komfa` |
 | Adresse des RIS | z. B. `https://ris.musterstadt.example`, ohne Schrägstrich am Ende |
 | Impressum, Datenschutzerklärung | enthalten Vorlagen mit Platzhaltern in `[eckigen Klammern]`. Ausfüllen kann später erfolgen, aber vor der Veröffentlichung. |
@@ -444,7 +444,7 @@ Zuerst den SMTP-Zugang direkt testen, ohne die Anwendung. So grenzt man Fehler b
 
 ```bash
 cat > /tmp/testmail.txt <<'EOF'
-From: Umweltbeirat <umweltbeirat@example.de>
+From: Beirat Musterstadt <beirat@example.de>
 To: <empfaenger-adresse>
 Subject: Beirat dabei: SMTP-Test
 
@@ -458,7 +458,7 @@ Das Passwort aus der `.env` lesen, so wird genau der Wert getestet, den die Anwe
 SMTP_PW=$(grep '^EMAIL_SMTP_PASSWORD=' .env | cut -d= -f2-)
 curl -v --ssl-reqd --url 'smtps://smtp.example.de:465' \
   --user "<smtp-benutzer>:$SMTP_PW" \
-  --mail-from 'umweltbeirat@example.de' \
+  --mail-from 'beirat@example.de' \
   --mail-rcpt '<empfaenger-adresse>' \
   --upload-file /tmp/testmail.txt 2>&1 | grep -E '^[<>] |curl:'
 unset SMTP_PW
@@ -506,7 +506,7 @@ Als technisches Konto: Verwaltung → **Mitglieder** → Neu:
 
 **Passwort-Mail prüfen:**
 
-1. Im privaten Browserfenster `https://umweltbeirat.example.de/dashboard/` öffnen.
+1. Im privaten Browserfenster `https://beirat.example.de/dashboard/` öffnen.
 2. *Passwort vergessen* für die Adresse des Mitglieds auslösen. Die Adresse von Hand eingeben.
 3. Die E-Mail muss ankommen. Der Link führt ins Dashboard auf eine Seite „Neues Passwort festlegen“. Passwort setzen, anmelden, Dashboard ansehen.
 
@@ -563,7 +563,7 @@ sudo docker compose logs --since 3m app | grep -iE "regellauf|trocken|error" | h
 Erwartet je fälliger Nachricht eine Zeile wie
 
 ```
-[trocken] R1 an Max Muster (…): Umweltbeirat Musterstadt: Bau- und Umweltausschuss am Do., 12.11., Tagesordnung veröffentlicht
+[trocken] R1 an Max Muster (…): Beirat Musterstadt: Bau- und Umweltausschuss am Do., 12.11., Tagesordnung veröffentlicht
 ```
 
 und am Ende `Regellauf (trocken): N fällig, 0 gesendet, 0 fehlgeschlagen`.
