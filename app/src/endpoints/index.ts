@@ -2,6 +2,27 @@ import type { Endpoint, PayloadRequest } from 'payload'
 import { Readable } from 'node:stream'
 import * as h from '@beirat-dabei/handlers'
 import { speicherAusPayload } from '../speicher'
+import { execFileSync } from 'node:child_process'
+import paket from '../../package.json'
+
+/** Versionsnummer für den Fuß des Dashboards (aus app/package.json, beim Bauen eingebunden). */
+const VERSION: string = paket.version
+
+/**
+ * Commit-Kennung des laufenden Stands. Im Container setzt scripts/deploy.sh sie beim Bauen (GIT_COMMIT),
+ * in der Entwicklung wird sie aus git gelesen. Ohne gültige Kennung bleibt sie leer.
+ */
+const COMMIT: string | null = (() => {
+  let wert = process.env.GIT_COMMIT?.trim() ?? ''
+  if (!wert && process.env.NODE_ENV !== 'production') {
+    try {
+      wert = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+    } catch {
+      /* kein git vorhanden */
+    }
+  }
+  return /^[0-9a-f]{7,40}(-lokal)?$/.test(wert) ? wert : null
+})()
 
 function abhaengigkeiten(req: PayloadRequest): h.OeffentlichAbhaengigkeiten {
   const geheimnis = process.env.MAGIC_LINK_SECRET
@@ -90,7 +111,14 @@ export const endpoints: Endpoint[] = [
     handler: async (req) => antwort(await h.linkBestaetigen(abhaengigkeiten(req), String(req.routeParams?.token ?? ''), await body(req))),
   },
   // Öffentlich, ohne Anmeldung: Name, Termine, veröffentlichte Unterlagen
-  { path: '/beirat-dabei/instanz', method: 'get', handler: async (req) => antwort(await h.instanz(abhaengigkeiten(req))) },
+  {
+    path: '/beirat-dabei/instanz',
+    method: 'get',
+    handler: async (req) => {
+      const a = await h.instanz(abhaengigkeiten(req))
+      return antwort(a.status === 200 ? { ...a, body: { ...(a.body as object), version: VERSION, commit: COMMIT } } : a)
+    },
+  },
   { path: '/beirat-dabei/oeffentlich', method: 'get', handler: async (req) => antwort(await h.oeffentlich(abhaengigkeiten(req))) },
   { path: '/beirat-dabei/rechtliches', method: 'get', handler: async (req) => antwort(await h.rechtliches(abhaengigkeiten(req))) },
   {

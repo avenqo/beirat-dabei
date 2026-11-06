@@ -231,6 +231,9 @@ details.jahr > .monat:first-of-type { margin-top: .25rem; }
 /* Fußzeile und Rechtstexte */
 .fuss { max-width: 46rem; margin: 0 auto; padding: 1.5rem 16px 2.5rem; display: flex; gap: 1.25rem; flex-wrap: wrap; border-top: 1px solid var(--linie); }
 .fuss a { color: var(--leise); font-size: .95rem; }
+.fuss .version { margin-left: auto; color: var(--leise); font-size: .75rem; opacity: .8; align-self: center; }
+.aktionen > a:not(.knopf) { align-self: center; }
+.login .vergessen { margin: -.25rem 0 0; font-size: .95rem; }
 .recht { background: var(--karte); border: 1px solid var(--linie); border-radius: var(--radius); padding: 1.25rem 1.25rem 1.5rem; }
 .recht-titel { text-transform: none; letter-spacing: 0; color: var(--text); font-size: 1.6rem; margin: .25rem 0 1rem; }
 .recht-abschnitt { font-size: 1.15rem; margin: 1.75rem 0 .5rem; }

@@ -128,7 +128,9 @@ mkdir -p data && sudo chown 1000:1000 data
 docker compose up -d --build
 ```
 
-Danach unter `PUBLIC_URL/admin` die erste Person registrieren: Sie wird das technische Administratorkonto. Alles Weitere (Gremien, Einstellungen, Mitglieder) steht in der [Betriebsanleitung](docs/Betrieb.md). Zum Entwickeln: Node 22, `corepack pnpm install`, Pakete bauen, `pnpm dev` im Ordner `app/` (siehe `app/.env.example`).
+Danach unter `PUBLIC_URL/admin` die erste Person registrieren: Sie wird das technische Administratorkonto. Alles Weitere (Gremien, Einstellungen, Mitglieder) steht in der [Betriebsanleitung](docs/Betrieb.md). Zum Entwickeln: Node 22, `corepack pnpm install`, Pakete bauen, `pnpm dev` im Ordner `app/` (siehe `app/.env.example`). Aktualisieren auf dem Server: `scripts/deploy.sh`.
+
+**Neue Version herausgeben:** Die Versionsnummer steht in `app/package.json` und erscheint mit der Commit-Kennung im Fuß des Dashboards. `pnpm release patch` (Fehlerbehebungen), `pnpm release minor` (neue Funktionen) oder `pnpm release major` erhöht sie, committet und legt den Tag `vX.Y.Z` an. Danach `git push --follow-tags`. Die Kennung kommt bei jedem Build von selbst dazu, ein vergessenes Hochzählen fällt also nicht ins Gewicht.
 
 Wichtige Werte in `.env`:
 

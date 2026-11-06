@@ -92,20 +92,7 @@ async function zeigeLogin(hinweis) {
   const email = el("input", { id: "email", type: "email", autocomplete: "username", required: true });
   const passwort = el("input", { id: "passwort", type: "password", autocomplete: "current-password", required: true });
   const knopf = el("button", { type: "submit", class: "primaer" }, "Anmelden");
-  const vergessen = el("button", {
-    type: "button",
-    class: "link",
-    onclick: async () => {
-      if (!email.value) {
-        fehler.textContent = "Bitte trage zuerst deine E-Mail-Adresse ein.";
-        fehler.hidden = false;
-        return;
-      }
-      await api.passwortVergessen(email.value.trim());
-      fehler.hidden = true;
-      inhalt.prepend(el("p", { class: "meldung" }, "Falls die Adresse bekannt ist, haben wir dir einen Link zum Zurücksetzen geschickt."));
-    },
-  }, "Passwort vergessen");
+  const vergessen = el("p", { class: "vergessen" }, el("a", { href: "passwort.html" }, "Passwort vergessen?"));
 
   inhalt.append(
     el("h2", {}, "Anmelden"),
@@ -126,8 +113,9 @@ async function zeigeLogin(hinweis) {
       },
       el("label", { for: "email" }, "E-Mail-Adresse", email),
       el("label", { for: "passwort" }, "Passwort", passwort),
+      vergessen,
       fehler,
-      el("div", { class: "aktionen" }, knopf, vergessen),
+      el("div", { class: "aktionen" }, knopf),
     ),
     el("p", { class: "hinweis abstand" }, "Kein Mitglied? ", el("a", { href: "oeffentlich.html" }, "Öffentliche Termine und Unterlagen ansehen")),
   );

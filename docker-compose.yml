@@ -1,7 +1,11 @@
 # Beirat dabei: ein Stack pro Instanz. Konfiguration über .env (siehe .env.example).
 services:
   app:
-    build: .
+    build:
+      context: .
+      # Commit-Kennung für den Fuß des Dashboards; scripts/deploy.sh setzt sie
+      args:
+        GIT_COMMIT: ${GIT_COMMIT:-}
     restart: unless-stopped
     env_file: .env
     environment:

@@ -13,7 +13,7 @@ E-Mails bekommst du nur, wenn etwas zu tun ist.
 Dein Konto legt die Verwaltung des Beirats für dich an, mit deiner E-Mail-Adresse. Ein Passwort vergibst du selbst:
 
 1. [umweltbeirat.kremmener.info/dashboard/](https://umweltbeirat.kremmener.info/dashboard/) öffnen.
-2. Auf **Passwort vergessen** klicken und deine E-Mail-Adresse eingeben.
+2. Unter dem Passwortfeld auf **Passwort vergessen?** klicken, deine E-Mail-Adresse eingeben und **Link anfordern**.
 3. In der E-Mail auf den Link klicken und ein Passwort festlegen.
 4. Mit E-Mail-Adresse und Passwort anmelden.
 
@@ -71,7 +71,7 @@ Die Notiz sehen alle Mitglieder. Waren mehrere von euch da, ergänzt ihr dieselb
 ## Gut zu wissen
 
 - **Termine im eigenen Kalender:** Im Dashboard unter **Kalender → Kalender abonnieren** bekommst du eine persönliche Adresse für deine Kalender-App. Sie aktualisiert sich von selbst. Bitte gib sie nicht weiter, sie gehört nur dir.
-- **Passwort vergessen:** Im Dashboard auf **Passwort vergessen** klicken, wie bei der ersten Anmeldung.
+- **Passwort vergessen:** Auf der Anmeldeseite auf **Passwort vergessen?** klicken, wie bei der ersten Anmeldung.
 - **Automatische Abmeldung:** Nach 2 Stunden ohne Aktivität meldet dich das Dashboard ab. Du meldest dich dann einfach neu an.
 - **Keine E-Mails von Beirat dabei?** Bitte im Spam-Ordner nachsehen und den Absender als vertrauenswürdig markieren.
 - **Öffentliche Termine und Unterlagen** sind auch ohne Anmeldung einsehbar, über den Link auf der Anmeldeseite. Notizen und Teilnahmen sehen nur Mitglieder.

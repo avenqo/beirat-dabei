@@ -9,6 +9,8 @@ export function markeLaden() {
     let name = "Beirat dabei";
     let logo = null;
     let akzent = null;
+    let version = null;
+    let commit = null;
     try {
       const res = await fetch("/beirat-dabei/instanz");
       if (res.ok) {
@@ -16,11 +18,14 @@ export function markeLaden() {
         name = d.name || name;
         logo = d.logo || null;
         akzent = d.akzent || null;
+        version = typeof d.version === "string" ? d.version : null;
+        commit = typeof d.commit === "string" ? d.commit : null;
       }
     } catch {
       /* ohne Verbindung bleibt der Standard */
     }
     markeSetzen(name, logo, akzent);
+    versionSetzen(version, commit);
     return name;
   })();
   return geladen;
@@ -42,6 +47,16 @@ export function markeSetzen(name, logo, akzent) {
     else bild.src = PLATZHALTER;
   }
   symbolSetzen(logo);
+}
+
+/** Versionsnummer und Commit-Kennung klein im Fuß der Seite. */
+function versionSetzen(version, commit) {
+  const fuss = document.querySelector(".fuss");
+  if (!fuss || !version || fuss.querySelector(".version")) return;
+  const span = document.createElement("span");
+  span.className = "version";
+  span.textContent = commit ? `Beirat dabei ${version} · ${commit}` : `Beirat dabei ${version}`;
+  fuss.append(span);
 }
 
 /** Ist in den Einstellungen ein Logo hinterlegt, erscheint es auch als Symbol im Browser-Tab. */

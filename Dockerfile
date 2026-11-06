@@ -21,4 +21,7 @@ RUN mkdir -p /bau/app/data && chown -R node:node /bau/app/data /bau/app/.next
 USER node
 WORKDIR /bau/app
 EXPOSE 3000
+# Commit-Kennung für die Anzeige im Dashboard (setzt scripts/deploy.sh). Steht zuletzt, damit der Cache davor erhalten bleibt.
+ARG GIT_COMMIT=
+ENV GIT_COMMIT=${GIT_COMMIT}
 CMD ["node_modules/.bin/next", "start"]

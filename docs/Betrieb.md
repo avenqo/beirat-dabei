@@ -216,16 +216,19 @@ Zum Testen des Mailversands ohne Wirkung auf alle: lege vorher nur dich selbst a
 
 ## Aktualisieren
 
-Vorher immer ein Backup machen (`scripts/backup.sh`). Dann:
+Am einfachsten mit dem Skript. Es macht vorher ein Backup, holt den neuen Stand, baut, startet und zeigt am Ende die laufende Version:
 
 ```bash
-git pull
-docker compose up -d --build
+scripts/deploy.sh
 ```
+
+Die Versionsnummer und die Commit-Kennung stehen danach klein im Fuß des Dashboards, zum Beispiel `Beirat dabei 0.2.0 · 68b629c`. An der Kennung erkennt man den genauen Stand, auch zwischen zwei Versionen. Steht dahinter `-lokal`, gibt es auf dem Server Änderungen an Dateien aus dem Repository. Eine bestimmte Version einspielen: `git checkout v0.2.0`, dann `OHNE_PULL=1 scripts/deploy.sh`.
+
+Von Hand geht es auch (ohne Commit-Kennung im Fuß): Backup mit `scripts/backup.sh`, dann `git pull` und `docker compose up -d --build`.
 
 Beim Start spielt die Anwendung neue Datenbankänderungen (Migrationen) selbst ein. Prüfe danach im Protokoll (`docker compose logs --tail 100 app`), dass `Migrated:` ohne Fehler erscheint und `docker compose ps` `healthy` zeigt. Die Version der Anwendung steht fest im Repository, Updates führst du bewusst durch.
 
-Nach einem fehlgeschlagenen Update: Meldungen ansehen. Notfalls zum letzten Backup zurück (`scripts/restore.sh`) und die alte Version mit `git checkout <Version>` und `docker compose up -d --build` wieder einspielen.
+Nach einem fehlgeschlagenen Update: Meldungen ansehen. Notfalls zum letzten Backup zurück (`scripts/restore.sh`) und die alte Version mit `git checkout <Version>` und `OHNE_PULL=1 scripts/deploy.sh` wieder einspielen.
 
 ## Backup und Wiederherstellung
 
