@@ -18,8 +18,13 @@
     </a>
     <nav class="navi">
       <a href="oeffentlich.html">Öffentliche Unterlagen</a>
-      <span id="angemeldet" class="angemeldet" hidden></span>
-      <button id="abmelden" type="button" class="link" hidden>Abmelden</button>
+      <div id="konto" class="konto" hidden>
+        <span class="konto-person">
+          <svg class="konto-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+          <span class="unsichtbar">Angemeldet als </span><strong id="angemeldet"></strong>
+        </span>
+        <button id="abmelden" type="button" class="link">Abmelden</button>
+      </div>
     </nav>
   </header>
   <main id="inhalt" aria-live="polite">

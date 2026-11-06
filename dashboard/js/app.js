@@ -8,6 +8,7 @@ import { notizFormular } from "./notizformular.js";
 const inhalt = document.getElementById("inhalt");
 const abmelden = document.getElementById("abmelden");
 const angemeldet = document.getElementById("angemeldet");
+const konto = document.getElementById("konto");
 
 // Wie weit zurück der Hinweis „Notiz fehlt“ erscheint (Tage)
 const NOTIZ_HINWEIS_TAGE = 90;
@@ -83,8 +84,7 @@ document.addEventListener("visibilitychange", () => {
 
 async function zeigeLogin(hinweis) {
   sitzungBeenden();
-  abmelden.hidden = true;
-  angemeldet.hidden = true;
+  konto.hidden = true;
   angemeldet.textContent = "";
   const name = await markeLaden();
   leeren(inhalt);
@@ -125,7 +125,7 @@ async function zeigeLogin(hinweis) {
 // --- Daten laden und anzeigen -------------------------------------------
 
 async function laden() {
-  const [r, konto] = await Promise.all([api.dashboard(), api.ich()]);
+  const [r, ich] = await Promise.all([api.dashboard(), api.ich()]);
   if (r.status === 401) return zeigeLogin(ablauf ? "Deine Anmeldung ist abgelaufen. Bitte melde dich neu an." : undefined);
   if (r.status === 403) {
     await api.logout();
@@ -136,22 +136,19 @@ async function laden() {
     return;
   }
   daten = r.daten;
-  kontoAnzeigen(konto);
-  abmelden.hidden = false;
+  kontoAnzeigen(ich);
   zeichnen();
 }
 
 /** Kopfzeile: als wer man angemeldet ist. Startet die Überwachung des Ablaufs. */
-function kontoAnzeigen(konto) {
-  const nutzer = konto?.status === 200 ? konto.daten?.user : null;
-  if (!nutzer) {
-    angemeldet.hidden = true;
-    return;
-  }
-  angemeldet.textContent = `Angemeldet als ${nutzer.name || nutzer.email}`;
-  angemeldet.title = nutzer.email ?? "";
-  angemeldet.hidden = false;
-  sitzungBeobachten(konto.daten.exp);
+function kontoAnzeigen(antwort) {
+  const nutzer = antwort?.status === 200 ? antwort.daten?.user : null;
+  // Abmelden gibt es immer, den Namen nur, wenn er sich laden ließ
+  angemeldet.textContent = nutzer ? nutzer.name || nutzer.email : "";
+  angemeldet.parentElement.hidden = !nutzer;
+  konto.title = nutzer ? `Angemeldet als ${nutzer.name || nutzer.email}${nutzer.email ? ` (${nutzer.email})` : ""}` : "";
+  konto.hidden = false;
+  if (nutzer) sitzungBeobachten(antwort.daten.exp);
 }
 
 async function aktion(knopf, aufruf) {
