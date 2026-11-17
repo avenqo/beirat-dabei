@@ -124,14 +124,14 @@ Name und Logo erscheinen in der Kopfzeile und auf der Anmeldeseite, auch ohne An
 
 ### Öffentliche Unterlagen
 
-Unter `PUBLIC_URL/dashboard/oeffentlich.html` sieht **jeder ohne Anmeldung** die nächsten Sitzungstermine mit Link zur Tagesordnung und die veröffentlichten Unterlagen: Geschäftsordnung, Stellungnahmen, Tätigkeitsberichte und weitere Dokumente. Die Seite zeigt keine Mitglieder und keine Notizen.
+Unter `PUBLIC_URL/dashboard/oeffentlich.html` sieht **jeder ohne Anmeldung** die nächsten Sitzungstermine mit Link zur Tagesordnung und die veröffentlichten Unterlagen: Öffentliche Informationen, Protokolle, Geschäftsordnung, Stellungnahmen, Tätigkeitsberichte und weitere Dokumente. Die Seite zeigt keine Mitglieder und keine Notizen.
 
 Unterlagen pflegst du in der Verwaltung unter Inhalt → **Dokumente**:
 
 | Feld | Bedeutung |
 | --- | --- |
 | Titel | so erscheint das Dokument öffentlich |
-| Kategorie | Geschäftsordnung, Stellungnahme, Tätigkeitsbericht oder Weitere Unterlagen |
+| Kategorie | Öffentliche Informationen, Protokoll, Geschäftsordnung, Stellungnahme, Tätigkeitsbericht oder Weitere Unterlagen (in dieser Reihenfolge erscheinen sie öffentlich) |
 | Datum | Datum des Dokuments, die neuesten stehen oben |
 | Beschreibung | optional, ein bis zwei Sätze |
 | Datei | die Datei hochladen (PDF empfohlen; auch PNG, JPEG, Word und ODT) |

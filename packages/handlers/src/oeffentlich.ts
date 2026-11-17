@@ -28,10 +28,11 @@ export interface OeffentlichSpeicher {
 export type OeffentlichAbhaengigkeiten = Omit<Abhaengigkeiten, "speicher"> & { speicher: Speicher & OeffentlichSpeicher };
 
 export const KATEGORIEN = [
+  { id: "information", titel: "Öffentliche Informationen" },
+  { id: "protokoll", titel: "Protokolle" },
   { id: "geschaeftsordnung", titel: "Geschäftsordnung" },
   { id: "stellungnahme", titel: "Stellungnahmen" },
   { id: "taetigkeitsbericht", titel: "Tätigkeitsberichte" },
-  { id: "protokoll", titel: "Protokolle" },
   { id: "sonstiges", titel: "Weitere Unterlagen" },
 ] as const;
 
