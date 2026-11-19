@@ -73,6 +73,7 @@ export interface Config {
     teilnahmen: Teilnahman;
     notizen: Notizen;
     dokumente: Dokumente;
+    veranstaltungen: Veranstaltungen;
     medien: Medien;
     benachrichtigungen: Benachrichtigungen;
     'payload-kv': PayloadKv;
@@ -88,6 +89,7 @@ export interface Config {
     teilnahmen: TeilnahmenSelect<false> | TeilnahmenSelect<true>;
     notizen: NotizenSelect<false> | NotizenSelect<true>;
     dokumente: DokumenteSelect<false> | DokumenteSelect<true>;
+    veranstaltungen: VeranstaltungenSelect<false> | VeranstaltungenSelect<true>;
     medien: MedienSelect<false> | MedienSelect<true>;
     benachrichtigungen: BenachrichtigungenSelect<false> | BenachrichtigungenSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -349,6 +351,10 @@ export interface PayloadLockedDocument {
         value: string | Dokumente;
       } | null)
     | ({
+        relationTo: 'veranstaltungen';
+        value: string | Veranstaltungen;
+      } | null)
+    | ({
         relationTo: 'medien';
         value: string | Medien;
       } | null)
@@ -473,6 +479,43 @@ export interface NotizenSelect<T extends boolean = true> {
   sitzung?: T;
   relevant?: T;
   antworten?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * Öffentlich interessante Termine mit Link, die auf der öffentlichen Seite erscheinen
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "veranstaltungen".
+ */
+export interface Veranstaltungen {
+  id: string;
+  titel: string;
+  beginn: string;
+  ort?: string | null;
+  link: string;
+  /**
+   * Optional: ein bis zwei Sätze
+   */
+  beschreibung?: string | null;
+  /**
+   * Nur mit Haken ist der Termin ohne Anmeldung sichtbar
+   */
+  veroeffentlicht?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "veranstaltungen_select".
+ */
+export interface VeranstaltungenSelect<T extends boolean = true> {
+  titel?: T;
+  beginn?: T;
+  ort?: T;
+  link?: T;
+  beschreibung?: T;
+  veroeffentlicht?: T;
   updatedAt?: T;
   createdAt?: T;
 }

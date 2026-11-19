@@ -6,7 +6,7 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Users } from './collections/Users'
-import { Benachrichtigungen, Dokumente, Gremien, Medien, Notizen, Sitzungen, Teilnahmen } from './collections/Daten'
+import { Benachrichtigungen, Dokumente, Gremien, Medien, Notizen, Sitzungen, Teilnahmen, Veranstaltungen } from './collections/Daten'
 import { Einstellungen } from './globals/Einstellungen'
 import { endpoints } from './endpoints'
 import { emailAdapter } from './email'
@@ -34,7 +34,7 @@ export default buildConfig({
     },
   },
   i18n: { supportedLanguages: { de }, fallbackLanguage: 'de' },
-  collections: [Users, Gremien, Sitzungen, Teilnahmen, Notizen, Dokumente, Medien, Benachrichtigungen],
+  collections: [Users, Gremien, Sitzungen, Teilnahmen, Notizen, Dokumente, Veranstaltungen, Medien, Benachrichtigungen],
   globals: [Einstellungen],
   endpoints,
   onInit: async (payload) => {

@@ -53,6 +53,21 @@ async function laden() {
       });
   const bereiche = [bereich({ id: "termine", titel: "Nächste Sitzungen", kurz: "Termine", anzahl: daten.sitzungen.length, art: "gruen", knoten: termine })];
 
+  // Abschnitt 2: Veranstaltungen mit Link
+  const veranstaltungen = daten.veranstaltungen ?? [];
+  if (veranstaltungen.length > 0) {
+    const karten = veranstaltungen.map((v) => {
+      const link = sichereUrl(v.link);
+      return el("article", { class: "karte" },
+        el("h3", {}, link ? el("a", { href: link, target: "_blank", rel: "noopener noreferrer" }, v.titel) : v.titel),
+        el("p", { class: "meta" }, datumLang(v.beginn, daten.instanz.zeitzone)),
+        v.ort ? el("p", { class: "meta" }, v.ort) : null,
+        v.beschreibung ? el("p", {}, v.beschreibung) : null,
+      );
+    });
+    bereiche.push(bereich({ id: "veranstaltungen", titel: "Veranstaltungen", kurz: "Veranstaltungen", anzahl: veranstaltungen.length, art: "gruen", knoten: karten }));
+  }
+
   // Weitere Abschnitte: je eine Kategorie von Unterlagen
   for (const k of daten.kategorien) {
     const liste = el("ul", { class: "dokumente" },

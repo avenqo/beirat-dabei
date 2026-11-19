@@ -214,6 +214,18 @@ export function speicherAusPayload(payload: Payload): VollerSpeicher {
         dateiGroesse: z.filesize ?? null,
       }))
     },
+    async veranstaltungen() {
+      const r = await payload.find({ collection: 'veranstaltungen', ...opt, sort: 'beginn' })
+      return r.docs.map((z) => ({
+        id: id(z.id),
+        titel: z.titel,
+        beginn: new Date(z.beginn),
+        ort: z.ort ?? null,
+        link: z.link,
+        beschreibung: z.beschreibung ?? null,
+        veroeffentlicht: Boolean(z.veroeffentlicht),
+      }))
+    },
     async dateiVonDokument(dokumentId) {
       const z = await payload.findByID({ collection: 'dokumente', id: dokumentId, overrideAccess: true, depth: 0 }).catch(() => null)
       if (!z || !z.veroeffentlicht || !z.filename) return null

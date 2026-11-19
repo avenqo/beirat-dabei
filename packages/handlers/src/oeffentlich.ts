@@ -14,12 +14,24 @@ export interface DokumentZeile {
   dateiGroesse: number | null;
 }
 
+export interface VeranstaltungZeile {
+  id: string;
+  titel: string;
+  beginn: Date;
+  ort: string | null;
+  link: string;
+  beschreibung: string | null;
+  veroeffentlicht: boolean;
+}
+
 /** Zusätzliche Zugriffe für den öffentlichen Bereich. */
 export interface OeffentlichSpeicher {
   /** Adresse des Projektlogos (oder null, dann zeigt das Dashboard den Platzhalter) */
   logoUrl(): Promise<string | null>;
   /** Alle Dokumente (auch Entwürfe); der Handler zeigt nur veröffentlichte */
   dokumente(): Promise<DokumentZeile[]>;
+  /** Alle Veranstaltungen (auch Entwürfe); der Handler zeigt nur veröffentlichte, kommende */
+  veranstaltungen(): Promise<VeranstaltungZeile[]>;
   dateiVonDokument(dokumentId: string): Promise<DateiStrom | null>;
   /** Impressum und Datenschutzerklärung als Markdown, wie sie in den Einstellungen stehen */
   rechtstexte(): Promise<{ impressum: string; datenschutz: string }>;
@@ -55,11 +67,12 @@ export async function instanz(d: OeffentlichAbhaengigkeiten): Promise<Antwort> {
 /** Öffentlich: nächste Sitzungstermine und veröffentlichte Unterlagen. Keine Namen, keine Notizen. */
 export async function oeffentlich(d: OeffentlichAbhaengigkeiten): Promise<Antwort> {
   const jetzt = d.jetzt().getTime();
-  const [{ name, einstellungen, akzent }, logo, sitzungen, dokumente] = await Promise.all([
+  const [{ name, einstellungen, akzent }, logo, sitzungen, dokumente, veranstaltungen] = await Promise.all([
     d.speicher.einstellungen(),
     d.speicher.logoUrl(),
     d.speicher.sitzungen(),
     d.speicher.dokumente(),
+    d.speicher.veranstaltungen(),
   ]);
 
   const kommend = sitzungen
@@ -73,6 +86,11 @@ export async function oeffentlich(d: OeffentlichAbhaengigkeiten): Promise<Antwor
       abgesagt: s.abgesagt,
       tagesordnung: s.toVeroeffentlicht && s.toLink && URL_PRUEFEN.test(s.toLink) ? s.toLink : null,
     }));
+
+  const termine = veranstaltungen
+    .filter((v) => v.veroeffentlicht && v.beginn.getTime() > jetzt && URL_PRUEFEN.test(v.link))
+    .sort((a, b) => a.beginn.getTime() - b.beginn.getTime())
+    .map((v) => ({ id: v.id, titel: v.titel, beginn: v.beginn.toISOString(), ort: v.ort, link: v.link, beschreibung: v.beschreibung }));
 
   const veroeffentlicht = dokumente.filter((x) => x.veroeffentlicht && x.hatDatei);
   const bekannt = new Set<string>(KATEGORIEN.map((k) => k.id));
@@ -99,6 +117,7 @@ export async function oeffentlich(d: OeffentlichAbhaengigkeiten): Promise<Antwor
     body: {
       instanz: { name: name ?? "Beirat dabei", logo, akzent: farbe(akzent), zeitzone: einstellungen.zeitzone },
       sitzungen: kommend,
+      veranstaltungen: termine,
       kategorien,
     },
     kopf: { "cache-control": "public, max-age=120" },

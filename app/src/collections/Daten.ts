@@ -98,6 +98,23 @@ export const Dokumente: CollectionConfig = {
   ],
 }
 
+/** Öffentlich interessante Termine (Veranstaltungen anderer), die auf der öffentlichen Seite mit Link erscheinen. */
+export const Veranstaltungen: CollectionConfig = {
+  slug: 'veranstaltungen',
+  labels: { singular: 'Veranstaltung', plural: 'Veranstaltungen' },
+  admin: { useAsTitle: 'titel', defaultColumns: ['titel', 'beginn', 'veroeffentlicht'], group: 'Inhalt', description: 'Öffentlich interessante Termine mit Link, die auf der öffentlichen Seite erscheinen' },
+  // Öffentlich sichtbar ist nur, was der Endpoint /beirat-dabei/oeffentlich ausliefert (veröffentlichte, kommende Termine)
+  access: verwaltung,
+  fields: [
+    { name: 'titel', label: 'Titel', type: 'text', required: true, hooks: bereinigen },
+    { name: 'beginn', label: 'Beginn', type: 'date', required: true, admin: { date: { pickerAppearance: 'dayAndTime' } } },
+    { name: 'ort', label: 'Ort', type: 'text', hooks: bereinigen },
+    { name: 'link', label: 'Link zur Veranstaltung', type: 'text', required: true, hooks: bereinigen, validate: (wert: unknown) => (typeof wert === 'string' && /^https?:\/\/\S+$/.test(wert.trim()) ? true : 'Bitte eine vollständige Adresse mit https:// angeben') },
+    { name: 'beschreibung', label: 'Beschreibung', type: 'textarea', admin: { description: 'Optional: ein bis zwei Sätze' } },
+    { name: 'veroeffentlicht', label: 'Veröffentlicht', type: 'checkbox', defaultValue: false, admin: { description: 'Nur mit Haken ist der Termin ohne Anmeldung sichtbar' } },
+  ],
+}
+
 /** Logo und andere Bilder; öffentlich lesbar, damit das Logo auch ohne Anmeldung erscheint. */
 export const Medien: CollectionConfig = {
   slug: 'medien',

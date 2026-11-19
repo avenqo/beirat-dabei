@@ -1,7 +1,7 @@
 import { Readable } from "node:stream";
 import { beforeEach, describe, expect, it } from "vitest";
 import { STANDARD_EINSTELLUNGEN, type SitzungInfo } from "@beirat-dabei/core";
-import { datei, instanz, oeffentlich, rechtliches, type DokumentZeile, type OeffentlichAbhaengigkeiten, type OeffentlichSpeicher } from "../src/oeffentlich.js";
+import { datei, instanz, oeffentlich, rechtliches, type DokumentZeile, type VeranstaltungZeile, type OeffentlichAbhaengigkeiten, type OeffentlichSpeicher } from "../src/oeffentlich.js";
 import type { Speicher } from "../src/handlers.js";
 
 const d = (iso: string) => new Date(iso);
@@ -13,6 +13,7 @@ const ID4 = "44444444-4444-4444-8444-444444444444";
 let akzent: string | undefined;
 let logo: string | null;
 let dokumente: DokumentZeile[];
+let veranstaltungen: VeranstaltungZeile[];
 let geliefert: string[];
 let rechtstexte: { impressum: string; datenschutz: string };
 
@@ -34,6 +35,7 @@ const speicher = {
   sitzungen: async () => sitzungen,
   logoUrl: async () => logo,
   dokumente: async () => dokumente,
+  veranstaltungen: async () => veranstaltungen,
   rechtstexte: async () => rechtstexte,
   dateiVonDokument: async (id: string) => {
     geliefert.push(id);
@@ -50,6 +52,7 @@ beforeEach(() => {
   akzent = undefined;
   geliefert = [];
   dokumente = [];
+  veranstaltungen = [];
   rechtstexte = { impressum: "# Impressum\n\nMuster", datenschutz: "# Datenschutz\n\nText" };
 });
 
@@ -140,5 +143,31 @@ describe("rechtliches", () => {
   it("leere Texte bleiben leer (die Seite zeigt dann einen Hinweis)", async () => {
     rechtstexte = { impressum: "", datenschutz: "" };
     expect((await rechtliches(deps())).body).toMatchObject({ impressum: "", datenschutz: "" });
+  });
+});
+
+describe("oeffentlich: Veranstaltungen", () => {
+  const v = (extra: Partial<VeranstaltungZeile>): VeranstaltungZeile => ({
+    id: "v1", titel: "Bürgerforum", beginn: d("2026-11-05T17:00:00Z"), ort: "Stadthalle", link: "https://example.org/forum",
+    beschreibung: null, veroeffentlicht: true, ...extra,
+  });
+
+  it("zeigt nur veröffentlichte, kommende Termine mit sicherem Link, nach Beginn sortiert", async () => {
+    veranstaltungen = [
+      v({ id: "spaet", titel: "Später", beginn: d("2026-12-01T10:00:00Z") }),
+      v({ id: "frueh" }),
+      v({ id: "entwurf", veroeffentlicht: false }),
+      v({ id: "vorbei", beginn: d("2026-10-01T10:00:00Z") }),
+      v({ id: "js", link: "javascript:alert(1)" }),
+    ];
+    const r = await oeffentlich(deps());
+    const liste = (r.body as { veranstaltungen: { id: string; link: string }[] }).veranstaltungen;
+    expect(liste.map((x) => x.id)).toEqual(["frueh", "spaet"]);
+    expect(liste[0]?.link).toBe("https://example.org/forum");
+  });
+
+  it("liefert ohne Termine eine leere Liste", async () => {
+    const r = await oeffentlich(deps());
+    expect((r.body as { veranstaltungen: unknown[] }).veranstaltungen).toEqual([]);
   });
 });

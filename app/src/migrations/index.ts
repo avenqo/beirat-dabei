@@ -1,6 +1,7 @@
 import * as migration_20261103_045919_initial from './20261103_045919_initial';
 import * as migration_20261103_050601_ergaenzungen from './20261103_050601_ergaenzungen';
 import * as migration_20261104_172252_akzentfarbe from './20261104_172252_akzentfarbe';
+import * as migration_20261119_090000_veranstaltungen from './20261119_090000_veranstaltungen';
 
 export const migrations = [
   {
@@ -17,5 +18,10 @@ export const migrations = [
     up: migration_20261104_172252_akzentfarbe.up,
     down: migration_20261104_172252_akzentfarbe.down,
     name: '20261104_172252_akzentfarbe'
+  },
+  {
+    up: migration_20261119_090000_veranstaltungen.up,
+    down: migration_20261119_090000_veranstaltungen.down,
+    name: '20261119_090000_veranstaltungen'
   },
 ];

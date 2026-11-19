@@ -137,6 +137,8 @@ Unterlagen pflegst du in der Verwaltung unter Inhalt → **Dokumente**:
 | Datei | die Datei hochladen (PDF empfohlen; auch PNG, JPEG, Word und ODT) |
 | Veröffentlicht | **nur mit Haken** ist das Dokument öffentlich. Ohne Haken bleibt es ein Entwurf, den niemand ohne Zugang sieht. |
 
+Öffentlich interessante Termine (etwa Bürgerforen oder Veranstaltungen anderer) pflegst du unter Inhalt → **Veranstaltungen**: Titel, Beginn, Ort (optional), **Link zur Veranstaltung** (vollständige Adresse mit `https://`), Beschreibung (optional) und **Veröffentlicht**. Nur veröffentlichte, noch kommende Termine erscheinen auf der öffentlichen Seite im Abschnitt *Veranstaltungen*, sortiert nach Beginn. Vergangene Termine verschwinden von selbst.
+
 Prüfe vor dem Veröffentlichen, dass im Dokument nichts Internes steht (Namen, Mailadressen, Entwurfsvermerke). Wer die Adresse einer Datei kennt, kann sie abrufen, solange sie veröffentlicht ist. Entwürfe sind nicht abrufbar.
 
 ### Impressum und Datenschutzerklärung
